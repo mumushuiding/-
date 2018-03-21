@@ -17,6 +17,6 @@
         http://mybatis.org/schema/mybatis-spring
         http://mybatis.org/schema/mybatis-spring.xsd
 	                    ">
-	<!-- 会将目标包里的所有接口当作mapper配置，之后可以自动引入mapper类 -->
+	<!-- 会将目标包里的所有接口当作mapper配置，之后可以自动引入mapper类==== -->
 	<mybatis:scan base-package="com.crm.mapper"/>
 </beans>
