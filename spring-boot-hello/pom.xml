@@ -32,15 +32,18 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
-        <!--<version></version>由于我们在上面指定了 parent(spring boot)-->
+        <exclusions>
+	      <exclusion>
+	         <groupId>org.springframework.boot</groupId>
+	         <artifactId>spring-boot-starter-logging</artifactId>
+	      </exclusion>
+        </exclusions>
      </dependency>
-        
-      <!-- 添加fastjson 依赖包. -->
-      <dependency>
-          <groupId>com.alibaba</groupId>
-          <artifactId>fastjson</artifactId>
-          <version>1.2.15</version>
-      </dependency>
+   <dependency>
+	   <groupId>com.google.code.gson</groupId>
+	   <artifactId>gson</artifactId>
+	   <version>2.8.2</version>
+    </dependency>     
       
       <!-- spring boot devtools 依赖包. -->
       <dependency>
@@ -57,19 +60,67 @@
       <version>1.2.4.RELEASE</version>
    </dependency>
 
-
-   <!-- 添加MySQL数据库驱动依赖包. -->
+<!-- =============================数据库相关============================== -->
+    <!-- 添加MySQL数据库驱动依赖包. -->
     <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
     </dependency>
-    
-    <!-- 添加Spring-data-jpa依赖. -->
+    <!-- 添加Mybatis框架jar包 -->
+    <dependency>
+	    <groupId>org.mybatis</groupId>
+	    <artifactId>mybatis</artifactId>
+	    <version>3.4.6</version>
+    </dependency>
+    <!-- 添加Mybatis整合spring中间件-->
+    <dependency>
+	   <groupId>org.mybatis</groupId>
+	   <artifactId>mybatis-spring</artifactId>
+       <version>1.3.2</version>
+   </dependency>
+   <dependency>
+	   <groupId>org.mybatis.spring.boot</groupId>
+	   <artifactId>mybatis-spring-boot-starter</artifactId>
+	   <version>1.1.1</version>
+   </dependency>
+   <dependency>
+	    <groupId>com.alibaba</groupId>
+	    <artifactId>druid</artifactId>
+	    <version>1.1.9</version>
+   </dependency>
+
+<!-- =============================数据库相关============================== -->
+<!-- =============================日志相关=============================== -->
+	<!-- log4j日志 -->
+	<dependency>
+	    <groupId>commons-logging</groupId>
+	    <artifactId>commons-logging</artifactId>
+	    <version>1.2</version>
+    </dependency>
+<!-- =============================日志相关=============================== -->
+    <!-- 添加Spring-data-jpa依赖.
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
+    </dependency> -->
+    <!-- spring boot tomcat jsp 支持开启 -->  
+     <dependency>  
+            <groupId>org.apache.tomcat.embed</groupId>  
+            <artifactId>tomcat-embed-jasper</artifactId>  
+      
+      
+      </dependency>  
+        <!-- servlet支持开启 -->  
+      <dependency>  
+            <groupId>javax.servlet</groupId>  
+            <artifactId>javax.servlet-api</artifactId>  
+      </dependency>  
+        <!-- jstl 支持开启 -->  
+      <dependency>  
+            <groupId>javax.servlet</groupId>  
+            <artifactId>jstl</artifactId>  
+      </dependency> 
+      <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
