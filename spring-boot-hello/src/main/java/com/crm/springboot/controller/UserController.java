@@ -20,9 +20,9 @@ public class UserController {
 	
 	@RequestMapping("/getUserById")
 	public User getUserById(Integer id){
-		System.out.println(userService.toString());
+		
 		User user=userService.getUserById(id);
-		System.out.println(user.toString());
+		
 		return user;
 	}
 }
