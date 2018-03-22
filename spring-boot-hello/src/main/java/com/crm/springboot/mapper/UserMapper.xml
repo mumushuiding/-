@@ -14,10 +14,10 @@
     <association property="dept" column="did" javaType="dept" select="selectDeptWithId"></association>
   </resultMap>
 
-  <insert id="saveUser" parameterType="user" useGeneratedKeys="true">
+  <insert id="save" parameterType="user" useGeneratedKeys="true">
     INSERT INTO USER(loginname,password,did,phone) VALUES(#{loginname},#{password},#{dept.id},#{phone})
   </insert>
-  <select id="selectUserById" parameterType="int" resultMap="userResultMap">
+  <select id="getById" parameterType="int" resultMap="userResultMap">
     SELECT * FROM USER WHERE ID=#{id}
   </select>
   <select id="findUserWithNameAndPass" parameterType="user" resultMap="userResultMap">
@@ -47,7 +47,7 @@
   <select id="selectAllUser" resultMap="userResultMap">
     SELECT * FROM USER
   </select>
-  <update id="updateUser" parameterType="user">
+  <update id="update" parameterType="user">
     update user
     <set>
       <if test="loginname!=null">loginname=#{loginname},</if>
@@ -56,7 +56,7 @@
     </set>
     where id=#{id}
   </update>
-  <delete id="deleteUserById" parameterType="int">
+  <delete id="deleteById" parameterType="int">
     delete from user where id=#{id}
   </delete>
 <!-- =================================部门============================ -->
