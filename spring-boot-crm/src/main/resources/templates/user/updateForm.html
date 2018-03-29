@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>用户更新</title>
+</head>
+<body>
+  <form action="#" method="post" th:action="@{../update}" th:object="${user}">
+    <table>
+      <tr>
+        <input type="hidden" name="id" id="id" th:value="*{id}"/>
+        <th>登陆名</th>
+        <td><input type="text" th:value="*{loginname}" th:field="*{loginname}"/></td>
+        <td><input type="submit" value="提交"/></td>
+      </tr>
+    </table>
+    
+  </form>
+</body>
+</html>
