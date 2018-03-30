@@ -153,7 +153,7 @@ public class UserController {
 		User user=userService.getById(id);
 		model.addAttribute("user",user);
 		
-		return "user/list";
+		return "user/resList";
 	}
 	
 	/**

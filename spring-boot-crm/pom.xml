@@ -117,8 +117,17 @@
 	    <artifactId>log4j-core</artifactId>
 	    <version>2.11.0</version>
 	</dependency>
-	
+
 <!-- =============================工作流引擎   ================================ -->
+	 <dependency>
+	   <groupId>org.activiti</groupId>
+	   <artifactId>activiti-spring-boot-starter-basic</artifactId>
+	   <version>6.0.0</version>
+	 </dependency>
+	 <dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
 
 <!-- =============================前端显示模板=============================== -->
 	<dependency>
