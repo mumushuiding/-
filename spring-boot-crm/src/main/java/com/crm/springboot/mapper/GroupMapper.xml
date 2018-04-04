@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- 指向UserMapper.xml文件 -->
+<mapper namespace="com.crm.springboot.mapper.GroupMapper">
+
+   <insert id="save" parameterType="group" keyProperty="groupid" useGeneratedKeys="true">
+   	insert into hrm.group (groupname,groupinfo,groupType,creatorid,creatorname,createddate) values (#{groupname},#{groupinfo},#{groupType},#{creatorid},#{creatorname},#{createdDate})
+   </insert>
+   
+</mapper>
