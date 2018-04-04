@@ -1,5 +1,6 @@
 package com.crm.springboot.service;
 
+import java.io.Serializable;
 
 public interface BaseService<T> {
 	/**
@@ -10,7 +11,7 @@ public interface BaseService<T> {
 	 * delete by id
 	 */
 	
-	public  <T> void deleteById(Integer id);
+	public  <T> void deleteById(Serializable id);
 	/**
 	 * update by entity
 	 */
@@ -19,6 +20,6 @@ public interface BaseService<T> {
 	 * select by id
 	 */
 	
-	public  <T> T getById(Integer id);
+	public  <T> T getById(Serializable id);
 
 }

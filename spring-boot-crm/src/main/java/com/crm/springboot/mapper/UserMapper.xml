@@ -14,11 +14,31 @@
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
     INSERT INTO USER(loginname,password,did,phone) VALUES(#{loginname},#{password},#{dept.id},#{phone})
   </insert>
-  <select id="getById" parameterType="int" resultMap="userResultMap">
+  <select id="getById" parameterType="string" resultMap="userResultMap">
     SELECT * FROM USER WHERE ID=#{id}
   </select>
   <select id="findUserWithNameAndPass" parameterType="user" resultMap="userResultMap">
     SELECT * FROM USER WHERE loginname=#{loginname} and password=#{password}
+  </select>
+  <select id="getBySomething" parameterType="user" resultMap="userResultMap">
+  	select * from user 
+  	<where>
+  		<if test="id!=null">
+  			id=#{id}
+  		</if>
+  		<if test="phone!=null">
+  			and phone=#{phone}
+  		</if>
+  		<if test="loginname!=null">
+  			and loginname=#{loginname}
+  		</if>
+  		<if test="password!=null">
+  			and password=#{password}
+  		</if>
+  		<if test="username!=null">
+  			and username=#{username}
+  		</if>
+  	</where>
   </select>
   <select id="selectUsersLike" parameterType="hashmap" resultMap="userResultMap">
     select * from user

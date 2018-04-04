@@ -18,4 +18,8 @@ public class WelcomController {
 	public String main(){
 		return "layout/center";
 	}
+	@RequestMapping(value="system")
+	public String system(){
+		return "system/system";
+	}
 }

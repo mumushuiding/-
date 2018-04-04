@@ -1,5 +1,8 @@
 package com.crm.springboot.service.impl;
 
+import java.io.Serializable;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	@CacheEvict(key="#id")
-	public void deleteById(Integer id) {
+	public void deleteById(Serializable id) {
 	
 		userMapper.deleteById(id);
 	}
@@ -46,18 +49,15 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	@Cacheable(key="#id")
-	public <T> T getById(Integer id) {
+	public <T> T getById(Serializable id) {
 		
 		return userMapper.getById(id);
 	}
 
 	@Override
-	public boolean checkLogin(User user) {
-		//登陆名登陆
+	public List<User> getBySomething(User user) {
 		
-		//手机号登陆
-		
-		return true;
+		return userMapper.getBySomething(user);
 	}
 
 

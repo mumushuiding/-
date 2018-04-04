@@ -11,11 +11,6 @@ import com.alibaba.druid.pool.DruidDataSource;
 
 @Configuration
 @MapperScan("com.crm.springboot.mapper")
-//@ImportResource(locations={"classpath:activiti-cfg.xml"})
 public class MyBatisConfig {
-//    @Bean  //会自动生成bean
-//    @ConfigurationProperties(prefix = "spring.datasource")  
-//    public DataSource dataSource() {  
-//        return new DruidDataSource();  
-//    } 
+
 }

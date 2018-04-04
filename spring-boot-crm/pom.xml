@@ -152,6 +152,14 @@
 	      <version>3.8.1</version>
 	      <scope>test</scope>
       </dependency>
+      <dependency>
+      	<groupId>org.springframework.boot</groupId>
+      	<artifactId>spring-boot-starter-jta-narayana</artifactId>
+      </dependency>
+      <dependency>
+      	<groupId>com.querydsl</groupId>
+      	<artifactId>querydsl-core</artifactId>
+      </dependency>
   </dependencies>
       <!-- 构建节点. -->
     <build>

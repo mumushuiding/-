@@ -35,11 +35,11 @@
 <!-- NAVBAR
 ================================================== -->
   <body>
-    <div class="navbar-wrapper">
-      <div class="container">
+    
+      
      
        
-        <nav class="navbar navbar-inverse navbar-fixed-top">
+        <nav class="navbar navbar-inverse">
           <div class="container">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -54,36 +54,21 @@
               <ul class="nav navbar-nav">
                 <li class="active"><a href="/main" target="mainFrame">主页</a></li>
                 <li><a href="#about">公告</a></li>
-                <li><a href="#contact">维护中心</a></li>
+                <li><a href="/system" target="mainFrame">维护中心</a></li>
                 <li><a href="/user/user" target="mainFrame">个人中心</a></li>
-
-                <li class="active" th:if="${1==2}"><a href="#">登出 </a></li>
-                <li class="active" th:if="${1==1}">
-                <div id="navbar" class="navbar-collapse collapse">
-               
-                  <form class="navbar-form navbar-right" action="#" method="post" th:action="@{/user/login}" th:object="${user}" target="mainFrame">
-                    <div class="form-group">
-                      <input type="text" placeholder="手机号" class="form-control" th:field="*{phone}"    maxlength="16"/>
-                    </div>
-                    <div class="form-group">
-                      <input type="password" placeholder="密码" class="form-control" th:field="*{password}"   maxlength="16"/>
-                    </div>
-                    <button type="submit" class="btn btn-success">登陆 </button>
-                    <a href="/user/registerForm"  class="btn btn-success" target="mainFrame">注册</a>
-                  </form>
-         
-                </div>
-                </li>
+                
+                <li class="active" th:if="${session.sysuser!=null}"><a href="user/logout">登出 </a></li>
+                <li class="active" th:if="${session.sysuser==null}"><a href="user/loginForm">登录 </a></li>
+             
               </ul>
             </div>
           </div>
         </nav>
 
-      </div>
-    </div>
+
     
      <div class="row">
-       <iframe src="main" width="100%" height="900" border="none" name="mainFrame"></iframe>
+       <iframe src="main" width="100%" height="900" frameborder="0" scrolling="auto" name="mainFrame"></iframe>
      </div> 
      
      

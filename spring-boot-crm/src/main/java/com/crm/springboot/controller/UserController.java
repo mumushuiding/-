@@ -1,9 +1,12 @@
 package com.crm.springboot.controller;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -17,11 +20,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.alibaba.druid.sql.visitor.functions.Locate;
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.User;
 import com.crm.springboot.service.UserService;
+
+import javassist.expr.NewArray;
 
 @Controller
 @RequestMapping(value="/user")
@@ -42,7 +48,7 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping(value="/{location}/{id}")
-	public String locate(@PathVariable String location,@PathVariable Integer id,Model model){
+	public String locate(@PathVariable String location,@PathVariable Serializable id,Model model){
 		User user=new User();
 		if(id!=null) user=userService.getById(id);
 		 model.addAttribute("user", user);
@@ -124,21 +130,34 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/login")
-	public String login(@ModelAttribute("user") User user,Model model,HttpServletRequest request){
+	public String login(@ModelAttribute("user") User user,Model model){
 		String msg="";
-		user.setPhone("1234");
-	    if(userService.checkLogin(user)){
+		User u = null;
+		if(userService.getBySomething(user).size()>0) u=userService.getBySomething(user).get(0);
+		
+	    if(u!=null){
 	    	msg="登录成功";
 	    	model.addAttribute("msg",msg);
-	    	request.setAttribute("msg",msg);
-	    	
+	    	model.addAttribute("sysuser", u);
 	    	return "redirect:/index";
 	    }else{
 	    	msg="帐号或者密码错误";
 	    	model.addAttribute("msg",msg);
 	    }
 	    
-		return "javascript:history.go(-1)";
+		return "user/loginForm";
+	}
+	/**
+	 * 登出
+	 * @return
+	 */
+	@RequestMapping("/logout")
+	public String logout(Model model,HttpSession session,SessionStatus sessionStatus){
+		session.invalidate();
+		sessionStatus.setComplete();
+		
+		
+		return "redirect:/index";
 	}
 //*****************************************增删改查***********************************************	
 	/**
@@ -148,7 +167,7 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/get/{id}")
-	public String get(@PathVariable("id") Integer id,Model model){
+	public String get(@PathVariable("id") Serializable id,Model model){
 		
 		User user=userService.getById(id);
 		model.addAttribute("user",user);
@@ -162,12 +181,16 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping(value="/save",method=RequestMethod.POST)
-	@ResponseBody
-	public User save(@ModelAttribute("user") User user,Model model){
-		
+	public String save(@ModelAttribute("user") User user,Model model){
+		String msg="";
+		if(userService.getBySomething(user).size()>0){
+			msg="用户已经存在";
+			model.addAttribute("msg", msg);
+			return "user/registerForm";
+		}
 		userService.save(user);
 
-		return user;
+		return "user/loginForm";
 	}
 	/**
 	 * 更新
