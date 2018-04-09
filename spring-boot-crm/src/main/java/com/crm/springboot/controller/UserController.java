@@ -51,6 +51,7 @@ public class UserController {
 	public String locate(@PathVariable String location,@PathVariable Serializable id,Model model){
 		User user=new User();
 		if(id!=null) user=userService.getById(id);
+		System.out.println("locate="+user.toString());
 		 model.addAttribute("user", user);
 		return "user/"+location;
 	}
@@ -201,7 +202,7 @@ public class UserController {
 	@ResponseBody
 	public User update(@ModelAttribute("user") User user){
 		
-		System.out.println("update:"+user.toString());
+		System.out.println("before:"+user.toString());
 		userService.update(user);
 		
 		return user;

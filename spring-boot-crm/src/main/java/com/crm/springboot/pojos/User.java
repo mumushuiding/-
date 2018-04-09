@@ -30,11 +30,21 @@ public class User implements Serializable{
 
 
 
+
+
+
+
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", loginname=" + loginname + ", password=" + password + ", username=" + username
-				+ ", sex=" + sex + ", dept=" + dept + ", birthday=" + birthday + ", phone=" + phone+ "]";
+				+ ", sex=" + sex + ", dept=" + dept + ", birthday=" + birthday + ", phone=" + phone + "]";
 	}
+
+
+
+
+
 
 
 

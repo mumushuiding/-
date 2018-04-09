@@ -1,6 +1,7 @@
 package com.crm.springboot.pojos;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,6 +15,7 @@ public class Group {
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date createdDate;
 	
+	private List<ActionGroup> actionGroups;
 	
 
 	@Override
@@ -65,6 +67,12 @@ public class Group {
 	}
 	public void setGroupType(String groupType) {
 		this.groupType = groupType;
+	}
+	public List<ActionGroup> getActionGroups() {
+		return actionGroups;
+	}
+	public void setActionGroups(List<ActionGroup> actionGroups) {
+		this.actionGroups = actionGroups;
 	}
 	
 	

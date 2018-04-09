@@ -8,4 +8,6 @@ public interface UserService extends BaseService<User> {
 	
 	
 	public List<User> getBySomething(User user);
+	
+	public List<User> selectAllUser();
 }

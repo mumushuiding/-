@@ -43,7 +43,9 @@ public class UserServiceImpl implements UserService{
 	@Override
 	@CachePut(key="#t.id")
 	public <T> T update(T t) {
+		
 		userMapper.update(t);
+		System.out.println(t.toString());
 		return t;
 	}
 
@@ -58,6 +60,12 @@ public class UserServiceImpl implements UserService{
 	public List<User> getBySomething(User user) {
 		
 		return userMapper.getBySomething(user);
+	}
+
+	@Override
+	public List<User> selectAllUser() {
+		
+		return userMapper.selectAllUser();
 	}
 
 

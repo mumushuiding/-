@@ -17,12 +17,15 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
 
+    <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="/css/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
+    
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
@@ -51,9 +54,39 @@
     
     <script src="/js/plugins/bootstrap-table.min.js"></script>
     
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
     
-    
-    <table id="mytab"></table>
+<div class="container">  
+    <div class="panel-heading">
+            查询条件
+     </div>
+     <div class="panel-body form-group" style="margin-bottom:0px;">
+        <label class="col-sm-1 control-label" style="text-align: right; margin-top:5px">姓名：</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" name="username" id="search_name"/>
+        </div>
+        <label class="col-sm-1 control-label" style="text-align: right; margin-top:5px">手机号：</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" name="phone" id="search_tel"/>
+        </div>
+        <div class="col-sm-1 col-sm-offset-4">
+            <button class="btn btn-primary" id="search_btn">查询</button>
+        </div>
+     </div>
+
+    <table id="mytab" class="table table-hover"></table>
+    <div id="toolbar" class="btn-group pull-right" style="margin-right: 20px;">
+        <button id="btn_power" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true" ></span>权限
+        </button>
+        <button id="btn_delete" type="button" class="btn btn-default" >
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+        </button>
+        <button id="btn_add" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+        </button>
+    </div>
+</div>
     <script>
     //根据窗口调整表格高度
     $(window).resize(function() {
@@ -65,7 +98,7 @@
     $('#mytab').bootstrapTable({
         method: 'post',
         contentType: "application/x-www-form-urlencoded",//必须要有！！！！
-        url:"../index.php/admin/index/userManagement",//要请求数据的文件路径
+        url:"/system/power/userInfo",//要请求数据的文件路径
         height:tableHeight(),//高度调整
         toolbar: '#toolbar',//指定工具栏
         striped: true, //是否显示行间隔色
@@ -82,7 +115,7 @@
         showRefresh:true,//刷新按钮
         showColumns:true,
         clickToSelect: true,//是否启用点击选中行
-        toolbarAlign:'right',工具栏对齐方式
+        toolbarAlign:'right',//工具栏对齐方式
         buttonsAlign:'right',//按钮对齐方式
         toolbar:'#toolbar',//指定工作栏
         columns:[
@@ -91,37 +124,27 @@
                 field:'select',
                 //复选框
                 checkbox:true,
-                width:25,
                 align:'center',
                 valign:'middle'
             },
             {
                 title:'ID',
-                field:'ID',
-                visible:false
+                field:'id',
+                visible:true
             },
             {
                 title:'登录名',
-                field:'LoginName',
+                field:'loginname',
                 sortable:true
             },
             {
                 title:'姓名',
-                field:'Name',
+                field:'username',
                 sortable:true
             },
             {
                 title:'手机号',
-                field:'Tel',
-            },
-            {
-                title:'邮箱',
-                field:'Email'
-            },
-            {
-                title:'注册日期',
-                field:'CreateTime',
-                sortable:true
+                field:'phone',
             },
             {
                 title:'状态',
@@ -134,6 +157,7 @@
         locale:'zh-CN',//中文支持,
         responseHandler:function(res){
             //在ajax获取到数据，渲染表格之前，修改数据源
+            //alert(JSON.stringify(res));
             return res;
         }
     })
@@ -144,7 +168,7 @@
         }else if(value==1){
             return '<i class="fa fa-unlock" style="color:green"></i>'
         }else{
-            return '数据错误'
+            return '数据错误' 
         }
     }
 
@@ -161,13 +185,28 @@
     }
      //查询按钮事件
     $('#search_btn').click(function(){
-        $('#mytab').bootstrapTable('refresh', {url: '../index.php/admin/index/userManagement'});
+        $('#mytab').bootstrapTable('refresh', {url: '/system/power/userInfo'});
     })
     //tableHeight函数
     function tableHeight(){
         //可以根据自己页面情况进行调整
         return $(window).height() -280;
     }
+    
+        //增加按钮事件
+    $('#btn_delete').click(function(){
+       
+		var dataArr=$('#mytab').bootstrapTable('getSelections');
+		
+		
+		for(x in dataArr) alert(dataArr[x].id);
+    })
+    
+    //查看权限
+    $('#btn_power').click(function(){
+    	var dataArr=$('#mytab').bootstrapTable('getSelections');
+    	alert(dataArr[0].id);
+    });
     </script>
     
     

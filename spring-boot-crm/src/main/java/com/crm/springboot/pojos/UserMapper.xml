@@ -68,7 +68,6 @@
     update user
     <set>
       <if test="loginname!=null">loginname=#{loginname},</if>
-      <if test="username!=null">username=#{username},</if>
       <if test="password!=null">password=#{password},</if>
       <if test="phone!=null">phone=#{phone}</if>
     </set>
