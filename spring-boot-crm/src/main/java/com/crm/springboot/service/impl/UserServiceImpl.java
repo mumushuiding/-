@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.User;
+import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.UserService;
 /**
  * User服务接口实现类
@@ -19,38 +20,41 @@ import com.crm.springboot.service.UserService;
  * @author Administrator
  *
  */
-@CacheConfig(cacheNames="user")
+//@CacheConfig(cacheNames="user")
 @Service("userService")
 public class UserServiceImpl implements UserService{
 	
     @Autowired
     private UserMapper userMapper;
+    
+    @Autowired
+    private ActivitiService activitiService;
 
-	@Override
-	@CachePut(key="#t.id")
+//	@Override
+//	@CachePut(key="#t.id")
 	public <T> T save(T t) {
+		User user=(User) t;
 		userMapper.save(t);
+		activitiService.saveUser(user.getId());
 		return t;
 	}
 
-	@Override
-	@CacheEvict(key="#id")
+//	@Override
+//	@CacheEvict(key="#id")
 	public void deleteById(Serializable id) {
 	
 		userMapper.deleteById(id);
 	}
 
-	@Override
-	@CachePut(key="#t.id")
+//	@Override
+//	@CachePut(key="#t.id")
 	public <T> T update(T t) {
-		
 		userMapper.update(t);
-		System.out.println(t.toString());
 		return t;
 	}
 
-	@Override
-	@Cacheable(key="#id")
+//	@Override
+//	@Cacheable(key="#id")
 	public <T> T getById(Serializable id) {
 		
 		return userMapper.getById(id);

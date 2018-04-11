@@ -12,7 +12,7 @@
   </resultMap>
 
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
-    INSERT INTO USER(loginname,password,did,phone) VALUES(#{loginname},#{password},#{dept.id},#{phone})
+    INSERT INTO USER(loginname,password,did,phone,username) VALUES(#{loginname},#{password},#{dept.id},#{phone},#{username})
   </insert>
   <select id="getById" parameterType="string" resultMap="userResultMap">
     SELECT * FROM USER WHERE ID=#{id}
@@ -65,14 +65,14 @@
     SELECT * FROM USER
   </select>
   <update id="update" parameterType="user">
-    update user
-    <set>
-      <if test="loginname!=null">loginname=#{loginname},</if>
-      <if test="username!=null">username=#{username},</if>
-      <if test="password!=null">password=#{password},</if>
-      <if test="phone!=null">phone=#{phone}</if>
-    </set>
-    where id=#{id}
+    update user set 
+                  loginname=#{loginname},
+                  password=#{password},
+                  username=#{username}, 
+                  sex=#{sex},
+                  did=#{dept.did},
+                  birthday=#{birthday},
+                  phone=#{phone} where id=#{id}
   </update>
   <delete id="deleteById" parameterType="int">
     delete from user where id=#{id}

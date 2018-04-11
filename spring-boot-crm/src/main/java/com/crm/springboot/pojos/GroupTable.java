@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class Group {
+public class GroupTable {
 	private int groupid;
 	private String groupname;
 	private String groupType;
@@ -17,10 +17,11 @@ public class Group {
 	
 	private List<ActionGroup> actionGroups;
 	
-
+	private String ids;//做为接收页面传递多个Id值的容器，没有其它作用
+	
 	@Override
 	public String toString() {
-		return "Group [groupid=" + groupid + ", groupname=" + groupname + ", groupType=" + groupType + ", groupinfo="
+		return "GroupTable [groupid=" + groupid + ", groupname=" + groupname + ", groupType=" + groupType + ", groupinfo="
 				+ groupinfo + ", creatorid=" + creatorid + ", creatorname=" + creatorname + ", createdDate="
 				+ createdDate + "]";
 	}
@@ -73,6 +74,12 @@ public class Group {
 	}
 	public void setActionGroups(List<ActionGroup> actionGroups) {
 		this.actionGroups = actionGroups;
+	}
+	public String getIds() {
+		return ids;
+	}
+	public void setIds(String ids) {
+		this.ids = ids;
 	}
 	
 	

@@ -41,7 +41,7 @@
         <h1 class="text-center text-primary">登录</h1>
       </div>
       <div class="modal-body">
-         <form action="#" method="post" th:action="@{./login}" th:object="${user}">
+         <form action="#" method="post" th:action="@{/user/login}" th:object="${user}">
           <div class="form-group">
             <input type="text" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"    maxlength="16"/>
           </div>

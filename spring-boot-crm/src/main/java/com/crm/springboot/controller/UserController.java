@@ -9,12 +9,14 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import com.alibaba.druid.sql.visitor.functions.Locate;
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.User;
+import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.UserService;
 
 import javassist.expr.NewArray;
@@ -39,7 +42,18 @@ public class UserController {
 	@Qualifier("userService")
 	private UserService userService;
 	
-
+	@Autowired
+	private ActivitiService activitiService;
+	
+	@RequestMapping(value="/{location}")
+	public String locate(@PathVariable String location,Model model,HttpSession session,HttpServletRequest request){
+		model.addAttribute("user", new User());
+		if("loginForm".equals(location)){
+			
+			session.setAttribute("referer", request.getHeader("referer"));
+		}
+		return "user/"+location;
+	}
 	/**
 	 * 根据浏览器输入的location值，进行跳转
 	 * @param location
@@ -50,17 +64,13 @@ public class UserController {
 	@RequestMapping(value="/{location}/{id}")
 	public String locate(@PathVariable String location,@PathVariable Serializable id,Model model){
 		User user=new User();
-		if(id!=null) user=userService.getById(id);
-		System.out.println("locate="+user.toString());
-		 model.addAttribute("user", user);
-		return "user/"+location;
-	}
-	@RequestMapping(value="/{location}")
-	public String locate(@PathVariable String location,Model model){
-		User user=new User();
+		if("updateForm".equals(location)){
+			if(id!=null) user=userService.getById(id);
+		}
 		model.addAttribute("user", user);
 		return "user/"+location;
 	}
+
 //***************************************************用户考核 *****************************************
 	/**
 	 * 个人中心
@@ -131,7 +141,10 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/login")
-	public String login(@ModelAttribute("user") User user,Model model){
+	public String login(@ModelAttribute("user") User user,Model model,HttpSession session){
+		
+		String referer=(String) session.getAttribute("referer");
+		
 		String msg="";
 		User u = null;
 		if(userService.getBySomething(user).size()>0) u=userService.getBySomething(user).get(0);
@@ -140,7 +153,7 @@ public class UserController {
 	    	msg="登录成功";
 	    	model.addAttribute("msg",msg);
 	    	model.addAttribute("sysuser", u);
-	    	return "redirect:/index";
+	    	return "redirect:"+referer;
 	    }else{
 	    	msg="帐号或者密码错误";
 	    	model.addAttribute("msg",msg);
@@ -199,20 +212,23 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/update")
-	@ResponseBody
-	public User update(@ModelAttribute("user") User user){
+	public String update(@ModelAttribute("user") User user,HttpServletRequest request){
 		
-		System.out.println("before:"+user.toString());
+		String referer = request.getHeader("Referer");
+		System.out.println(referer);
 		userService.update(user);
-		
-		return user;
+		  
+		 
+		return "redirect:/system/power/userList";
 	}
 	/**
 	 * 删除
 	 * @param id
 	 */
 	@RequestMapping("/delete/{id}")
-	public void delete(@PathVariable("id") Integer id){
+	public String delete(@PathVariable("id") Integer id){
 		userService.deleteById(id);
+		activitiService.deleteUser(id);
+		return "redirect:/system/power/userList";
 	}
 }

@@ -7,18 +7,21 @@ import java.util.List;
 
 
 public class Dept implements Serializable{
-	private Integer id;
+	private Integer did;
 	private String name;
 	@Override
 	public String toString() {
-		return "Dept [id=" + id + ", name=" + name;
+		return "Dept [did=" + did + ", name=" + name;
 	}
-	public Integer getId() {
-		return id;
+
+	public Integer getDid() {
+		return did;
 	}
-	public void setId(Integer id) {
-		this.id = id;
+
+	public void setDid(Integer did) {
+		this.did = did;
 	}
+
 	public String getName() {
 		return name;
 	}
