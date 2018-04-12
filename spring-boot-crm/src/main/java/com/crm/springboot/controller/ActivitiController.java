@@ -1,12 +1,19 @@
 package com.crm.springboot.controller;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +28,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
+
 
 @Controller
 @RequestMapping(value="/system/activiti")
@@ -84,5 +92,30 @@ public class ActivitiController {
 		System.out.println(JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(pList), activitiService.processDefinitionCount(), pageIndex, pageSize));
 		return JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(pList), activitiService.processDefinitionCount(), pageIndex, pageSize);
 	}
-	
+	@RequestMapping("/viewProcessImage")
+	public void viewProcessImage(HttpServletResponse response,HttpServletRequest request){
+		    String param=request.getParameter("param");
+		    String[] params=param.split(",");
+		
+		    
+            ServletOutputStream out = null;
+			try {
+				out = response.getOutputStream();
+				activitiService.viewProcessImage(params[0], params[1],out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally{
+					try {
+						if(out!=null) out.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			}	
+	}
+	//启动流程
+	@RequestMapping("/startProcess/{processDefinitionKey}")
+	public String startProcess(@PathVariable String processDefinitionKey){
+		
+		return ;
+	}
 }

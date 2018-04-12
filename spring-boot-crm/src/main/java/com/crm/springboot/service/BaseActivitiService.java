@@ -1,5 +1,7 @@
 package com.crm.springboot.service;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -42,13 +44,15 @@ public interface BaseActivitiService {
 	 */
     long processDefinitionCount();
 	List<ProcessDefinition> selectAllProcessDefinition(int pageIndex,int pageSize);
+	void viewProcessImage(Serializable deploymentId,String resourceName,OutputStream out);
+
 	
 	/**
 	 * 启动流程
 	 * @param processId
 	 * @param bizKey
 	 */
-	void startProcess(String processDefinitionKey, String businessKey);
+	ProcessInstance startProcess(String processDefinitionKey);
 	/**
 	 * 根据审批人id查询需要审批的任务
 	 * @param userId

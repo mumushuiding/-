@@ -1,9 +1,17 @@
 package com.crm.springboot.service.impl;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
@@ -14,11 +22,13 @@ import org.activiti.engine.identity.User;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.apache.logging.log4j.core.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.crm.springboot.pojos.GroupTable;
 import com.crm.springboot.service.ActivitiService;
+import com.crm.springboot.utils.FileUtils;
 @Service
 public class ActivitiServiceImpl implements ActivitiService{
 	@Autowired
@@ -29,12 +39,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 	private IdentityService identityService;
 	@Autowired
 	private RepositoryService repositoryService;
-	@Override
-	public void startProcess(String processDefinitionKey, String businessKey) {
-		System.out.println("开始流程："+processDefinitionKey+","+businessKey);
-		runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey);
-		
-	}
+
 
 	@Override
 	public List<Task> findTaskByUserId(String userIdForCandidateAndAssignee) {
@@ -148,6 +153,43 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
 		return repositoryService.createProcessDefinitionQuery().count();
 	}
+
+	@Override
+	public void viewProcessImage(Serializable deploymentId,String resourceName,OutputStream out) {
+		
+		InputStream in = null;
+		try {
+			in=repositoryService.getResourceAsStream(String.valueOf(deploymentId), resourceName);
+			byte[] b=new byte[1024];
+			for(int len=-1;(len=in.read(b))!=-1;){
+				out.write(b, 0, len);
+			}
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}finally{
+			try {
+				out.close();
+				in.close();
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
+		}
+	   
+	}
+
+	@Override
+	public ProcessInstance startProcess(String processDefinitionKey) {
+		
+		ProcessDefinition pd=repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).singleResult();
+		ProcessInstance pi=runtimeService.startProcessInstanceByKey(pd.getKey());
+		return pi;
+	}
+
+
 
 
 

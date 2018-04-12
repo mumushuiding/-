@@ -49,7 +49,7 @@ public class LeaveInfoServiceImpl implements LeaveInfoService{
 		String id=UUID.randomUUID().toString();
 		leaveInfo.setId(id);
 		leaveInfoMapper.save(leaveInfo);
-		activitiService.startProcess("leaveProcess", id);
+		//activitiService.startProcess("leaveProcess", id);
 		
 	}
 
