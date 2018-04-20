@@ -15,6 +15,7 @@ public class User implements Serializable{
 	private String username;
 	private Integer sex;
     private Dept dept;
+    private String email;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date birthday;
@@ -39,6 +40,32 @@ public class User implements Serializable{
 	public String toString() {
 		return "User [id=" + id + ", loginname=" + loginname + ", password=" + password + ", username=" + username
 				+ ", sex=" + sex + ", dept=" + dept + ", birthday=" + birthday + ", phone=" + phone + "]";
+	}
+
+
+
+
+
+
+
+
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+
+
+
+
+
+
+
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 

@@ -8,7 +8,6 @@ import java.util.Map;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.InitializingBean;
@@ -22,6 +21,15 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.crm.springboot.mapper.SysPowerMapper;
+import com.crm.springboot.mapper.UserMapper;
+import com.crm.springboot.pojos.GroupManager;
+import com.crm.springboot.pojos.GroupTable;
+import com.crm.springboot.pojos.User;
+import com.crm.springboot.service.ActivitiService;
+import com.crm.springboot.service.SysPowerService;
+import com.crm.springboot.service.UserService;
 
 
 /**
@@ -47,28 +55,58 @@ public class Application {
 	}
 
 
-	//以下为测试用
-//	 @Bean
-//	    InitializingBean usersAndGroupsInitializer() {
-//	        return new InitializingBean() {
-//	            @Autowired
-//	            private RuntimeService runtimeService;
-//	            @Autowired
-//	            IdentityService identityService;
-//	            public void afterPropertiesSet() throws Exception {
-//	                Group group = identityService.newGroup("user7");
-//	                group.setName("users");
-//	                group.setType("security-role");
-//	                identityService.saveGroup(group);
-//	                User admin = identityService.newUser("kl7");
-//	                admin.setPassword("kl2");
-//	                identityService.saveUser(admin);
-//	                Map<String, Object> variables = new HashMap<String, Object>();
-//	                variables.put("kl","ckl");
-//	                
-//	                ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("hireProcessWithJpa", variables);
-//	            }
-//	        };
-//	    }
+	//以下为测试用,启动application会运行一次
+	 @Bean
+	   InitializingBean deploymentInitializer(){
+		return new InitializingBean() {
+			@Autowired
+			private ActivitiService activitiService;
+			@Override
+			public void afterPropertiesSet() throws Exception {
+				
+				activitiService.deleteLowerVersionProcessDefinitions();
+				
+			}
+		};
+		 
+	 }
+//	
+	 @Bean
+	    InitializingBean usersAndGroupsInitializer() {
+	        return new InitializingBean() {
+	            @Autowired
+	            private SysPowerService sysPowerService;
+	            @Autowired
+	            private UserService userService;
+	            @Autowired
+	            
+	            private ActivitiService activitiService;
+	            public void afterPropertiesSet() throws Exception {
+	            	
+	            	//用户自己的表格同activiti表格内容同步
+	                List<User> users=userService.selectAllUser();
+	                List<GroupTable> groupTables=sysPowerService.selectAllGroups();
+	                List<GroupManager> groupManagers=sysPowerService.selectAllGroupManagers();
+	                //同步表格user同act_id_user内容 
+	                for(User u:users){
+	                	org.activiti.engine.identity.User au=activitiService.selectUser(String.valueOf(u.getId()));
+	                	if(au==null){
+	                		activitiService.saveUser(String.valueOf(u.getId()));
+	                	}
+	                }
+	                //同步用户组
+	                for(GroupTable groupTable:groupTables){
+	                	Group group=activitiService.selectGroupById(groupTable.getGroupid());
+	                	if(group==null){
+	                		activitiService.saveGroup(groupTable);
+	                	}
+	                }
+	                //同步act_id_membership和groupmanager表格的内容
+	                for(GroupManager gm:groupManagers){
+	                	activitiService.asnyMembership(gm);
+	                }
+	            }
+	        };
+	    }
 
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
   <!-- 指向UserMapper.xml文件 -->
 <mapper namespace="com.crm.springboot.mapper.UserMapper">
   <resultMap type="user" id="userResultMap">
@@ -8,11 +9,12 @@
     <result property="loginname" column="loginname"/>
     <result property="password"  column="password"/>
     <result property="phone" column="phone"/>
+    <result property="email" column="email"/>
     <association property="dept" column="did" javaType="dept" select="selectDeptWithId"></association>
   </resultMap>
 
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
-    INSERT INTO USER(loginname,password,did,phone,username) VALUES(#{loginname},#{password},#{dept.id},#{phone},#{username})
+    INSERT INTO USER(loginname,password,did,phone,username,email) VALUES(#{loginname},#{password},#{dept.id},#{phone},#{username},#{email})
   </insert>
   <select id="getById" parameterType="string" resultMap="userResultMap">
     SELECT * FROM USER WHERE ID=#{id}

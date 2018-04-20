@@ -1,12 +1,20 @@
 package com.crm.springboot.controller;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.activiti.engine.task.Comment;
+import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpRequest;
@@ -26,11 +34,17 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import com.alibaba.druid.sql.visitor.functions.Locate;
 import com.crm.springboot.mapper.UserMapper;
+import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.User;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.UserService;
+import com.crm.springboot.utils.DateUtil;
+import com.crm.springboot.utils.JsonUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 
 import javassist.expr.NewArray;
+
 
 @Controller
 @RequestMapping(value="/user")
@@ -45,6 +59,8 @@ public class UserController {
 	@Autowired
 	private ActivitiService activitiService;
 	
+	
+	
 	@RequestMapping(value="/{location}")
 	public String locate(@PathVariable String location,Model model,HttpSession session,HttpServletRequest request){
 		model.addAttribute("user", new User());
@@ -52,6 +68,11 @@ public class UserController {
 			
 			session.setAttribute("referer", request.getHeader("referer"));
 		}
+		//用户申请的任务列表
+		if("applyList".equals(location)){
+			return "user/activiti/"+location;
+		}
+
 		return "user/"+location;
 	}
 	/**
@@ -61,17 +82,22 @@ public class UserController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value="/{location}/{id}")
-	public String locate(@PathVariable String location,@PathVariable Serializable id,Model model){
-		User user=new User();
+	@RequestMapping(value="/{location}/{parameter}")
+	public String locate(@PathVariable String location,@PathVariable Serializable parameter,Model model){
+		
 		if("updateForm".equals(location)){
-			if(id!=null) user=userService.getById(id);
+			User user=new User();
+			if(parameter!=null) user=userService.getById(parameter);
+			model.addAttribute("user", user);
 		}
-		model.addAttribute("user", user);
+
 		return "user/"+location;
 	}
+	
 
-//***************************************************用户考核 *****************************************
+/**
+ * **********************************************流程************************************************
+ */
 	/**
 	 * 个人中心
 	 * @return
@@ -88,50 +114,8 @@ public class UserController {
 	public String ini(){
 		return "user/ini";
 	}
-	/**
-	 * 个人责任清单
-	 * @return
-	 */
-	@RequestMapping(value="/res/{res}")
-	public String restList(@PathVariable String res,Model model){
-		String msg="";
-		String data="[{\"name\":\"督查组点评\",\"url\":\"/user/res/"+res+"/Overseer\"},"
-				   + "{\"name\":\"领导点评\",\"url\":\"/user/res/"+res+"/leaderForm\"},"
-				   + "{\"name\":\"已经点评\",\"url\":\"/user/res/"+res+"/evaluatedList\"}]";
-		
-		if("resList".equals(res)){
-		
-			msg="责任清单";
-			model.addAttribute("msg", msg);
-			
-			
-		}
-		
-		if("month".equals(res)){
-			msg="月度考核";
-			model.addAttribute("msg", msg);
-			model.addAttribute("data", data);
-		}
-		data="[{\"name\":\"领导点评\",\"url\":\"/user/res/"+res+"/leaderForm\"},"
-				   + "{\"name\":\"群众点评\",\"url\":\"/user/res/"+res+"/publicForm\"},"
-				   + "{\"name\":\"组织点评\",\"url\":\"/user/res/"+res+"/orgForm\"},"
-				   + "{\"name\":\"已经点评\",\"url\":\"/user/res/"+res+"/evaluatedList\"}]";
-		if("halfYear".equals(res)){
-			msg="半年考核";
-			model.addAttribute("msg", msg);
-			model.addAttribute("data", data);
-		}
-		if("fullYear".equals(res)){
-			msg="年度考核";
-			model.addAttribute("msg", msg);
-			model.addAttribute("data", data);
-		}
-		return "user/resList";
-	}
-	@RequestMapping(value="/res/{res}/{role}")
-	public String assessForm(@PathVariable String res,@PathVariable String role){
-		return "user/assessForm";
-	}
+
+	
 //************************************************登录验证************************************************
 	/**
 	 * 登录
@@ -212,12 +196,13 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/update")
-	public String update(@ModelAttribute("user") User user,HttpServletRequest request){
+	public String update(@ModelAttribute("user") User user,HttpServletRequest request,HttpSession session){
 		
 		String referer = request.getHeader("Referer");
-		System.out.println(referer);
+		
 		userService.update(user);
-		  
+		
+		session.setAttribute("sysuser", userService.getById(user.getId()));
 		 
 		return "redirect:/system/power/userList";
 	}

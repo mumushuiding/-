@@ -5,19 +5,22 @@ input{
 	width: 100%;
 	height: 100%;
 	border: none;
-	background: #F3FAFC;
+	/* background: #F3FAFC; */
 }
 textarea{
 	width: 100%;
 	height: 100%;
 	border: none;
-	background: #F3FAFC;
+	/* background: #F3FAFC; */
+}
+.writeV{
+	writing-mode: vertical-lr;
 }
 .row{
 	width:100%;
     border: 1px solid #ddd;
     border: 1px solid rgba(86,61,124,.2);
-    background: #F3FAFC;
+    /* background: #F3FAFC; */
     align-items: center;
 }
 [class*="FlexItem-"] {
@@ -62,7 +65,7 @@ textarea{
 	align-items:center;
 	min-height: 500px;
 }
-/*×ÝÏò*/
+/*ï¿½ï¿½ï¿½ï¿½*/
 .FlexItem-vd-1{
 	height: 5%;
 }
@@ -71,6 +74,12 @@ textarea{
 }
 .FlexItem-vd-3{
 	height: 15%;
+}
+.FlexItem-vd-6{
+	height: 30%;
+}
+.FlexItem-vd-7{
+	height: 35%;
 }
 .FlexItem-vd-11{
 	height: 55%;
@@ -85,7 +94,7 @@ textarea{
 .FlexItem-vd-17{
 	height: 85%;
 }
-/*ºáÏò*/
+/*ï¿½ï¿½ï¿½ï¿½*/
 .FlexItem-md-1{
 	width: 4%;
 
@@ -104,8 +113,14 @@ textarea{
 .FlexItem-md-6{
 	width: 24%;
 }
+.FlexItem-md-7{
+	width: 28%;
+}
 .FlexItem-md-8{
 	width: 32%;
+}
+.FlexItem-md-9{
+	width: 36%;
 }
 .FlexItem-md-10{
 	width: 40%;
