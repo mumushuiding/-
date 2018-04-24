@@ -28,12 +28,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.crm.springboot.pojos.CommentVO;
 import com.crm.springboot.pojos.FormField;
+import com.crm.springboot.pojos.ProcessType;
 import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.User;
 import com.crm.springboot.pojos.Vacation;
+import com.crm.springboot.pojos.assess.Evaluation;
+import com.crm.springboot.pojos.assess.Project;
+import com.crm.springboot.pojos.assess.Responsibility;
 import com.crm.springboot.service.ActivitiService;
+import com.crm.springboot.service.ResponsibilityService;
 import com.crm.springboot.service.VacationService;
 import com.crm.springboot.service.impl.VacationServiceImpl;
 import com.crm.springboot.utils.DateUtil;
@@ -51,6 +57,10 @@ import javassist.expr.NewArray;
 @RequestMapping(value="/system/activiti")
 public class ActivitiController {
 	
+	
+	
+	@Autowired
+	private ResponsibilityService responsibilityService;
 	@Autowired
 	private ActivitiService activitiService;
 	@Autowired 
@@ -189,26 +199,103 @@ public class ActivitiController {
 /**
  * *****************************流程******************************************
  */
+		
+	 
 		//启动流程
-		/**
-		 * params[0]对应processDefinitonKey,params[1]对应deploymentId
-		 * @param model
-		 * @param request
-		 * @return
-		 */
-		@RequestMapping("/toStart")
-		public String toStart(Model model,HttpServletRequest request){
-
-			String[] params=request.getParameter("param").split(",");
-			if("Vacation".equals(params[0])){
-				Vacation vacation=new Vacation();
-				vacation.setDeploymentId(params[1]);
-	            vacation.setBusinessKey(params[0]);
-				model.addAttribute("vacation",vacation);
+        @RequestMapping("/preStart/{processType}/{taskType}")
+        public String preStart(Model model,@PathVariable String processType,@PathVariable String taskType,HttpSession session){
+        	
+			
+			if("ResponsibilityProcess".equals(processType)){
+				
+				if("monthForm".equals(taskType)){
+					Evaluation evaluation=new Evaluation();
+					
+					evaluation.setBusinessKey(processType);
+                    
+					
+					
+				    model.addAttribute("evaluation", evaluation);
+					
+					return "/system/activiti/"+processType+"/"+taskType;
+				}
 			}
-			return "/activiti/"+params[0]+"/start";
+			return null;
+        }
+		@RequestMapping("/toStartEvaluation/{taskType}")
+		public String toStartEvaluation(Model model,Evaluation evaluation,HttpSession session,@PathVariable String taskType){
+			User user=(User)session.getAttribute("sysuser");
+			if(user==null)return "redirect:/user/loginForm";
+			
+			
+			if (evaluation.getBusinessKey()==null) {
+				evaluation=(Evaluation) session.getAttribute("evaluation");
+			}
+			session.setAttribute("evaluation", evaluation);
+			Date createTime=new Date();
+			String deploymentId=activitiService.getDeploymentIdByBusinessKey(evaluation.getBusinessKey());
+			if("ResponsibilityProcess".equals(evaluation.getBusinessKey())){
+				
+				HashMap<String, Object> params = new HashMap<String,Object>();
+				params.put("userId",user.getId());
+				params.put("startDate",DateUtil.formatTimesTampDate(evaluation.getStartDate()));
+				params.put("endDate", DateUtil.formatTimesTampDate(evaluation.getEndDate()));
+				System.out.println("startDate="+params.get("startDate"));
+				System.out.println("endDate="+params.get("endDate"));
+				List<Project> projects=responsibilityService.selectAllProject(params);
+			    int totalMark =0;
+			    for(Project project:projects){
+			    	if(project.getMark()!=null){
+			    		totalMark+=Integer.valueOf(project.getMark().getMarkNumber());
+			    	}
+			    	
+			    }
+			    evaluation.setTotalMark(String.valueOf(totalMark));
+				if("startmonth".equals(taskType)){
+					evaluation.setCreateTime(createTime);
+					evaluation.setDeploymentId(deploymentId);
+					evaluation.setUser(user);
+					model.addAttribute("projects", projects);
+					model.addAttribute("evaluation", evaluation);
+				}
+			}
+			
+			return "/system/activiti/"+evaluation.getBusinessKey()+"/"+taskType;
 		}
-	
+	@RequestMapping("/startResponsibility")
+	public String startResponsibility(Responsibility responsibility,Model model,HttpSession session){
+		User user=(User)session.getAttribute("sysuser");
+		if(user==null)return "redirect:/user/loginForm";
+		//启动流程实例
+		System.out.println("BusinessKey="+responsibility.getBusinessKey());
+		ProcessInstance pInstance=activitiService.startProcess(responsibility.getBusinessKey(), responsibility.getDeploymentId());
+		//纪录流程实例数据
+		responsibility.setUser(user);
+		responsibility.setTitle(user.getUsername()+"-"+responsibility.getDescription()+"年责任清单");
+		responsibility.setBusinessType(ProcessType.RESPONSIBILITY_TYPE);
+		responsibility.setRequestedDate(DateUtil.formatTimesTampDate(new Date()));
+		responsibility.setProcessInstanceId(pInstance.getId());
+		if(user.getEmail()==null){
+			
+		}
+		responsibility.setEmailTo(user.getEmail());
+		
+		// 初始化任务参数
+		HashMap<String, Object> variables=new HashMap<String, Object>();
+		variables.put("arg",responsibility);
+		variables.put("html",responsibility.getTitle()+"  申请已经审批通过，请登录客户端查阅");
+		
+		//查询第一任务
+		Task fTask=this.activitiService.getFirstTask(pInstance.getId());
+		responsibility.setExecutionId(fTask.getExecutionId());
+		
+		//设置任务代理人
+		this.activitiService.setAssignee(fTask.getId(), String.valueOf(responsibility.getUser().getId()));
+		//完成 任务
+		this.activitiService.complete(fTask.getId(), variables);
+		return "/system/activiti/processInstanceList";
+		
+	}
 	@RequestMapping("/startVacation")
 	public String startVacation(Vacation vacation,Model model,HttpSession session){
 		User user=(User)session.getAttribute("sysuser");
@@ -224,7 +311,7 @@ public class ActivitiController {
 		vacation.setRequestedDate(DateUtil.formatTimesTampDate(new Date()));
 		vacation.setProcessInstanceId(pi.getId());
 		vacation.setEmailTo(user.getEmail());
-		vacation.setEmailFrom(user.getEmail());
+
 		
 		// 初始化任务参数
 		HashMap<String, Object> variables=new HashMap<String, Object>();

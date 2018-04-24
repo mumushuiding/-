@@ -20,5 +20,4 @@ import com.alibaba.druid.pool.DruidDataSource;
 @MapperScan("com.crm.springboot.mapper")
 public class MyBatisConfig {
 
-
 }

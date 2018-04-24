@@ -15,6 +15,7 @@ public class User implements Serializable{
 	private String username;
 	private Integer sex;
     private Dept dept;
+    private Post post;
     private String email;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @JsonFormat(pattern="yyyy-MM-dd")
@@ -28,6 +29,32 @@ public class User implements Serializable{
 	}
 	
 	
+
+
+
+
+
+
+
+
+	public Post getPost() {
+		return post;
+	}
+
+
+
+
+
+
+
+
+
+
+	public void setPost(Post post) {
+		this.post = post;
+	}
+
+
 
 
 

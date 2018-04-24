@@ -60,7 +60,8 @@ public interface BaseActivitiService {
 	void deleteDeploymentById(String id);
 	
 	Deployment getDeploymentById(String deploymentId);
-
+	
+	String getDeploymentIdByBusinessKey(String businessKey);
 	/**
 	 * ********************************流程实例**********************************
 	 */

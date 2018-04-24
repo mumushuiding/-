@@ -125,10 +125,12 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/login")
-	public String login(@ModelAttribute("user") User user,Model model,HttpSession session){
+	public String login(@ModelAttribute("user") User user,Model model,HttpSession session,HttpServletRequest request){
 		
 		String referer=(String) session.getAttribute("referer");
+
 		
+
 		String msg="";
 		User u = null;
 		if(userService.getBySomething(user).size()>0) u=userService.getBySomething(user).get(0);
@@ -137,6 +139,13 @@ public class UserController {
 	    	msg="登录成功";
 	    	model.addAttribute("msg",msg);
 	    	model.addAttribute("sysuser", u);
+	    	String servletPath=request.getServletPath();
+	    	System.out.println("servletPath="+servletPath);
+	    	System.out.println(referer.split("/")[referer.split("/").length-1]);
+			if("index".equals(referer.split("/")[referer.split("/").length-1])||"".equals(referer.split("/")[referer.split("/").length-1])){
+				
+				return "/user/ini";
+			}
 	    	return "redirect:"+referer;
 	    }else{
 	    	msg="帐号或者密码错误";

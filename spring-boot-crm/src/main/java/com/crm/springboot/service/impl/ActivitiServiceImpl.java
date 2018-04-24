@@ -576,6 +576,14 @@ public class ActivitiServiceImpl implements ActivitiService{
 		return repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 	}
 
+	@Override
+	public String getDeploymentIdByBusinessKey(String businessKey) {
+		
+		Deployment deployment=repositoryService.createDeploymentQuery().processDefinitionKey(businessKey).singleResult();
+		
+		return deployment.getId();
+	}
+
 
 
 
