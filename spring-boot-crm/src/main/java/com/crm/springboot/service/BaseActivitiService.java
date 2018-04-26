@@ -66,7 +66,8 @@ public interface BaseActivitiService {
 	 * ********************************流程实例**********************************
 	 */
 	void deleteProcessInstance(String processInstanceId,String deleteReason);
-	
+	ProcessInstance selectProcessInstance(String processInstanceId);
+	Object getVariableFromProcessInstance(String processInstanceId);
 	/**
 	 * ********************************任务存储与查询*************************************
 	 */

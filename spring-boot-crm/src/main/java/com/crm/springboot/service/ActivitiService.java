@@ -3,6 +3,7 @@ package com.crm.springboot.service;
 import java.io.Serializable;
 import java.util.List;
 
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
@@ -22,6 +23,7 @@ public interface ActivitiService extends BaseActivitiService{
 	
 	 //同步act_id_membership和groupmanager表格的内容
 	void asnyMembership(GroupManager groupManager);
+	
    /**
     * *********************************申请列表****************************************
     */
@@ -29,7 +31,7 @@ public interface ActivitiService extends BaseActivitiService{
 	long countUserApplyList(Serializable assignee);
 //	List<Task> getUserApplyList(Serializable assignee, Integer pageIndex, Integer pageSize);
 	// 读取请假申请
-	PageInfo listVacation(String userId, Integer pageIndex, Integer pageSize);
+
 	/**
 	 * ********************************流程实例查询*************************************
 	 */
@@ -37,9 +39,23 @@ public interface ActivitiService extends BaseActivitiService{
 	List<ProcessInstance> selectAllProcessInstances(Integer pageIndex, Integer pageSize);
 	PageInfo selectAllProcessInstancesPageInfo(Integer pageIndex, Integer pageSize);
 	List<ProcessVO> createProcessVOs(List<ProcessInstance> processInstances);
+	/**
+	 * ********************************历史流程实例查询*************************************
+	 */
+	long countAllHistoryProcessInstance();
+	List<HistoricProcessInstance> selectAllHistoryProcessInstances(Integer pageIndex, Integer pageSize);
+	PageInfo selectAllHistoryProcessInstancesPageInfo(Integer pageIndex, Integer pageSize);
+	List<ProcessVO> createHistoricProcessVOs(List<HistoricProcessInstance> historicProcessInstances);
+	/**
+	 * 
+	 * *********************************task****************
+	 */
+	Task selectTask(String processInstanceId,String taskDefinitionKey);
+	void setTaskCandidateGroup(String processInstanceId,String taskDefinitionKey,String delegateTaskName);
    /**
     * *********************************待办业务列表****************************************
     */
+	
 	long countAllTaskList();
 	List<Task> selectAllTask(Integer pageIndex, Integer pageSize);
 	PageInfo selectAllTaskPageInfo(Integer pageIndex, Integer pageSize);
@@ -58,6 +74,5 @@ public interface ActivitiService extends BaseActivitiService{
  	
  	//查询一个任务所在流程的全部评论
  	List<Comment> getComments(String taskId);
- 	//查询一个任务流程
- 	List<FormField> getFormFields(String taskId);
+
 }

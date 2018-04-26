@@ -20,6 +20,6 @@ public interface BaseService<T> {
 	 * select by id
 	 */
 	
-	public  <T> T getById(Serializable id);
+	public  <T> T getById(String id);
 
 }

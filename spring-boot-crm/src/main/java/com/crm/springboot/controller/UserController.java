@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,9 @@ import org.springframework.web.bind.support.SessionStatus;
 import com.alibaba.druid.sql.visitor.functions.Locate;
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.TaskVO;
-import com.crm.springboot.pojos.User;
+import com.crm.springboot.pojos.user.Dept;
+import com.crm.springboot.pojos.user.Post;
+import com.crm.springboot.pojos.user.User;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.UserService;
 import com.crm.springboot.utils.DateUtil;
@@ -64,9 +68,20 @@ public class UserController {
 	@RequestMapping(value="/{location}")
 	public String locate(@PathVariable String location,Model model,HttpSession session,HttpServletRequest request){
 		model.addAttribute("user", new User());
+		String referer=request.getHeader("referer");
+		session.setAttribute("referer", request.getHeader("referer"));
 		if("loginForm".equals(location)){
 			
-			session.setAttribute("referer", request.getHeader("referer"));
+			if(referer.contains("/user/updateForm")){
+				session.setAttribute("referer", "/index");
+			}
+			
+		}
+       if("registerForm".equals(location)){
+			List<Dept> depts=userService.selectAllDept();
+			List<Post> posts=userService.selectAllPost();
+			model.addAttribute("depts", depts);
+			model.addAttribute("posts", posts);
 		}
 		//用户申请的任务列表
 		if("applyList".equals(location)){
@@ -87,7 +102,11 @@ public class UserController {
 		
 		if("updateForm".equals(location)){
 			User user=new User();
-			if(parameter!=null) user=userService.getById(parameter);
+			if(parameter!=null) user=userService.getById(String.valueOf(parameter));
+			List<Dept> depts=userService.selectAllDept();
+			List<Post> posts=userService.selectAllPost();
+			model.addAttribute("depts", depts);
+			model.addAttribute("posts", posts);
 			model.addAttribute("user", user);
 		}
 
@@ -128,7 +147,7 @@ public class UserController {
 	public String login(@ModelAttribute("user") User user,Model model,HttpSession session,HttpServletRequest request){
 		
 		String referer=(String) session.getAttribute("referer");
-
+        String[] toIndex={"save","login"};
 		
 
 		String msg="";
@@ -142,10 +161,10 @@ public class UserController {
 	    	String servletPath=request.getServletPath();
 	    	System.out.println("servletPath="+servletPath);
 	    	System.out.println(referer.split("/")[referer.split("/").length-1]);
-			if("index".equals(referer.split("/")[referer.split("/").length-1])||"".equals(referer.split("/")[referer.split("/").length-1])){
-				
-				return "/user/ini";
-			}
+	    	if(Arrays.asList(toIndex).contains(referer.split("/")[referer.split("/").length-1])){
+	    		return "/index";
+	    	}
+			
 	    	return "redirect:"+referer;
 	    }else{
 	    	msg="帐号或者密码错误";
@@ -164,7 +183,7 @@ public class UserController {
 		sessionStatus.setComplete();
 		
 		
-		return "redirect:/index";
+		return "redirect:/user/loginForm";
 	}
 //*****************************************增删改查***********************************************	
 	/**
@@ -176,7 +195,7 @@ public class UserController {
 	@RequestMapping("/get/{id}")
 	public String get(@PathVariable("id") Serializable id,Model model){
 		
-		User user=userService.getById(id);
+		User user=userService.getById(String.valueOf(id));
 		model.addAttribute("user",user);
 		
 		return "user/resList";
@@ -195,8 +214,7 @@ public class UserController {
 			model.addAttribute("msg", msg);
 			return "user/registerForm";
 		}
-		userService.save(user);
-
+		userService.saveUserWithPostIdsAndDeptIds(user);
 		return "user/loginForm";
 	}
 	/**
@@ -205,24 +223,25 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/update")
-	public String update(@ModelAttribute("user") User user,HttpServletRequest request,HttpSession session){
+	public String update(@ModelAttribute("user") User user){
 		
-		String referer = request.getHeader("Referer");
 		
 		userService.update(user);
 		
-		session.setAttribute("sysuser", userService.getById(user.getId()));
-		 
-		return "redirect:/system/power/userList";
+		return "redirect:/user/loginForm";
 	}
 	/**
-	 * 删除
+	 * 批量删除
 	 * @param id
 	 */
-	@RequestMapping("/delete/{id}")
-	public String delete(@PathVariable("id") Integer id){
-		userService.deleteById(id);
-		activitiService.deleteUser(id);
+	@RequestMapping("/delete/{ids}")
+	public String delete(@PathVariable("ids") String ids){
+		//userService.deleteById(id);
+		userService.deleteUsersByUserIds(ids.split(","));
+		for (String  id : ids.split(",")) {
+			activitiService.deleteUser(id);
+		}
 		return "redirect:/system/power/userList";
 	}
+	
 }

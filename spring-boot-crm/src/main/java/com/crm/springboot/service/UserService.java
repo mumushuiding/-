@@ -1,8 +1,14 @@
 package com.crm.springboot.service;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
-import com.crm.springboot.pojos.User;
+import com.crm.springboot.pojos.user.Dept;
+import com.crm.springboot.pojos.user.Post;
+import com.crm.springboot.pojos.user.User;
+import com.crm.springboot.pojos.user.UserLinkDept;
+import com.crm.springboot.pojos.user.UserLinkPost;
 
 public interface UserService extends BaseService<User> {
 	
@@ -10,4 +16,29 @@ public interface UserService extends BaseService<User> {
 	public List<User> getBySomething(User user);
 	
 	public List<User> selectAllUser();
+	public List<Dept> selectAllDept();
+	public List<Post> selectAllPost();
+	/**
+	 * ***********************用户***********************************************
+	 */
+	void saveUserWithPostIdsAndDeptIds(User user);
+	void deleteUsersByUserIds(String[] ids);
+	/**
+	 * ***********************用户和职位*******************************************
+	 */
+	List<UserLinkPost> selectUserLinkPostWithUserId(Serializable userId);
+	/**
+	 * params包含两个值：userId(用户Id)和postIds(用逗号分隔的职位id字符串)
+	 * @param params
+	 */
+	void saveUserLinkPost(HashMap<String, Object> params);
+	/**
+	 * ***********************用户和部门*******************************************
+	 */
+	List<UserLinkDept> selectUserLinkDeptWithUserId(Serializable userId);
+	/**
+	 * params包含两个值：userId(用户Id)和deptIds(用逗号分隔的职位id字符串)
+	 * @param params
+	 */
+	void saveUserLinkDept(HashMap<String, Object> params);
 }

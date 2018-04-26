@@ -6,7 +6,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.crm.springboot.pojos.User;
+import com.crm.springboot.pojos.user.User;
 
 import javassist.expr.NewArray;
 @Controller

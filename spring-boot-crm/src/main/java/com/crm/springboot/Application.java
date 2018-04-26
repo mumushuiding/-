@@ -26,7 +26,7 @@ import com.crm.springboot.mapper.SysPowerMapper;
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
-import com.crm.springboot.pojos.User;
+import com.crm.springboot.pojos.user.User;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.SysPowerService;
 import com.crm.springboot.service.UserService;

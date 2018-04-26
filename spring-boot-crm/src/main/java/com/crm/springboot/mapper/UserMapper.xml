@@ -3,23 +3,24 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
  
   <!-- 指向UserMapper.xml文件 -->
+  
 <mapper namespace="com.crm.springboot.mapper.UserMapper">
+  
   <resultMap type="user" id="userResultMap">
     <id property="id" column="id"></id>
-    <result property="loginname" column="loginname"/>
-    <result property="password"  column="password"/>
-    <result property="phone" column="phone"/>
-    <result property="email" column="email"/>
-    <association property="dept" column="did" javaType="dept" select="selectDeptWithId"></association>
-    <association property="post" column="pId" javaType="post" select="selectPostWithId"></association>
+    <collection property="userLinkDept" column="id" javaType="ArrayList"  ofType="dept" select="selectUserLinkDeptWithUserId"></collection>
+    <collection property="userLinkPost" column="id" javaType="ArrayList"  ofType="post" select="selectUserLinkPostWithUserId"></collection>
+    <collection property="userLinkGroup" column="id" javaType="ArrayList" ofType="groupManager" select="com.crm.springboot.mapper.SysPowerMapper.selectGroupManagerByUserId2"></collection>
   </resultMap>
 
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
     INSERT INTO info_USER
-    (loginname,password,did,phone,username,email,SEX,pId) 
+    (loginname,password,phone,username,email,sex) 
     VALUES
-    (#{loginname},#{password},#{dept.id},#{phone},#{username},#{email},#{SEX},#{post.pId})
+    (#{loginname},#{password},#{phone},#{username},#{email},#{sex})
   </insert>
+  
+ 
   <select id="getById" parameterType="string" resultMap="userResultMap">
     SELECT * FROM info_USER WHERE ID=#{id}
   </select>
@@ -70,39 +71,79 @@
   <select id="selectAllUser" resultMap="userResultMap">
     SELECT * FROM info_USER
   </select>
+
   <update id="update" parameterType="user">
-    update info_user set 
-                  loginname=#{loginname},
-                  password=#{password},
-                  username=#{username}, 
-                  sex=#{sex},
-                  did=#{dept.did},
-                  birthday=#{birthday},
-                  phone=#{phone} where id=#{id}
+  
+    update info_user
+     <set>
+     	<if test="loginname!=null">loginname=#{loginname},</if>
+     	<if test="password!=null">password=#{password},</if>
+     	<if test="username!=null">username=#{username},</if>
+     	<if test="sex!=null">sex=#{sex},</if>
+     	<if test="birthday!=null">birthday=#{birthday},</if>
+     	<if test="phone!=null">phone=#{phone},</if>
+     	<if test="email!=null">email=#{email},</if>
+     </set>
+     where id=#{id}
   </update>
   <delete id="deleteById" parameterType="int">
     delete from info_user where id=#{id}
   </delete>
-<!-- =================================部门============================ -->
+  <delete id="deleteUsersByUserIds" parameterType="int[]">
+  	delete from info_user where id in 
+  	<foreach collection="array" item="id" index="no" separator="," open="(" close=")">
+  		#{id}
+  	</foreach>
+  </delete>
+
+<!-- =================================用户和部门info_user_dept表============================ -->
+  <resultMap type="userLinkDept" id="userLinkDeptResultMap">
+  	<id property="id" column="id"/>
+  	<association property="dept" column="deptId" javaType="dept" select="selectDeptWithId"></association>
+  </resultMap>
+  <select id="selectUserLinkDeptWithUserId" resultMap="userLinkDeptResultMap">
+  	select * from info_user_dept where userId=#{id}
+  </select>
+  <insert id="saveUserLinkDeptWithUserIdAndDeptIds" parameterType="hashmap">
+  	insert into info_user_dept (userId,deptId) values
+  	<foreach collection="deptIds" item="id" index="index" separator=",">
+  		(#{userId},#{id})
+  	</foreach>
+  </insert>
+<!-- =================================用户和职位info_user_post表============================ -->
+  <resultMap type="userLinkPost" id="userLinkPostResultMap">
+  	<id property="id" column="id"/>
+  	<association property="post" column="postId" javaType="post" select="selectPostWithId"></association>
+  </resultMap>
+  <select id="selectUserLinkPostWithUserId" resultMap="userLinkPostResultMap">
+  	select * from info_user_post where userId=#{id}
+  </select>
+  <insert id="saveUserLinkPostWithUserIdAndPostIds">
+  	insert into info_user_post (userId,postId) values
+  	<foreach collection="postIds" item="id" index="index" separator=",">
+  		(#{userId},#{id})
+  	</foreach>
+  </insert>
+<!-- =================================部门dept表============================ -->
+
   <!-- 根据部门ID查询部门 -->
-  <resultMap type="dept" id="deptMap">
-    <id property="id" column="did"></id>
-    <result property="name" column="name"></result>
-   </resultMap>
-  <!-- 根据部门ID查询部门 -->
-  <select id="selectDeptWithId" resultMap="deptMap">
+  <select id="selectDeptWithId" resultType="dept">
     select * from info_dept where did=#{id}
   </select>
   <!-- 根据部门ID查询所有用户 -->
   <select id="selectUsersWithDeptId" parameterType="int" resultMap="userResultMap">
-    select * from info_user where did=#{id}
+    select * from info_user_dept where deptId=#{id}
   </select>
   <!-- 查询所有部门的信息 -->
-  <select id="selectAllDept" resultMap="deptMap">
+  <select id="selectAllDept" resultType="dept">
     select * from info_dept
   </select>
-  <!-- ===============================职务=============================== -->
+  
+  <!-- ===============================职务post表=============================== -->
   <select id="selectPostWithId" resultType="post">
   	select * from info_post where pId=#{pId}
+  </select>
+  <select id="selectAllPost" resultType="post">
+  	select * from info_post 
   </select>
 </mapper>

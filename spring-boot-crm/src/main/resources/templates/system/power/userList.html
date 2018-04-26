@@ -55,6 +55,8 @@
     
     <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
     
+    <script src="/js/plugins/ajaxfileupload.js"></script>
+    
 <div class="container">  
     <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
@@ -115,12 +117,16 @@
      <button id="btn_add" type="button" class="btn btn-default">
          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
      </button>
+      <button id="btn_batchAdd" type="button" class="btn btn-default">
+         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>批量导入用户
+      </button>
    </div>
+   <span th:each="u:${userLinkDept}" th:text="${u.dept.name}"></span>
    <!-- /工具栏 -->
   <table id="mytab" class="table table-hover"></table>
-
+  <input type="file" name="file" id="file" onchange="upload1('/file/upload');" style="display:none"/> 
 </div>
-    <script>
+    <script th:inline="javascript">
     //根据窗口调整表格高度
     $(window).resize(function() {
         $('#mytab').bootstrapTable('resetView', {
@@ -163,11 +169,6 @@
                 visible:false
             },
             {
-                title:'登录名',
-                field:'loginname',
-                sortable:true
-            },
-            {
                 title:'姓名',
                 field:'username',
                 sortable:true
@@ -176,13 +177,31 @@
                 title:'手机号',
                 field:'phone',
             },
+   
             {
-                title:'状态',
-                field:'Attribute',
+                title:'邮箱',
+                field:'email',
+            },
+            {
+                title:'部门',
+                field:'operate',
                 align:'center',
                 //列数据格式化
-                formatter:operateFormatter
+                formatter:operateDept
+            },
+            {
+            	title:'职级',
+            	field:'operate',
+            	align:'center',
+            	formatter:operatePost
+            },
+            {
+            	title:'所属审批组',
+            	field:'operate',
+            	align:'center',
+            	formatter:operateGroup
             }
+            
         ],
         locale:'zh-CN',//中文支持,
         responseHandler:function(result){
@@ -190,15 +209,30 @@
 		    return result;
         }
     })
+    function operateGroup(value,row,index){
+       var result="";
+       for(x in row.userLinkPost){
+       	result+='<span>'+row.userLinkGroup[x].groupTable.groupname+'</span>,';
+       }
+       return [result,].join('');
+    }
+    function operatePost(value,row,index){
+       var result="";
+       for(x in row.userLinkPost){
+       	result+='<span>'+row.userLinkPost[x].post.name+'</span>,';
+       }
+       return [result,].join('');
+    }
     //三个参数，value代表该列的值
-    function operateFormatter(value,row,index){
-        if(value==2){
-            return '<i class="fa fa-lock" style="color:red"></i>'
-        }else if(value==1){
-            return '<i class="fa fa-unlock" style="color:green"></i>'
-        }else{
-            return '数据错误' 
-        }
+    function operateDept(value,row,index){
+       var result="";
+       for(x in row.userLinkDept){
+       	result+='<span>'+row.userLinkDept[x].dept.name+'</span>,';
+       }
+       return [  
+            
+           result,
+        ].join('');
     }
 
     //请求服务数据时所传参数
@@ -240,13 +274,35 @@
     //删除用户
     $('#btn_delete').click(function(){
     	var dataArr=$('#mytab').bootstrapTable('getSelections');
-    	location.href="/user/delete/"+dataArr[0].id;
+    	var ids="";
+    	for(x in dataArr){
+    		ids+=dataArr[x].id+",";
+    	}
+    	location.href="/user/delete/"+ids;
     });
     //添加新用户
     $('#btn_add').click(function(){
     	
     	location.href="/user/registerForm";
     });
+    //批量导入用户
+    
+    $('#btn_batchAdd').click(function(){
+    	
+    	$("#file").click();
+
+    });
+    function upload1(url){
+    	$.ajaxFileUpload({
+    		url:url,
+    		secureuri: false, //是否需要安全协议，一般设置为false
+    		fileElementId:'file',//id
+    		dataType:'json',//返回值
+    		success:function(data,status){
+    			alert(data);
+    		}
+    	});
+    }
     </script>
     
     

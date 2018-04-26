@@ -1,6 +1,7 @@
 package com.crm.springboot.service.impl;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.crm.springboot.mapper.UserMapper;
-import com.crm.springboot.pojos.User;
+import com.crm.springboot.pojos.user.Dept;
+import com.crm.springboot.pojos.user.Post;
+import com.crm.springboot.pojos.user.User;
+import com.crm.springboot.pojos.user.UserLinkDept;
+import com.crm.springboot.pojos.user.UserLinkPost;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.UserService;
 /**
@@ -55,7 +60,7 @@ public class UserServiceImpl implements UserService{
 
 //	@Override
 //	@Cacheable(key="#id")
-	public <T> T getById(Serializable id) {
+	public <T> T getById(String id) {
 		
 		return userMapper.getById(id);
 	}
@@ -71,6 +76,78 @@ public class UserServiceImpl implements UserService{
 		
 		return userMapper.selectAllUser();
 	}
+
+	@Override
+	public List<Dept> selectAllDept() {
+		
+		return userMapper.selectAllDept();
+	}
+
+	@Override
+	public List<Post> selectAllPost() {
+		
+		return userMapper.selectAllPost();
+	}
+
+	@Override
+	public List<UserLinkPost> selectUserLinkPostWithUserId(Serializable userId) {
+		
+		return userMapper.selectUserLinkPostWithUserId(userId);
+	}
+
+	@Override
+	public void saveUserLinkPost(HashMap<String, Object> params) {
+		
+		userMapper.saveUserLinkPostWithUserIdAndPostIds(params);
+		
+	}
+
+	@Override
+	public List<UserLinkDept> selectUserLinkDeptWithUserId(Serializable userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void saveUserLinkDept(HashMap<String, Object> params) {
+		
+		userMapper.saveUserLinkDeptWithUserIdAndDeptIds(params);
+		
+	}
+
+	@Override
+	public void saveUserWithPostIdsAndDeptIds(User user) {
+		this.save(user);
+		
+		if(user.getId()!=0){
+			if(user.getDeptIds()!=null){
+				HashMap<String , Object> params1=new HashMap<String, Object>();
+				params1.put("userId", user.getId());
+				params1.put("deptIds", (user.getDeptIds()).split(","));
+				 this.saveUserLinkDept(params1);
+				
+			}
+			if(user.getPostIds()!=null){
+				HashMap<String, Object> params2=new HashMap<String, Object>();
+				params2.put("userId", user.getId());
+				params2.put("postIds",(user.getPostIds()).split(","));
+				this.saveUserLinkPost(params2);
+			}
+			
+	       
+	        
+		}
+		
+	}
+
+	@Override
+	public void deleteUsersByUserIds(String[] ids) {
+		
+		userMapper.deleteUsersByUserIds(ids);
+		
+	}
+
+
 
 
 }

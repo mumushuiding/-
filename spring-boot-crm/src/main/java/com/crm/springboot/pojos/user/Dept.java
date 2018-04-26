@@ -1,4 +1,4 @@
-package com.crm.springboot.pojos;
+package com.crm.springboot.pojos.user;
 
 import java.io.Serializable;
 import java.util.ArrayList;

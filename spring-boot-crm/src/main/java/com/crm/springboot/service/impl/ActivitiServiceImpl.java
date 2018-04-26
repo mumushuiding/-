@@ -1,8 +1,5 @@
 package com.crm.springboot.service.impl;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
@@ -21,7 +17,7 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.repository.Deployment;
@@ -36,18 +32,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.crm.springboot.mapper.VacationMapper;
-import com.crm.springboot.pojos.BaseForm;
 import com.crm.springboot.pojos.FormField;
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
+import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
 import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.Vacation;
 import com.crm.springboot.service.ActivitiService;
+import com.crm.springboot.service.ProcessService;
 import com.crm.springboot.utils.DateUtil;
-import com.crm.springboot.utils.FileUtils;
-import com.crm.springboot.utils.JsonUtils;
-import com.crm.springboot.utils.ReflectUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 @Service
@@ -66,7 +60,8 @@ public class ActivitiServiceImpl implements ActivitiService{
     
 	@Autowired
 	private VacationMapper vacationMapper;
-
+    
+	@Autowired ProcessService processService;
 
 
 	@Override
@@ -119,6 +114,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 	@Override
 	public void deleteUser(Serializable id) {
 		identityService.deleteUser(String.valueOf(id));
+	
 		
 	}
 
@@ -264,32 +260,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 		return taskService.createTaskQuery().taskCandidateOrAssigned(String.valueOf(userId)).listPage((pageIndex-1)*pageSize, pageSize);
 	}
 
-	@Override
-	public PageInfo listVacation(String userId, Integer pageIndex, Integer pageSize) {
-		pageIndex=pageIndex==null?1:pageIndex;
-		pageSize=pageSize==null?10:pageSize;
-		PageHelper.startPage(pageIndex, pageSize);
-		List<Vacation> vacs=vacationMapper.selectAllByUserId(userId);
-		List<TaskVO> result=new ArrayList<TaskVO>();
-		for(Vacation vac:vacs){
-			//查询流程实例
-			ProcessInstance pi=runtimeService
-					.createProcessInstanceQuery()
-					.processInstanceId(String.valueOf(vac.getProcessInstanceId()))
-					.singleResult();
-			if(pi!=null){
-				TaskVO vo=new TaskVO();
-				vo.setTaskName(String.valueOf(vac.getTitle()));
-				vo.setTaskId(String.valueOf(vac.getId()));
-				vo.setProcessInstanceId(vac.getProcessInstanceId());
-				vo.setExecutionId(vac.getExecutionId());
-				vo.setCreateTime(vac.getRequestedDate());
-				result.add(vo);
-			}
-		}
-		PageInfo pageInfo=new PageInfo(result);
-		return pageInfo;
-	}
+	
 
 	@Override
 	public void claim(String taskId, String userId) {
@@ -311,32 +282,35 @@ public class ActivitiServiceImpl implements ActivitiService{
 		//查询用户所在的所有用户组
 		
 		List<String> groupIds=this.candidateGroups(userId);
-		
+		if(groupIds==null){
+			return null;
+		}
 		return taskService.createTaskQuery().taskCandidateGroupIn(groupIds).listPage((pageIndex-1)*pageSize, pageSize);
 	
 	}
 
 	@Override
 	public List<Task> listAssigneeTasks(String userId, Integer pageIndex, Integer pageSize) {
-	
+		
 		return taskService.createTaskQuery().taskAssignee(userId).listPage((pageIndex-1)*pageSize, pageSize);
 	}
 
 	@Override
 	public List<TaskVO> createTaskVOList(List<Task> tasks) {
 		List<TaskVO> result=new ArrayList<TaskVO>();
+		if(tasks==null) return result;
 		for(Task task:tasks){
 			ProcessInstance pi=this.getProcessInstance(task.getId());
 			//查询流程参数
-			BaseForm arg=(BaseForm) this.runtimeService.getVariable(pi.getId(), "arg");
+			ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
 			//封装值对象
 			TaskVO vo=new TaskVO();
 			vo.setProcessInstanceId(task.getProcessInstanceId());
 			vo.setCreateTime(arg.getRequestedDate());
-			vo.setRequestUser(arg.getUser().getUsername());
+			
 			vo.setTaskName(arg.getTitle());
 			vo.setTaskId(task.getId());
-
+            
 			vo.setExecutionId(task.getExecutionId());
 			result.add(vo);
 		}
@@ -405,14 +379,6 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
 	}
 
-	@Override
-	public List<FormField> getFormFields(String taskId) {
-		ProcessInstance pi=getProcessInstance(taskId);
-		//获取流程参数
-		BaseForm baseForm=(BaseForm)this.runtimeService.getVariable(pi.getId(), "arg");
-		
-		return baseForm.getFormFields();
-	}
 
 	@Override
 	public void complete(String taskId) {
@@ -544,6 +510,42 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
 		return this.getPageInfo(this.createProcessVOs(this.selectAllProcessInstances(pageIndex, pageSize)), this.countAllProcessInstance());
 	}
+	@Override
+	public long countAllHistoryProcessInstance() {
+		System.out.println("countAllHistoryProcessInstance="+historyService.createHistoricProcessInstanceQuery().count());
+		return historyService.createHistoricProcessInstanceQuery().count();
+	}
+
+	@Override
+	public List<HistoricProcessInstance> selectAllHistoryProcessInstances(Integer pageIndex, Integer pageSize) {
+		
+		return historyService.createHistoricProcessInstanceQuery().listPage((pageIndex-1)*pageSize, pageSize);
+	}
+
+	@Override
+	public PageInfo selectAllHistoryProcessInstancesPageInfo(Integer pageIndex, Integer pageSize) {
+		
+		return this.getPageInfo(createHistoricProcessVOs(this.selectAllHistoryProcessInstances(pageIndex, pageSize)), this.countAllHistoryProcessInstance());
+	}
+	@Override
+	public List<ProcessVO> createHistoricProcessVOs(List<HistoricProcessInstance> historicProcessInstances) {
+		List<ProcessVO> result=new ArrayList<ProcessVO>();
+		for (HistoricProcessInstance p : historicProcessInstances) {
+			System.out.println("p.getId()="+p.getId());
+			ProcessVO processVO=new ProcessVO();
+			processVO.setId(p.getId());
+			processVO.setName(p.getName());
+			processVO.setProcessDefinitionName(p.getProcessDefinitionName());
+			processVO.setProcessInstanceId(p.getSuperProcessInstanceId());
+			processVO.setStartTime(DateUtil.formatTimesTampDate(p.getStartTime()));
+			processVO.setProcessDefinitionVersion( p.getProcessDefinitionVersion());         
+			processVO.setStartUserId(p.getStartUserId());
+			
+			
+			result.add(processVO);
+		}
+		return result;
+	}
 
 	@Override
 	public List<ProcessVO> createProcessVOs(List<ProcessInstance> processInstances) {
@@ -559,6 +561,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 			processVO.setProcessDefinitionVersion( p.getProcessDefinitionVersion());         
 			processVO.setStartUserId(p.getStartUserId());
 			processVO.setSuperExecutionId(p.getSuperExecutionId());
+			
 			result.add(processVO);
 		}
 		return result;
@@ -566,7 +569,11 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public void deleteProcessInstance(String processInstanceId,String deleteReason) {
-		runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
+		
+		if(this.selectProcessInstance(processInstanceId)!=null){
+			runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
+		}
+		
 		
 	}
 
@@ -578,11 +585,52 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public String getDeploymentIdByBusinessKey(String businessKey) {
-		
-		Deployment deployment=repositoryService.createDeploymentQuery().processDefinitionKey(businessKey).singleResult();
-		
-		return deployment.getId();
+		List<Deployment> deployments=repositoryService.createDeploymentQuery()
+				.processDefinitionKeyLike(businessKey)
+				.list();
+		long time=0;
+		Deployment result=null;
+		for (Deployment deployment : deployments) {
+			System.out.println(deployment.getDeploymentTime());
+			if(deployment.getDeploymentTime().getTime()>time){
+				time=deployment.getDeploymentTime().getTime();
+				result=deployment;
+			}
+		}
+		//Deployment deployment=repositoryService.createDeploymentQuery().processDefinitionKey(businessKey).singleResult();
+		System.out.println("最终选择的部署文件ID="+result.getId());
+		return result.getId();
 	}
+
+	@Override
+	public Task selectTask(String processInstanceId, String taskDefinitionKey) {
+		
+		return taskService.createTaskQuery().processInstanceId(processInstanceId)
+				.taskDefinitionKey(taskDefinitionKey).singleResult();
+	}
+
+	@Override
+	public void setTaskCandidateGroup(String processInstanceId, String taskDefinitionKey, String delegateTaskName) {
+		Task task=selectTask(processInstanceId, taskDefinitionKey);
+		Group group=identityService.createGroupQuery().groupName(delegateTaskName).singleResult();
+		System.out.println(delegateTaskName+"---设置候选人组："+group.getId());
+		taskService.addCandidateGroup(task.getId(), group.getId());
+		
+	}
+
+	@Override
+	public Object getVariableFromProcessInstance(String processInstanceId) {
+		
+		return this.runtimeService.getVariable(processInstanceId, "arg");
+	}
+
+	@Override
+	public ProcessInstance selectProcessInstance(String processInstanceId) {
+		
+		return runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+	}
+
+
 
 
 

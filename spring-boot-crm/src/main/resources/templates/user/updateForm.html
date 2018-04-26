@@ -11,9 +11,10 @@
 
     <title>一线考核系统</title>
 
-    <!-- Bootstrap core CSS -->
+<!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet"/>
-
+    <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
 
@@ -26,8 +27,19 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+       <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
 
-    <!-- Custom styles for this template -->
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
     <link href="/css/carousel.css" rel="stylesheet"/>
 </head>
 <body>
@@ -44,26 +56,25 @@
          <form action="#" method="post" th:action="@{/user/update}" th:object="${user}">
           <input type="hidden" name="id" id="id" th:value="*{id}"/>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="登陆名" th:field="*{loginname}"    maxlength="16"/>
+            <input type="text" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"  th:value="*{phone}"  maxlength="16"/>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="真实姓名" th:field="*{username}"    maxlength="16"/>
+            <input type="text" class="form-control input-lg" placeholder="邮箱" th:field="*{email}" th:value="*{email}"/>
           </div>
-          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="密码" th:field="*{password}"    maxlength="16"/>
+         <div class="form-group">
+            <input type="text" class="form-control input-lg" placeholder="真实姓名" th:field="*{username}" th:value="*{email}"   maxlength="16"/>
           </div>
-          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="性别" th:field="*{sex}"    maxlength="16"/>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="所在部门" th:field="*{dept.did}"    maxlength="16"/>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="出生日期" th:field="*{birthday}"    maxlength="16"/>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"    maxlength="16"/>
-          </div>
+
+	    <div class="form-group">
+	      <select  class="selectpicker" data-live-search="true" title="请正确选择部门 ..." th:field="*{dept.did}" th:value="*{dept.did}">
+	        <option th:each="d:${depts}"  th:value="${d.did}" th:text="${d.name}"></option>
+	     
+	      </select>
+	      <select  class="selectpicker" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" th:value="*{post.pId}">
+	        <option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}"></option>
+	     
+	      </select>
+	     </div>
           <div class="form-group">
             <div th:text="${msg}" style="font:red;text-align:center"></div>
             <button class="btn btn-primary btn-lg btn-block" >更新用户信息</button>
@@ -78,10 +89,6 @@
     </div>
   </div>
 </div>
-    <!-- Bootstrap core JavaScript ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/js/jquery-3.2.1.js"></script>
 
-    <script src="/js/bootstrap.min.js"></script>
 </body>
 </html>
