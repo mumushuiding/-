@@ -1,7 +1,10 @@
 package com.crm.springboot.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.user.Dept;
+import com.crm.springboot.pojos.user.DeptIdentityLink;
 import com.crm.springboot.pojos.user.Post;
 import com.crm.springboot.pojos.user.User;
 import com.crm.springboot.pojos.user.UserLinkDept;
@@ -35,32 +39,34 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private ActivitiService activitiService;
 
-//	@Override
+	@Override
 //	@CachePut(key="#t.id")
-	public <T> T save(T t) {
-		User user=(User) t;
-		userMapper.save(t);
+	public User save(User user) {
+		
+		userMapper.save(user);
 		activitiService.saveUser(user.getId());
-		return t;
+		return user;
 	}
 
-//	@Override
+	@Override
 //	@CacheEvict(key="#id")
 	public void deleteById(Serializable id) {
 	
 		userMapper.deleteById(id);
 	}
 
-//	@Override
+	@Override
 //	@CachePut(key="#t.id")
-	public <T> T update(T t) {
-		userMapper.update(t);
-		return t;
+	
+	public User update(User user) {
+		userMapper.update(user);
+		
+		return user;
 	}
 
-//	@Override
+	@Override
 //	@Cacheable(key="#id")
-	public <T> T getById(String id) {
+	public User getById(String id) {
 		
 		return userMapper.getById(id);
 	}
@@ -108,37 +114,6 @@ public class UserServiceImpl implements UserService{
 		return null;
 	}
 
-	@Override
-	public void saveUserLinkDept(HashMap<String, Object> params) {
-		
-		userMapper.saveUserLinkDeptWithUserIdAndDeptIds(params);
-		
-	}
-
-	@Override
-	public void saveUserWithPostIdsAndDeptIds(User user) {
-		this.save(user);
-		
-		if(user.getId()!=0){
-			if(user.getDeptIds()!=null){
-				HashMap<String , Object> params1=new HashMap<String, Object>();
-				params1.put("userId", user.getId());
-				params1.put("deptIds", (user.getDeptIds()).split(","));
-				 this.saveUserLinkDept(params1);
-				
-			}
-			if(user.getPostIds()!=null){
-				HashMap<String, Object> params2=new HashMap<String, Object>();
-				params2.put("userId", user.getId());
-				params2.put("postIds",(user.getPostIds()).split(","));
-				this.saveUserLinkPost(params2);
-			}
-			
-	       
-	        
-		}
-		
-	}
 
 	@Override
 	public void deleteUsersByUserIds(String[] ids) {
@@ -146,6 +121,90 @@ public class UserServiceImpl implements UserService{
 		userMapper.deleteUsersByUserIds(ids);
 		
 	}
+
+	@Override
+	public void updateUserLinkDeptWithUserIdAndDeptIds(String userId, String deptIds) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String[] getDeptNames(User user) {
+		List<UserLinkDept> userLinkDepts=user.getUserLinkDepts();
+		
+		List<String> dept=new ArrayList<String>();
+		for (int i = 0; i < userLinkDepts.size(); i++) {
+			
+			if(!dept.contains((userLinkDepts.get(i)).getFirstLevel().getName())){
+				dept.add((userLinkDepts.get(i)).getFirstLevel().getName());
+			}
+			if(!dept.contains((userLinkDepts.get(i)).getSecondLevel().getName())){
+				dept.add((userLinkDepts.get(i)).getSecondLevel().getName());
+			}
+		}
+		String[] deptNames=new String[dept.size()];
+		dept.toArray(deptNames);
+		for (String string : deptNames) {
+			System.out.println("================="+string);
+		}
+		return deptNames;
+	}
+
+	@Override
+	public void saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(HashMap<String, Object> params) {
+		userMapper.saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(params);
+		
+	}
+
+	@Override
+	public void saveDept(Dept dept) {
+		userMapper.saveDept(dept);
+		
+	}
+
+	@Override
+	public void saveDeptIdentityLink(DeptIdentityLink deptIdentityLink) {
+		userMapper.saveDeptIdentityLink(deptIdentityLink);
+		
+	}
+
+
+	@Override
+	public void saveUserLinkDept(Integer userId, String firstLevelId, String secondLevelId, String thirdLevelId) {
+		UserLinkDept userLinkDept=new UserLinkDept();
+		userLinkDept.setUserId(userId);
+
+		//第二列为secondLevel，次级部门
+		if(!"".equals(secondLevelId)){
+			Dept secondLevel=new Dept();
+			secondLevel.setDid(Integer.valueOf(secondLevelId));
+			userLinkDept.setSecondLevel(secondLevel);
+		}
+		
+		//第三列为thirdLevel，第三级部门
+		if(!"".equals(thirdLevelId)){
+			Dept thirdLevel=new Dept();
+            thirdLevel.setDid(Integer.valueOf(thirdLevelId));
+			userLinkDept.setThirdLevel(thirdLevel);
+		}
+	    if(firstLevelId!=null&&!"".equals(firstLevelId)){
+	    	
+	    	HashMap<String, Object> params=new HashMap<String, Object>();
+	    	//第一列为firstLevel，最底层部门
+	    	String[] firstLevelIds=firstLevelId.split(",");
+
+			params.put("firstLevelIds", firstLevelIds);
+			params.put("userLinkDept", userLinkDept);
+			userMapper.saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(params);
+	    }else{
+	    	userMapper.saveUserLinkDeptWithUserLinkDept(userLinkDept);
+	    }
+		
+				
+	}
+
+
+
 
 
 

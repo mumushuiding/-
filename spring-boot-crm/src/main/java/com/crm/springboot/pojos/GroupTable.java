@@ -1,11 +1,12 @@
 package com.crm.springboot.pojos;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class GroupTable {
+public class GroupTable implements Serializable{
 	private int groupid;
 	private String groupname;
 	private String groupType;

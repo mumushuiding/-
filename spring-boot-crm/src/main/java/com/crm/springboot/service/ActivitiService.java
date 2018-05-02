@@ -1,6 +1,7 @@
 package com.crm.springboot.service;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -62,17 +63,18 @@ public interface ActivitiService extends BaseActivitiService{
 	long countUserTaskList(Serializable userId);
 	List<Task> getTaskToDoList(Serializable userId, Integer pageIndex, Integer pageSize);
 	//查询待办的全部任务
-    List<Task> listCandidateTasks(String userId,Integer pageIndex, Integer pageSize);
-    long countListCandidateTasks(String userId);
-    PageInfo listCandidatePageInfo(String userId,Integer pageIndex, Integer pageSize);
+    List<Task> listCandidateTasks(String userId,List<String> processInstanceIds,Integer pageIndex, Integer pageSize);
+    long countListCandidateTasks(String userId,List<String> processInstanceIds);
+    PageInfo listCandidatePageInfo(String userId,List<String> processInstanceIds,Integer pageIndex, Integer pageSize);
    // 查询用户所受理的全部任务
  	List<Task> listAssigneeTasks(String userId,Integer pageIndex, Integer pageSize);
  	long countListAssigneeTasks(String userId);
  	PageInfo listAssigneePageInfo(String userId,Integer pageIndex, Integer pageSize);
  // 将Task集合转为TaskVO集合
  	List<TaskVO> createTaskVOList(List<Task> tasks);
- 	
  	//查询一个任务所在流程的全部评论
  	List<Comment> getComments(String taskId);
+    //查询当前任务的审批用户组
+ 	List<String> selectCandidateGroup(String taskId);
 
 }

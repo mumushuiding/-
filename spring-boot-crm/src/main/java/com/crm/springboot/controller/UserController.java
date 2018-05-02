@@ -69,10 +69,12 @@ public class UserController {
 	public String locate(@PathVariable String location,Model model,HttpSession session,HttpServletRequest request){
 		model.addAttribute("user", new User());
 		String referer=request.getHeader("referer");
+		System.out.println("referer="+referer);
 		session.setAttribute("referer", request.getHeader("referer"));
 		if("loginForm".equals(location)){
 			
-			if(referer.contains("/user/updateForm")){
+			
+			if(referer==null||referer.contains("/user/updateForm")){
 				session.setAttribute("referer", "/index");
 			}
 			
@@ -156,15 +158,17 @@ public class UserController {
 		
 	    if(u!=null){
 	    	msg="登录成功";
+	    	System.out.println("登录成功");
 	    	model.addAttribute("msg",msg);
 	    	model.addAttribute("sysuser", u);
 	    	String servletPath=request.getServletPath();
 	    	System.out.println("servletPath="+servletPath);
 	    	System.out.println(referer.split("/")[referer.split("/").length-1]);
 	    	if(Arrays.asList(toIndex).contains(referer.split("/")[referer.split("/").length-1])){
+	    		System.out.println("跳转到index");
 	    		return "/index";
 	    	}
-			
+	    	System.out.println("跳转到"+referer);
 	    	return "redirect:"+referer;
 	    }else{
 	    	msg="帐号或者密码错误";
@@ -214,7 +218,7 @@ public class UserController {
 			model.addAttribute("msg", msg);
 			return "user/registerForm";
 		}
-		userService.saveUserWithPostIdsAndDeptIds(user);
+		userService.save(user);
 		return "user/loginForm";
 	}
 	/**

@@ -16,8 +16,8 @@ public class User implements Serializable{
 	private String password;
 	private String username;
 	private String sex;
-    private List<UserLinkDept> userLinkDept;
-    private List<UserLinkPost> userLinkPost;
+    private List<UserLinkDept> userLinkDepts;
+    private Post post;
     //用户所属的审批管理组
     private List<GroupManager> userLinkGroup;
     private String email;
@@ -27,37 +27,34 @@ public class User implements Serializable{
     
     private String phone;
     
-    private String deptIds;//做为接收页面传递多个Id值的容器，没有其它作用
-    private String postIds;//做为接收页面传递多个Id值的容器，没有其它作用
+    private String avatar;
     
+    private UserLinkDept userLinkDept;//主要是注册时接收员工部门属性，没有其它作用
     
-    
-	public String getDeptIds() {
-		return deptIds;
+
+	public String getAvatar() {
+		return avatar;
 	}
 
-	public void setDeptIds(String deptIds) {
-		this.deptIds = deptIds;
+
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 
-	public String getPostIds() {
-		return postIds;
+
+
+	public void setUserLinkDept(UserLinkDept userLinkDept) {
+		this.userLinkDept = userLinkDept;
 	}
 
-	public void setPostIds(String postIds) {
-		this.postIds = postIds;
-	}
+
 
 	public  User() {
 		super();
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", loginname=" + loginname + ", password=" + password + ", username=" + username
-				+ ", sex=" + sex + ", userLinkDept=" + userLinkDept + ", userLinkPost=" + userLinkPost + ", email="
-				+ email + ", birthday=" + birthday + ", phone=" + phone + "]";
-	}
+
 
 	public String getEmail() {
 		return email;
@@ -125,20 +122,32 @@ public class User implements Serializable{
 		this.phone = phone;
 	}
 
-	public List<UserLinkDept> getUserLinkDept() {
+
+	
+	public List<UserLinkDept> getUserLinkDepts() {
+		return userLinkDepts;
+	}
+
+
+
+	public void setUserLinkDepts(List<UserLinkDept> userLinkDepts) {
+		this.userLinkDepts = userLinkDepts;
+	}
+
+
+
+	public UserLinkDept getUserLinkDept() {
 		return userLinkDept;
 	}
 
-	public void setUserLinkDept(List<UserLinkDept> userLinkDept) {
-		this.userLinkDept = userLinkDept;
+
+
+	public Post getPost() {
+		return post;
 	}
 
-	public List<UserLinkPost> getUserLinkPost() {
-		return userLinkPost;
-	}
-
-	public void setUserLinkPost(List<UserLinkPost> userLinkPost) {
-		this.userLinkPost = userLinkPost;
+	public void setPost(Post post) {
+		this.post = post;
 	}
 
 	public List<GroupManager> getUserLinkGroup() {

@@ -120,11 +120,20 @@
       <button id="btn_batchAdd" type="button" class="btn btn-default">
          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>批量导入用户
       </button>
+      
+      <button id="btn_batchAddDept" type="button" class="btn btn-default">
+         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>批量导入部门
+      </button>
+      
+      <button id="btn_batchAddDeptIdentityLink" type="button" class="btn btn-default">
+         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>批量导入组织架构
+      </button>
+      
    </div>
    <span th:each="u:${userLinkDept}" th:text="${u.dept.name}"></span>
    <!-- /工具栏 -->
   <table id="mytab" class="table table-hover"></table>
-  <input type="file" name="file" id="file" onchange="upload1('/file/upload');" style="display:none"/> 
+  <input type="file" name="file" id="file"  style="display:none"/> 
 </div>
     <script th:inline="javascript">
     //根据窗口调整表格高度
@@ -178,10 +187,12 @@
                 field:'phone',
             },
    
+ 
             {
-                title:'邮箱',
-                field:'email',
+            	title:'职级',
+            	field:'post.name',
             },
+
             {
                 title:'部门',
                 field:'operate',
@@ -189,18 +200,14 @@
                 //列数据格式化
                 formatter:operateDept
             },
+
             {
-            	title:'职级',
-            	field:'operate',
-            	align:'center',
-            	formatter:operatePost
+                title:'审批组',
+                field:'operate1',
+                align:'center',
+                //列数据格式化
+                formatter:operateGroup
             },
-            {
-            	title:'所属审批组',
-            	field:'operate',
-            	align:'center',
-            	formatter:operateGroup
-            }
             
         ],
         locale:'zh-CN',//中文支持,
@@ -211,23 +218,20 @@
     })
     function operateGroup(value,row,index){
        var result="";
-       for(x in row.userLinkPost){
+       for(x in row.userLinkGroup){
        	result+='<span>'+row.userLinkGroup[x].groupTable.groupname+'</span>,';
        }
-       return [result,].join('');
+       return [  
+            
+           result,
+        ].join('');
     }
-    function operatePost(value,row,index){
-       var result="";
-       for(x in row.userLinkPost){
-       	result+='<span>'+row.userLinkPost[x].post.name+'</span>,';
-       }
-       return [result,].join('');
-    }
+
     //三个参数，value代表该列的值
     function operateDept(value,row,index){
        var result="";
-       for(x in row.userLinkDept){
-       	result+='<span>'+row.userLinkDept[x].dept.name+'</span>,';
+       for(x in row.userLinkDepts){
+       	result+='<span>'+row.userLinkDepts[x].secondLevel.name+'->'+row.userLinkDepts[x].firstLevel.name+'</span>,';
        }
        return [  
             
@@ -288,9 +292,21 @@
     //批量导入用户
     
     $('#btn_batchAdd').click(function(){
-    	
+    	$("#file").attr("onchange","upload1('/file/upload');");
     	$("#file").click();
+    	
 
+    });
+    
+    //批量导入部门
+    $("#btn_batchAddDept").click(function(){
+    	$("#file").attr("onchange","upload1('/file/uploadDepts');");
+    	$("#file").click();
+    });
+    //批量导入组织架构
+    $("#btn_batchAddDeptIdentityLink").click(function(){
+    	$("#file").attr("onchange","upload1('/file/uploadDeptIdentityLinks');");
+    	$("#file").click();
     });
     function upload1(url){
     	$.ajaxFileUpload({

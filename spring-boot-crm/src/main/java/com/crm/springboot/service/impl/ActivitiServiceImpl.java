@@ -22,8 +22,10 @@ import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
@@ -278,31 +280,43 @@ public class ActivitiServiceImpl implements ActivitiService{
 		return groupIds;
 	}
 	@Override
-	public List<Task> listCandidateTasks(String userId, Integer pageIndex, Integer pageSize) {
+	public List<Task> listCandidateTasks(String userId,List<String> processInstanceIds, Integer pageIndex, Integer pageSize) {
 		//查询用户所在的所有用户组
 		
-		List<String> groupIds=this.candidateGroups(userId);
-		if(groupIds==null){
+		List<String> candidateGroups=this.candidateGroups(userId);
+		if(candidateGroups==null){
 			return null;
 		}
-		return taskService.createTaskQuery().taskCandidateGroupIn(groupIds).listPage((pageIndex-1)*pageSize, pageSize);
+		if(processInstanceIds.size()==0){
+			
+			return null;
+		}else {
+			
+			return taskService.createTaskQuery()
+					.processInstanceIdIn(processInstanceIds).taskCandidateGroupIn(candidateGroups)
+					.listPage((pageIndex-1)*pageSize, pageSize);
+		}
+		
 	
 	}
 
 	@Override
 	public List<Task> listAssigneeTasks(String userId, Integer pageIndex, Integer pageSize) {
-		
+	
 		return taskService.createTaskQuery().taskAssignee(userId).listPage((pageIndex-1)*pageSize, pageSize);
 	}
 
 	@Override
 	public List<TaskVO> createTaskVOList(List<Task> tasks) {
+		if(tasks==null) return null;
 		List<TaskVO> result=new ArrayList<TaskVO>();
 		if(tasks==null) return result;
 		for(Task task:tasks){
 			ProcessInstance pi=this.getProcessInstance(task.getId());
+	
 			//查询流程参数
 			ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
+			
 			//封装值对象
 			TaskVO vo=new TaskVO();
 			vo.setProcessInstanceId(task.getProcessInstanceId());
@@ -319,21 +333,22 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 
 	@Override
-	public PageInfo listCandidatePageInfo(String userId, Integer pageIndex, Integer pageSize) {
-		
-		return this.getPageInfo(createTaskVOList(this.listCandidateTasks(userId, pageIndex, pageSize)), this.countListCandidateTasks(userId));
+	public PageInfo listCandidatePageInfo(String userId,List<String> processInstanceIds, Integer pageIndex, Integer pageSize) {
+
+	    if(processInstanceIds.size()==0) return null;
+		return this.getPageInfo(createTaskVOList(this.listCandidateTasks(userId,processInstanceIds, pageIndex, pageSize)), this.countListCandidateTasks(userId,processInstanceIds));
 	}
 
 	@Override
 	public PageInfo listAssigneePageInfo(String userId, Integer pageIndex, Integer pageSize) {
-
-		return this.getPageInfo(createTaskVOList(this.listAssigneeTasks(userId, pageIndex, pageSize)), this.countListAssigneeTasks(userId));
+        return this.getPageInfo(createTaskVOList(this.listAssigneeTasks(userId, pageIndex, pageSize)), this.countListAssigneeTasks(userId));
 	}
 
 	@Override
-	public long countListCandidateTasks(String userId) {
+	public long countListCandidateTasks(String userId,List<String> processInstanceIds) {
 		List<String> candidateGroups=this.candidateGroups(userId);
-		return taskService.createTaskQuery().taskCandidateGroupIn(candidateGroups).count();
+		if(processInstanceIds==null || processInstanceIds.size()==0) return 0;
+		return taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskCandidateGroupIn(candidateGroups).count();
 	}
 
 	@Override
@@ -361,9 +376,12 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public Task getFirstTask(String processInstanceId) {
-		
+		Task task=this.taskService.createTaskQuery()
+				.processInstanceId(processInstanceId).orderByTaskCreateTime().desc()
+				.singleResult();
+		System.out.println(task.getCreateTime());
 		return this.taskService.createTaskQuery()
-				.processInstanceId(processInstanceId)
+				.processInstanceId(processInstanceId).orderByTaskCreateTime().desc()
 				.singleResult();
 	}
 
@@ -422,7 +440,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 	}
 
 	@Override
-	public void deleteLowerVersionProcessDefinitions() {
+	public void deleteLowerVersionProcessDefinitions(boolean cascade) {
 		HashMap<String, ProcessDefinition> map = new HashMap<String,ProcessDefinition>();
 		List<ProcessDefinition> processDefinitions=this.selectAllProcessDefinitionsOrderByDesc();
 		for(ProcessDefinition pd:processDefinitions){
@@ -433,13 +451,13 @@ public class ActivitiServiceImpl implements ActivitiService{
 				System.out.println("++++++++++++++++++++++++++++++++++++");
 				System.out.println("流程KEY为："+pd.getKey()+",原来的版本为："+map.get(pd.getKey())+",新版本为："+pd.getVersion());
 				System.out.println("现在删除旧版本,并保存新的版本");
-				this.deleteDeploymentById(old.getDeploymentId());
+				this.deleteDeploymentById(old.getDeploymentId(),cascade);
 				map.put(pd.getKey(), pd);
 			}else {
 				System.out.println("++++++++++++++++++++++++++++++++++++");
 				System.out.println("流程KEY为："+pd.getKey()+",原来的版本为："+map.get(pd.getKey())+",新版本为："+pd.getVersion());
 				System.out.println("原来版本的比较高，现在删除当前流程");
-				this.deleteDeploymentById(pd.getDeploymentId());
+				this.deleteDeploymentById(pd.getDeploymentId(),cascade);
 			}
 			
 		}
@@ -447,10 +465,11 @@ public class ActivitiServiceImpl implements ActivitiService{
 	}
 
 	@Override
-	public void deleteDeploymentById(String deploymentId) {
+	public void deleteDeploymentById(String deploymentId,boolean cascade) {
 		try {
 			if(this.getDeploymentById(deploymentId)!=null){
-				repositoryService.deleteDeployment(deploymentId);
+		
+				repositoryService.deleteDeployment(deploymentId, cascade);
 			}
 			
 		} catch (Exception e) {
@@ -629,6 +648,33 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
 		return runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 	}
+
+	@Override
+	public void setVariable(Task task,HashMap<String, Object> variables) {
+		System.out.println("task.getExecutionId()="+task.getExecutionId());
+		Execution execution=this.runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
+		System.out.println("execution.getId()="+execution.getId());
+		this.runtimeService.setVariables(execution.getId(), variables);
+		
+	}
+
+	@Override
+	public List<String> selectCandidateGroup(String taskId) {
+		Task task=this.selectTask(taskId);
+		List<String> result=new ArrayList<String>();
+		List<IdentityLink> x=taskService.getIdentityLinksForTask(taskId);
+		for (IdentityLink identityLink : x) {
+			result.add(identityLink.getGroupId());
+		}
+		return result;
+	}
+
+	@Override
+	public Task selectTask(String taskId) {
+		
+		return taskService.createTaskQuery().taskId(taskId).singleResult();
+	}
+
 
 
 

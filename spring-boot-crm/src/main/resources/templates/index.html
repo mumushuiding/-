@@ -99,9 +99,7 @@
                   </li>
                   <li>
                     <a href="#">
-                      <div class="pull-left">
-                        <img src="/images/user/avatar3.png" class="img-circle" alt="用户头像"/>
-                      </div>
+                      
                       <h4>
                         Developers
                         <small><i class="fa fa-clock-o"></i> Today</small>
@@ -262,7 +260,8 @@
 
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" th:if="${session.sysuser!=null}">
-              <img src="/images/user/avatar5.png" class="user-image" alt="User Image"/>
+              
+              <img th:src="${session.sysuser.avatar}" class="user-image" alt="User Image" />
               <span class="hidden-xs" th:text="${session.sysuser.username}" th:if="${session.sysuser!=null}"></span>
             </a>
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" th:if="${session.sysuser==null}">
@@ -272,11 +271,12 @@
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="/images/user/avatar04.png" class="img-circle" alt="User Image"/>
-
-                <p>
-                  Alexander Pierce - Web Developer
-                  <small>Member since Nov. 2012</small>
+                <img src="/images/user/avatar04.png" class="img-circle" alt="User Image" th:if="${session.sysuser==null}"/>
+                <img th:src="${session.sysuser.avatar}" class="img-circle" alt="User Image" th:if="${session.sysuser!=null}"/>
+                
+                <p th:text="${session.sysuser.username}">
+              
+                  <small th:each="d:${session.sysuser.userLinkDepts}" th:text="${d.secondLevel.name}"></small>
                 </p>
               </li>
               <!-- Menu Body -->
@@ -327,7 +327,8 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="/images/user/avatar2.png" class="img-circle" alt="User Image"/>
+          <img src="/images/user/avatar2.png" class="img-circle" alt="User Image" th:if="${session.sysuser==null}"/>
+          <img th:src="${session.sysuser.avatar}" class="img-circle" alt="User Image" th:if="${session.sysuser!=null}"/>
         </div>
         <div class="pull-left info" th:if="${session.sysuser!=null}">
           <p th:text="${session.sysuser.username}"></p>
@@ -369,9 +370,7 @@
               <li>
                     <a href="/system/power/syspower/addGroupForm" target="mainFrame"><i class="fa fa-fw fa-twitter"></i> 添加用户组</a>
               </li>
-              <li>
-                    <a href="/file/uploadUsers" target="mainFrame"><i class="fa fa-fw fa-twitter"></i>导入用户</a>
-              </li>
+
           </ul>
         </li>
        <li class="treeview">
@@ -384,11 +383,18 @@
           </a>
           <ul class="treeview-menu">
             <li th:if="${session.sysuser!=null}"><a th:href="@{'/user/updateForm/'+${session.sysuser.id}}" target="mainFrame">个人信息修改</a></li>
-            <li><a href="/responsibility/responsibilityList" target="mainFrame">责任清单</a></li>
             <li><a href="/responsibility/assessmentList/month" target="mainFrame">日常工作一线干部考核</a></li>
             <li><a href="/responsibility/projectList/completed" target="mainFrame">日常工作项目管理</a></li>
             <li><a href="/system/activiti/processInstanceList/now" target="mainFrame">日常工作流程申请列表</a></li>
-            <li><a href="/system/activiti/taskList/candidate" target="mainFrame">需要审批和待办的任务</a></li>
+            <li>
+	          <a href="/system/activiti/taskList/candidate" target="mainFrame">
+	            <i class="fa fa-envelope"></i> <span>任务</span>
+	            <span class="pull-right-container">
+	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber!=0}">待办<small th:text="${candidateTaskNumber}"></small></small>
+	              <small class="label pull-right bg-red" th:if="${assigneeTaskNumber!=0}">需审批<small th:text="${assigneeTaskNumber}"></small></small>
+	            </span>
+	          </a>
+		    </li>
           </ul>
         </li>
       </ul>

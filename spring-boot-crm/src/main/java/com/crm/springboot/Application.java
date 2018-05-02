@@ -64,7 +64,7 @@ public class Application {
 			@Override
 			public void afterPropertiesSet() throws Exception {
 				
-				activitiService.deleteLowerVersionProcessDefinitions();
+				activitiService.deleteLowerVersionProcessDefinitions(true);
 				
 			}
 		};

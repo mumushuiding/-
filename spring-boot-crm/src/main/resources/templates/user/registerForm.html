@@ -74,7 +74,7 @@
 	      <select  class="selectpicker" data-live-search="true" title="选择部门（分管领导可多选）..." th:field="*{deptIds}" multiple="multiple" >
 	        <option th:each="d:${depts}"  th:value="${d.did}" th:text="${d.name}"></option>
 	      </select>
-	      <select  class="selectpicker" data-live-search="true" title="请正确选择职级..."  th:field="*{postIds}" multiple="multiple">
+	      <select  class="selectpicker" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" >
 	        <option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}"></option>
 	     
 	      </select>

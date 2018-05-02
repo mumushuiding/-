@@ -54,7 +54,7 @@
       </div>
       <div class="modal-body">
          <form action="#" method="post" th:action="@{/user/update}" th:object="${user}">
-          <input type="hidden" name="id" id="id" th:value="*{id}"/>
+          <input type="text" name="id" id="id" th:value="*{id}" style="display:none;"/>
           <div class="form-group">
             <input type="text" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"  th:value="*{phone}"  maxlength="16"/>
           </div>
@@ -62,19 +62,21 @@
             <input type="text" class="form-control input-lg" placeholder="邮箱" th:field="*{email}" th:value="*{email}"/>
           </div>
          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="真实姓名" th:field="*{username}" th:value="*{email}"   maxlength="16"/>
+            <input type="text" class="form-control input-lg" placeholder="真实姓名" th:field="*{username}" th:value="*{username}"   maxlength="16"/>
           </div>
 
 	    <div class="form-group">
-	      <select  class="selectpicker" data-live-search="true" title="请正确选择部门 ..." th:field="*{dept.did}" th:value="*{dept.did}">
-	        <option th:each="d:${depts}"  th:value="${d.did}" th:text="${d.name}"></option>
-	     
-	      </select>
 	      <select  class="selectpicker" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" th:value="*{post.pId}">
 	        <option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}"></option>
-	     
 	      </select>
 	     </div>
+	     <label style="text-align:center;">----------修改密码-----------</label>
+	     <div class="form-group">
+            <input type="password" class="form-control input-lg" placeholder="旧密码"  maxlength="16"/>
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control input-lg" placeholder="新密码" th:field="*{password}"  maxlength="16"/>
+          </div>
           <div class="form-group">
             <div th:text="${msg}" style="font:red;text-align:center"></div>
             <button class="btn btn-primary btn-lg btn-block" >更新用户信息</button>

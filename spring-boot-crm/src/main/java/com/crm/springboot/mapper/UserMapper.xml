@@ -8,16 +8,18 @@
   
   <resultMap type="user" id="userResultMap">
     <id property="id" column="id"></id>
-    <collection property="userLinkDept" column="id" javaType="ArrayList"  ofType="dept" select="selectUserLinkDeptWithUserId"></collection>
-    <collection property="userLinkPost" column="id" javaType="ArrayList"  ofType="post" select="selectUserLinkPostWithUserId"></collection>
+    <association property="post" column="postId" javaType="post"  select="selectPostWithId"></association>
+
+    <collection property="userLinkDepts" column="id" javaType="ArrayList"  ofType="userLinkDept" select="selectUserLinkDeptWithUserId"></collection>
+    
     <collection property="userLinkGroup" column="id" javaType="ArrayList" ofType="groupManager" select="com.crm.springboot.mapper.SysPowerMapper.selectGroupManagerByUserId2"></collection>
   </resultMap>
 
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
     INSERT INTO info_USER
-    (loginname,password,phone,username,email,sex) 
+    (loginname,password,phone,username,email,sex,postId,avatar) 
     VALUES
-    (#{loginname},#{password},#{phone},#{username},#{email},#{sex})
+    (#{loginname},#{password},#{phone},#{username},#{email},#{sex},#{post.pId},#{avatar})
   </insert>
   
  
@@ -83,6 +85,8 @@
      	<if test="birthday!=null">birthday=#{birthday},</if>
      	<if test="phone!=null">phone=#{phone},</if>
      	<if test="email!=null">email=#{email},</if>
+     	<if test="post.pId!=null">postId=#{post.pId},</if>
+     	<if test="avatar!=null">avatar=#{avatar}</if>
      </set>
      where id=#{id}
   </update>
@@ -95,21 +99,47 @@
   		#{id}
   	</foreach>
   </delete>
+<!-- =================================部门之间联系info_dept_identityLink========================================== -->
+<insert id="saveDeptIdentityLink" parameterType="deptIdentityLink" useGeneratedKeys="true">
+	insert into info_dept_identityLink
+	 (firstLevelId,secondLevelId,thirdLevelId) values (#{firstLevel.did},#{secondLevel.did},#{thirdLevel.did})
+</insert>
 
 <!-- =================================用户和部门info_user_dept表============================ -->
   <resultMap type="userLinkDept" id="userLinkDeptResultMap">
   	<id property="id" column="id"/>
-  	<association property="dept" column="deptId" javaType="dept" select="selectDeptWithId"></association>
+  	<association property="firstLevel" column="firstLevelId" javaType="dept" select="selectDeptWithId"></association>
+  	<association property="secondLevel" column="secondLevelId" javaType="dept" select="selectDeptWithId"></association>
+  	<association property="thirdLevel" column="thirdLevelId" javaType="dept" select="selectDeptWithId"></association>
   </resultMap>
   <select id="selectUserLinkDeptWithUserId" resultMap="userLinkDeptResultMap">
   	select * from info_user_dept where userId=#{id}
   </select>
-  <insert id="saveUserLinkDeptWithUserIdAndDeptIds" parameterType="hashmap">
-  	insert into info_user_dept (userId,deptId) values
-  	<foreach collection="deptIds" item="id" index="index" separator=",">
-  		(#{userId},#{id})
-  	</foreach>
+  
+  <insert id="saveUserLinkDeptWithUserLinkDept" parameterType="userLinkDept">
+  	insert into info_user_dept (userId,secondLevelId,thirdLevelId) values
+  	(#{userId},#{secondLevel.did},#{thirdLevel.did})
   </insert>
+  
+  <insert id="saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds" parameterType="hashmap">
+   
+    	insert into info_user_dept (userId,firstLevelId,secondLevelId,thirdLevelId) values
+  	   <foreach collection="firstLevelIds" item="id" index="index" separator=",">
+  		(#{userLinkDept.userId},#{id},#{userLinkDept.secondLevel.did},#{userLinkDept.thirdLevel.did})
+  	  </foreach>
+    
+   
+
+
+  </insert>
+  <update id="updateUserLinkDeptWithUserIdAndDeptIds" parameterType="hashmap">
+  	update info_user_dept values
+  	
+  	<set>
+  		<if test=""></if>
+  	</set>
+  	where userId=#{userId}
+  </update>
 <!-- =================================用户和职位info_user_post表============================ -->
   <resultMap type="userLinkPost" id="userLinkPostResultMap">
   	<id property="id" column="id"/>
@@ -138,7 +168,9 @@
   <select id="selectAllDept" resultType="dept">
     select * from info_dept
   </select>
-  
+  <insert id="saveDept" parameterType="dept" useGeneratedKeys="true">
+  	insert into info_dept (name) values (#{name})
+  </insert>
   <!-- ===============================职务post表=============================== -->
   <select id="selectPostWithId" resultType="post">
   	select * from info_post where pId=#{pId}

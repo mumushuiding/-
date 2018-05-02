@@ -56,11 +56,11 @@ public interface BaseActivitiService {
 	void showDiagram(InputStream is,OutputStream out);
 	
 	List<ProcessDefinition> selectAllProcessDefinitionsOrderByDesc();
-	void deleteLowerVersionProcessDefinitions();
-	void deleteDeploymentById(String id);
+	void deleteLowerVersionProcessDefinitions(boolean cascade);
+
 	
 	Deployment getDeploymentById(String deploymentId);
-	
+	void deleteDeploymentById(String deploymentId, boolean cascade);
 	String getDeploymentIdByBusinessKey(String businessKey);
 	/**
 	 * ********************************流程实例**********************************
@@ -68,12 +68,20 @@ public interface BaseActivitiService {
 	void deleteProcessInstance(String processInstanceId,String deleteReason);
 	ProcessInstance selectProcessInstance(String processInstanceId);
 	Object getVariableFromProcessInstance(String processInstanceId);
+    /**
+     * *********************************设置变量****************************************
+     */
+ 	void setVariable(Task task,HashMap<String , Object> variable);
 	/**
 	 * ********************************任务存储与查询*************************************
 	 */
 	Task getFirstTask(String processInstanceId);
+	//查询task
+    Task selectTask(String taskId);
 	void setAssignee(String taskId,String userId);
 	void deleteTaskById(String taskId);
+	
+    
 	/**
 	 * 根据taskId获取流程实例
 	 * @param taskId
@@ -104,6 +112,7 @@ public interface BaseActivitiService {
 	void complete(String taskId);
 	void addComment(String taskId,String comment,String userId);
 	void claim(String taskId,String userId);
+	
 
 	
 }
