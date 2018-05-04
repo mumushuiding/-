@@ -73,7 +73,15 @@
   <select id="selectAllUser" resultMap="userResultMap">
     SELECT * FROM info_USER
   </select>
-
+  <select id="selectAllUserWithHashMap" resultMap="userResultMap" parameterType="hashmap">
+    SELECT * FROM info_USER
+    <where>
+    	<if test="username!=null and username!=''">
+    		<bind name="pattern" value="'%'+_parameter.get('username')+'%'"/>
+    		 username like #{pattern}
+    	</if>
+    </where>
+  </select>
   <update id="update" parameterType="user">
   
     update info_user
@@ -104,7 +112,18 @@
 	insert into info_dept_identityLink
 	 (firstLevelId,secondLevelId,thirdLevelId) values (#{firstLevel.did},#{secondLevel.did},#{thirdLevel.did})
 </insert>
-
+<!-- 查询不重复二级部门 -->
+<select id="selectDistinctSecondLevelDept" resultType="dept">
+	select * from info_dept where did in (select  distinct secondLevelId from info_dept_identityLink)
+</select>
+<!-- 根据二级部门，查询不重复一级部门 -->
+<select id="selectDistinctFirstLevelDept" parameterType="hashmap" resultType="dept">
+	select * from info_dept where did in (select distinct firstLevelId from info_dept_identityLink
+	<where>
+		<if test="secondLevelId!=null and secondLevelId!=''">secondLevelId=#{secondLevelId}</if>
+	</where>
+	)
+</select>
 <!-- =================================用户和部门info_user_dept表============================ -->
   <resultMap type="userLinkDept" id="userLinkDeptResultMap">
   	<id property="id" column="id"/>
@@ -127,19 +146,28 @@
   	   <foreach collection="firstLevelIds" item="id" index="index" separator=",">
   		(#{userLinkDept.userId},#{id},#{userLinkDept.secondLevel.did},#{userLinkDept.thirdLevel.did})
   	  </foreach>
-    
-   
-
-
   </insert>
   <update id="updateUserLinkDeptWithUserIdAndDeptIds" parameterType="hashmap">
-  	update info_user_dept values
+  	update info_user_dept 
   	
   	<set>
-  		<if test=""></if>
+  		<if test="firstLevl!=null !=''">=#{}</if>
   	</set>
   	where userId=#{userId}
   </update>
+  <select id="selectUserLinkDeptWithResutltType" parameterType="hashmap" resultType="userLinkDept">
+  	select * from info_user_dept
+  	<where>
+  		<if test="userId!=null and userId!=''">userId=#{userId}</if>
+  	</where>
+  </select>
+  
+  <delete id="deleteUserLinkDept" parameterType="hashmap">
+  	delete from info_user_dept 
+  	<where>
+  		<if test="id!=null and id!=''">id=#{id}</if>
+  	</where>
+  </delete>
 <!-- =================================用户和职位info_user_post表============================ -->
   <resultMap type="userLinkPost" id="userLinkPostResultMap">
   	<id property="id" column="id"/>

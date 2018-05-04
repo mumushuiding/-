@@ -37,6 +37,7 @@ import com.crm.springboot.pojos.ProcessType;
 import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.Vacation;
 import com.crm.springboot.pojos.assess.Evaluation;
+import com.crm.springboot.pojos.assess.Mark;
 import com.crm.springboot.pojos.assess.Project;
 import com.crm.springboot.pojos.assess.Responsibility;
 import com.crm.springboot.pojos.user.User;
@@ -141,14 +142,14 @@ public class ActivitiController {
 	 */
 	@RequestMapping("/listProcessInstance/{taskType}")
 	@ResponseBody
-	public String listProcessInstance(HttpSession session,Model model,Integer pageIndex,Integer pageSize,@PathVariable String taskType){
+	public String listProcessInstance(HttpSession session,Model model,Integer pageIndex,Integer pageSize,String title,@PathVariable String taskType){
 		User user=(User) session.getAttribute("sysuser");
 		model.addAttribute("taskType", taskType);
 		JsonUtils.startPageHelper(pageIndex, pageSize);
 		List<ProcessBean> processBeans=null;
 		HashMap<String, Object> params = new HashMap<String,Object>();
-		
-		
+		params.put("title", title);
+
 		if("all".equals(taskType)){
 			processBeans=processService.selectAllProcess(params);
 		}
@@ -216,14 +217,14 @@ public class ActivitiController {
 	//查看待办的任务列表
 		@RequestMapping("/listTask/{taskType}")
 		@ResponseBody
-		public String listTask(@PathVariable String taskType,HttpSession session,Integer pageIndex,Integer pageSize,Model model){
+		public String listTask(@PathVariable String taskType,HttpSession session,Integer pageIndex,Integer pageSize,String taskName,Model model){
 			User user=(User) session.getAttribute("sysuser");
 			if(user==null) return "redirect:/user/loginForm";
 			PageInfo pageInfo = null;
 			
 			model.addAttribute("taskType", taskType);
 			HashMap<String , Object> params=new HashMap<String, Object>();
-			
+			params.put("taskName", taskName);
 			params.put("deptNames", userService.getDeptNames(user));
 			
 			List<String> processInstanceIds=processService.selectAllProcessInstanceIds(params);
@@ -259,7 +260,7 @@ public class ActivitiController {
 			if(user==null)return "redirect:/user/loginForm";
         	if(!responsibilityService.canIStartEvaluationProcess(user)){
         		System.out.println("referer="+request.getHeader("referer"));
-        		session.setAttribute("msg", "你的职级或者所在的岗位，无法启动这个流程");
+        		session.setAttribute("msg", "你的职级，无法启动这个流程");
         		return "redirect:"+request.getHeader("referer");
         	}
 			
@@ -272,6 +273,7 @@ public class ActivitiController {
 					evaluation.setProcessBean(processBean);
                   
 					
+					model.addAttribute("taskTitle",responsibilityService.selectEvaluationBusinessType(ProcessType.EVALUCATION_MONTH));
 					
 				    model.addAttribute("evaluation", evaluation);
 					
@@ -296,21 +298,21 @@ public class ActivitiController {
 			String deploymentId=activitiService.getDeploymentIdByBusinessKey(evaluation.getProcessBean().getBusinessKey());
 			if("EvaluationProcess".equals(evaluation.getProcessBean().getBusinessKey())){
 				
-				HashMap<String, Object> params = new HashMap<String,Object>();
+				HashMap<String, Object> params =responsibilityService.getStartDateStrAndEndDateDateStr(evaluation.getSparation());
+				
+				evaluation.setStartDate(DateUtil.parseDefaultDate(String.valueOf(params.get("startDate"))));
+				evaluation.setEndDate(DateUtil.parseDefaultDate(String.valueOf(params.get("endDate"))));
+				
 				params.put("userId",user.getId());
-				params.put("startDate",DateUtil.formatTimesTampDate(evaluation.getStartDate()));
-				params.put("endDate", DateUtil.formatTimesTampDate(evaluation.getEndDate()));
+         
 
 				List<Project> projects=responsibilityService.selectAllProject(params);
-			    int totalMark =0;
-			    for(Project project:projects){
-			    	if(project.getMark()!=null){
-			    		totalMark+=Integer.valueOf(project.getMark().getMarkNumber());
-			    	}
-			    	
-			    }
+			    int totalMark =responsibilityService.getTotalMarkOfProjects(projects);
+			    
+			 
+			    
 			    evaluation.setTotalMark(String.valueOf(totalMark));
-			    System.out.println("evaluation.getTotalMark()="+evaluation.getTotalMark());
+			   
 				if("startmonth".equals(taskType)){
 					evaluation.setCreateTime(createTime);
 					processBean.setDeploymentId(deploymentId);
@@ -334,11 +336,12 @@ public class ActivitiController {
 		if(evaluation.geteId()==null){
 			ProcessInstance pInstance=activitiService.startProcess(processBean.getBusinessKey(), processBean.getDeploymentId());
 			processBean.setUser(user);
-			processBean.setTitle(user.getUsername()+"-"+responsibilityService.getTitle(evaluation.getStartDate(), evaluation.getEndDate()));
+			//processBean.setTitle(user.getUsername()+"-"+responsibilityService.getTitle(evaluation.getStartDate(), evaluation.getEndDate()));
+			processBean.setTitle(user.getUsername()+"-"+evaluation.getSparation());
 			processBean.setBusinessType(responsibilityService.getBusinessType(evaluation.getStartDate(), evaluation.getEndDate()));
 			processBean.setRequestedDate(DateUtil.formatTimesTampDate(new Date()));
 			processBean.setProcessInstanceId(pInstance.getId());
-			System.out.println("deptName="+processBean.getDeptName());
+			
 			evaluation.setCreateTime(new Date());
 			//查询第一任务
 			Task task=this.activitiService.getFirstTask(pInstance.getId());
@@ -358,8 +361,8 @@ public class ActivitiController {
 			responsibilityService.updateEvaluation(evaluation);
 		}
 		if("complete".equals(actionType)){
-			evaluation.setCommitted("1");
-			
+			processBean.setCommitted("1");
+			processService.updateProcess(processBean);
 			responsibilityService.updateEvaluation(evaluation);
 			this.activitiService.complete(this.activitiService.getFirstTask(evaluation.getProcessBean().getProcessInstanceId()).getId());
 		}
@@ -405,6 +408,8 @@ public class ActivitiController {
     public String complete(@PathVariable String taskId,@PathVariable String isPass,Evaluation evaluation,HttpSession session,Model model){
     	User user=(User)session.getAttribute("sysuser");
 		if(user==null) return "redirect:/user/loginForm";
+		
+        session.removeAttribute("evaluationHistory");
         
 		responsibilityService.updateEvaluation(evaluation);
         HashMap<String , Object> varsHashMap=new HashMap<String, Object>();

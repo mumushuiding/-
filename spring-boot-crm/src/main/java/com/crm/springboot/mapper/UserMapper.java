@@ -21,6 +21,7 @@ public interface UserMapper extends BaseMapper<User> {
      * ***********************用户***********************************************
      */
 	void deleteUsersByUserIds(String[] ids);
+	List<User> selectAllUserWithHashMap(HashMap<String, Object> params);
 	 /**
      * ***********************用户***********************************************
      */
@@ -44,6 +45,12 @@ public interface UserMapper extends BaseMapper<User> {
 	 */
 	void saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(HashMap<String, Object> params);
 	void saveUserLinkDeptWithUserLinkDept(UserLinkDept userLinkDept);
+	List<Dept> selectDistinctSecondLevelDept();
+	//根据二级部门Id查询一级部门
+	List<Dept> selectDistinctFirstLevelDept(HashMap<String, Object> params);
+	//查询用户当前所在一个部门或分管的多个部门
+	List<UserLinkDept> selectUserLinkDeptWithResutltType(HashMap<String, Object> params);
+	void deleteUserLinkDept(HashMap<String, Object> params);
 	/**
 	 * ***********************组织架构（部门之间的上下级关系）*******************************************
 	 */

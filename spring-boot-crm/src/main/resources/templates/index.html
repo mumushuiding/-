@@ -351,8 +351,36 @@
         <li class="header">功能导航</li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-files-o"></i>
-            <span>维护中心</span>
+            <h3><i class="fa fa-files-o"></i>
+              <span>个人中心</span></h3>
+            <span class="pull-right-container">
+              <span class="label label-primary pull-right">4</span>
+            </span>
+          </a>
+         
+          <ul class="treeview-menu">
+            
+            <h5><li><a href="/responsibility/assessmentList/month" target="mainFrame">日常一线干部考核表</a></li></h5>
+             <h5><li>
+	          <a href="/system/activiti/taskList/candidate" target="mainFrame">
+	            <i class="fa fa-envelope"></i> <span>待审批</span>
+	            <span class="pull-right-container">
+	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber!=0}">待办<small th:text="${candidateTaskNumber}"></small></small>
+	              <small class="label pull-right bg-red" th:if="${assigneeTaskNumber!=0}">需审批<small th:text="${assigneeTaskNumber}"></small></small>
+	            </span>
+	          </a>
+		    </li></h5>
+            <!-- <li><a href="/responsibility/projectList/completed" target="mainFrame">日常工作项目管理</a></li>
+            <li><a href="/system/activiti/processInstanceList/now" target="mainFrame">日常工作流程申请列表</a></li>-->
+
+          </ul>
+          
+        </li>
+       
+        <li class="treeview">
+          <a href="#">
+            <h3><i class="fa fa-files-o"></i>
+            <span>维护中心</span></h3>
             <span class="pull-right-container">
               <span class="label label-primary pull-right">4</span>
             </span>
@@ -373,30 +401,7 @@
 
           </ul>
         </li>
-       <li class="treeview">
-          <a href="#">
-            <i class="fa fa-files-o"></i>
-            <span>个人中心</span>
-            <span class="pull-right-container">
-              <span class="label label-primary pull-right">4</span>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li th:if="${session.sysuser!=null}"><a th:href="@{'/user/updateForm/'+${session.sysuser.id}}" target="mainFrame">个人信息修改</a></li>
-            <li><a href="/responsibility/assessmentList/month" target="mainFrame">日常工作一线干部考核</a></li>
-            <li><a href="/responsibility/projectList/completed" target="mainFrame">日常工作项目管理</a></li>
-            <li><a href="/system/activiti/processInstanceList/now" target="mainFrame">日常工作流程申请列表</a></li>
-            <li>
-	          <a href="/system/activiti/taskList/candidate" target="mainFrame">
-	            <i class="fa fa-envelope"></i> <span>任务</span>
-	            <span class="pull-right-container">
-	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber!=0}">待办<small th:text="${candidateTaskNumber}"></small></small>
-	              <small class="label pull-right bg-red" th:if="${assigneeTaskNumber!=0}">需审批<small th:text="${assigneeTaskNumber}"></small></small>
-	            </span>
-	          </a>
-		    </li>
-          </ul>
-        </li>
+       
       </ul>
     </section>
     <!-- /.sidebar -->
@@ -407,13 +412,18 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Timeline
-        <small>example</small>
+	     <ol class="breadcrumb">
+	        <li><a href="/index"><span class="glyphicon glyphicon-home"></span></a></li>
+	        <li><a href="javascript:history.back(-2)">前一页</a></li>
+	        <li><a href="javascript:history.back(-1)">上一页</a></li>
+	        <li><a href="javascript:history.go(1)">下一页</a></li>
+	      </ol>
       </h1>
       <ol class="breadcrumb">
         <li><a href="/index"><i class="fa fa-dashboard"></i>首页</a></li>
+        <li><a href="javascript:history.back(-2)">前一页</a></li>
         <li><a href="javascript:history.back(-1)">上一页</a></li>
-        <li class="active">Timeline</li>
+        
       </ol>
     </section>
 

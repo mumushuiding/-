@@ -11,6 +11,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 public class User implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3352357640051007148L;
 	private Integer id;
 	private String loginname;
 	private String password;
@@ -31,6 +35,19 @@ public class User implements Serializable{
     
     private UserLinkDept userLinkDept;//主要是注册时接收员工部门属性，没有其它作用
     
+    private String deptIds;////主要是接收注册时员工的部门信息;
+
+	public String getDeptIds() {
+		return deptIds;
+	}
+
+
+
+	public void setDeptIds(String deptIds) {
+		this.deptIds = deptIds;
+	}
+
+
 
 	public String getAvatar() {
 		return avatar;

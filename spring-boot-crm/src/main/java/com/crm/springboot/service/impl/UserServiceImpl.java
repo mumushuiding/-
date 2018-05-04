@@ -59,6 +59,7 @@ public class UserServiceImpl implements UserService{
 //	@CachePut(key="#t.id")
 	
 	public User update(User user) {
+		
 		userMapper.update(user);
 		
 		return user;
@@ -201,6 +202,36 @@ public class UserServiceImpl implements UserService{
 	    }
 		
 				
+	}
+
+	@Override
+	public List<User> selectAllUserWithHashMap(HashMap<String, Object> params) {
+		
+		return userMapper.selectAllUserWithHashMap(params);
+	}
+
+	@Override
+	public List<Dept> selectDistinctSecondLevelDept() {
+		
+		return userMapper.selectDistinctSecondLevelDept();
+	}
+
+	@Override
+	public List<Dept> selectDistinctFirstLevelDept(HashMap<String, Object> params){
+		
+		return userMapper.selectDistinctFirstLevelDept(params);
+	}
+
+	@Override
+	public List<UserLinkDept> selectUserLinkDeptWithResutltType(HashMap<String, Object> params) {
+		
+		return userMapper.selectUserLinkDeptWithResutltType(params);
+	}
+
+	@Override
+	public void deleteUserLinkDept(HashMap<String, Object> params) {
+		userMapper.deleteUserLinkDept(params);
+		
 	}
 
 

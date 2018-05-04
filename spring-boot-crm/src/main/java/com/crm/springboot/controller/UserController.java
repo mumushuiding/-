@@ -23,6 +23,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +41,7 @@ import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.user.Dept;
 import com.crm.springboot.pojos.user.Post;
 import com.crm.springboot.pojos.user.User;
+import com.crm.springboot.pojos.user.UserLinkDept;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.UserService;
 import com.crm.springboot.utils.DateUtil;
@@ -69,7 +71,7 @@ public class UserController {
 	public String locate(@PathVariable String location,Model model,HttpSession session,HttpServletRequest request){
 		model.addAttribute("user", new User());
 		String referer=request.getHeader("referer");
-		System.out.println("referer="+referer);
+		
 		session.setAttribute("referer", request.getHeader("referer"));
 		if("loginForm".equals(location)){
 			
@@ -100,21 +102,52 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping(value="/{location}/{parameter}")
-	public String locate(@PathVariable String location,@PathVariable Serializable parameter,Model model){
-		
+	public String locate(@PathVariable String location,@PathVariable String parameter,Model model,HttpSession session,HttpServletRequest request){
+       
 		if("updateForm".equals(location)){
 			User user=new User();
 			if(parameter!=null) user=userService.getById(String.valueOf(parameter));
-			List<Dept> depts=userService.selectAllDept();
+			String deptIds="";
+			for (UserLinkDept userLinkDept :user.getUserLinkDepts()) {
+				deptIds+=userLinkDept.getFirstLevel().getDid()+","+userLinkDept.getSecondLevel().getDid();
+			}
+			
+			System.out.println("deptIds="+deptIds);
 			List<Post> posts=userService.selectAllPost();
+			List<Dept> depts=userService.selectAllDept();
+			model.addAttribute("deptIds", deptIds);
 			model.addAttribute("depts", depts);
 			model.addAttribute("posts", posts);
 			model.addAttribute("user", user);
 		}
+        if("inChargeForm".equals(location)){
+        	
+        	String referer=request.getHeader("referer");
+     		
+     		session.setAttribute("referer", request.getHeader("referer"));
+        	
+    		List<Dept> depts=userService.selectDistinctSecondLevelDept();
 
+    		UserLinkDept userLinkDept=new UserLinkDept();
+    		userLinkDept.setUserId(Integer.valueOf(parameter));
+    		model.addAttribute("depts", depts);
+    		model.addAttribute("userLinkDept", userLinkDept);
+    	}
 		return "user/"+location;
 	}
-	
+	@RequestMapping("/selectFirstLevelDept/{secondLevelId}")
+	@ResponseBody
+	public String selectFirstLevelDept(@PathVariable String secondLevelId){
+		StringBuffer result=new StringBuffer();
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("secondLevelId", secondLevelId);
+		List<Dept> fdepts=userService.selectDistinctFirstLevelDept(params);
+		for (Dept dept : fdepts) {
+			result.append("<option value=\""+dept.getDid()+"\">"+dept.getName()+"</option>");
+		}
+		System.out.println(result.toString());
+		return result.toString();
+	}
 
 /**
  * **********************************************流程************************************************
@@ -149,7 +182,7 @@ public class UserController {
 	public String login(@ModelAttribute("user") User user,Model model,HttpSession session,HttpServletRequest request){
 		
 		String referer=(String) session.getAttribute("referer");
-        String[] toIndex={"save","login"};
+        String[] toIndex={"save","login","loginForm"};
 		
 
 		String msg="";
@@ -168,14 +201,13 @@ public class UserController {
 	    		System.out.println("跳转到index");
 	    		return "/index";
 	    	}
-	    	System.out.println("跳转到"+referer);
-	    	return "redirect:"+referer;
+	    	if(referer!=null)return "redirect:"+referer;
 	    }else{
 	    	msg="帐号或者密码错误";
 	    	model.addAttribute("msg",msg);
 	    }
 	    
-		return "user/loginForm";
+		return "/user/loginForm";
 	}
 	/**
 	 * 登出
@@ -187,7 +219,7 @@ public class UserController {
 		sessionStatus.setComplete();
 		
 		
-		return "redirect:/user/loginForm";
+		return "redirect:/index";
 	}
 //*****************************************增删改查***********************************************	
 	/**
@@ -246,6 +278,33 @@ public class UserController {
 			activitiService.deleteUser(id);
 		}
 		return "redirect:/system/power/userList";
+	}
+	@RequestMapping("/updateUserLinkDepts")
+	public String updateUserLinkDepts(UserLinkDept userLinkDept,HttpSession session){
+		String referer=(String) session.getAttribute("referer");
+		
+		
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("userId", userLinkDept.getUserId());
+		
+		List<UserLinkDept> userLinkDepts=userService.selectUserLinkDeptWithResutltType(params);
+		
+		params.remove("userId");
+		
+		//先删除全部旧有数据
+//		for (UserLinkDept userLinkDept2 : userLinkDepts) {
+//			params.put("id", userLinkDept2.getId());
+//			userService.deleteUserLinkDept(params);
+//		}
+		
+		params.remove("id");
+		//添加新数据
+		params.put("firstLevelIds",userLinkDept.getFirstLevelIds().split(","));
+		params.put("userLinkDept", userLinkDept);
+		userService.saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(params);
+		
+		return "redirect:"+referer;
+		
 	}
 	
 }

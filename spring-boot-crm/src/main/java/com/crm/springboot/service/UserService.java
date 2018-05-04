@@ -30,6 +30,7 @@ public interface UserService{
 	void deleteById(Serializable id);
 
 	User save(User user);
+	List<User> selectAllUserWithHashMap(HashMap<String, Object> params);
 	/**
 	 * ***********************部门***********************************************
 	 */
@@ -58,6 +59,11 @@ public interface UserService{
 	 * @param params
 	 */
 	void updateUserLinkDeptWithUserIdAndDeptIds(String userId,String deptIds);
+	List<Dept> selectDistinctSecondLevelDept();
+	//根据二级部门Id查询一级部门
+	List<Dept> selectDistinctFirstLevelDept(HashMap<String, Object> params);
+	List<UserLinkDept> selectUserLinkDeptWithResutltType(HashMap<String, Object> params);
+	void deleteUserLinkDept(HashMap<String, Object> params);
 	/**
 	 * ***********************组织架构（部门之间的上下级关系）*******************************************
 	 */

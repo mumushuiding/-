@@ -1,21 +1,36 @@
 .border1{
 	 border: 2px solid #ddd;
 }
-input,select{
-	width: 100%;
-	height: 100%;
-	border: none;
-	/* background: #F3FAFC; */
-}
+
 div { 
 	overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
-	border-bottom: 2px solid #ddd;; 
+	border-bottom: 2px solid #ddd;
+	font-size: 16px;
+	line-height: 1.42857143;
+	color:black;
+	
+	display: block;
+	text-align: left;
+    background-color: #fff;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
-
-textarea{
+p{
+	width: 100%;
+	height: 100%;
+	display: box;display: -webkit-box;display: -moz-box;-webkit-box-pack:center;-moz-box-pack:center;-webkit-box-align:center;-moz-box-align:center
+}
+input,select,texarea{
 	width: 100%;
 	height: 100%;
 	border: none;
+	display: block;
+	font-size:18px;
+	font-weight: bold;
+	padding: 6px 12px;
 	/* background: #F3FAFC; */
 }
 .writeV{

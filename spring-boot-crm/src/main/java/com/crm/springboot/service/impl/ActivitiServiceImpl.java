@@ -41,8 +41,10 @@ import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
 import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.Vacation;
+import com.crm.springboot.pojos.assess.Evaluation;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.ProcessService;
+import com.crm.springboot.service.ResponsibilityService;
 import com.crm.springboot.utils.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -65,6 +67,8 @@ public class ActivitiServiceImpl implements ActivitiService{
     
 	@Autowired ProcessService processService;
 
+	@Autowired
+	private ResponsibilityService responsibilityService;
 
 	@Override
 	public List<Group> selectGroups(int nowPage,int pageSize) {
@@ -315,8 +319,8 @@ public class ActivitiServiceImpl implements ActivitiService{
 			ProcessInstance pi=this.getProcessInstance(task.getId());
 	
 			//查询流程参数
-			ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
-			
+			//ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
+			ProcessBean arg=responsibilityService.selectEvaluationWithProcessInstanceId(pi.getId()).getProcessBean();
 			//封装值对象
 			TaskVO vo=new TaskVO();
 			vo.setProcessInstanceId(task.getProcessInstanceId());
@@ -617,7 +621,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 			}
 		}
 		//Deployment deployment=repositoryService.createDeploymentQuery().processDefinitionKey(businessKey).singleResult();
-		System.out.println("最终选择的部署文件ID="+result.getId());
+		
 		return result.getId();
 	}
 
@@ -630,10 +634,20 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public void setTaskCandidateGroup(String processInstanceId, String taskDefinitionKey, String delegateTaskName) {
+		System.out.println("processInstanceId="+processInstanceId+",taskDefinitionKey="+taskDefinitionKey+",delegateTaskName="+delegateTaskName);
 		Task task=selectTask(processInstanceId, taskDefinitionKey);
-		Group group=identityService.createGroupQuery().groupName(delegateTaskName).singleResult();
-		System.out.println(delegateTaskName+"---设置候选人组："+group.getId());
-		taskService.addCandidateGroup(task.getId(), group.getId());
+		if(task==null){
+			System.out.println("task==NULL");
+		}else {
+			System.out.println("task!=NULL");
+		}
+//		Group group=identityService.createGroupQuery().groupName(delegateTaskName).singleResult();
+//		
+//		if(taskService==null){
+//			System.out.println("taskService==NULL");
+//		}
+//		System.out.println("task.getId()="+task.getId()+","+delegateTaskName+"---设置候选人组："+group.getId());
+//		taskService.addCandidateGroup(task.getId(), group.getId());
 		
 	}
 
@@ -651,9 +665,9 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public void setVariable(Task task,HashMap<String, Object> variables) {
-		System.out.println("task.getExecutionId()="+task.getExecutionId());
+		
 		Execution execution=this.runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-		System.out.println("execution.getId()="+execution.getId());
+		
 		this.runtimeService.setVariables(execution.getId(), variables);
 		
 	}
@@ -666,6 +680,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 		for (IdentityLink identityLink : x) {
 			result.add(identityLink.getGroupId());
 		}
+
 		return result;
 	}
 
