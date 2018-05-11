@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,12 +40,12 @@ import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
-import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.Vacation;
 import com.crm.springboot.pojos.assess.Evaluation;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.ProcessService;
 import com.crm.springboot.service.ResponsibilityService;
+import com.crm.springboot.service.SysPowerService;
 import com.crm.springboot.utils.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -69,7 +70,8 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Autowired
 	private ResponsibilityService responsibilityService;
-
+    @Autowired
+    private SysPowerService sysPowerService;
 	@Override
 	public List<Group> selectGroups(int nowPage,int pageSize) {
 		
@@ -241,10 +243,9 @@ public class ActivitiServiceImpl implements ActivitiService{
 				.singleResult();
 	    
 		BpmnModel bpmnModel= repositoryService.getBpmnModel(pi.getProcessDefinitionId());
-	        
-	    InputStream is=new DefaultProcessDiagramGenerator()
-	        		.generateDiagram(bpmnModel, "png",
-	        				runtimeService.getActiveActivityIds(executionId));
+
+	    InputStream is=new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png",
+	    		runtimeService.getActiveActivityIds(executionId), Collections.<String>emptyList(), "宋体", "宋体", "宋体", null, 2.0);
 	    showDiagram(is, out);
 	}
 
@@ -286,11 +287,14 @@ public class ActivitiServiceImpl implements ActivitiService{
 	@Override
 	public List<Task> listCandidateTasks(String userId,List<String> processInstanceIds, Integer pageIndex, Integer pageSize) {
 		//查询用户所在的所有用户组
-		
+
 		List<String> candidateGroups=this.candidateGroups(userId);
-		if(candidateGroups==null){
+        
+		if(candidateGroups==null||candidateGroups.size()==0){
 			return null;
 		}
+
+
 		if(processInstanceIds.size()==0){
 			
 			return null;
@@ -311,26 +315,22 @@ public class ActivitiServiceImpl implements ActivitiService{
 	}
 
 	@Override
-	public List<TaskVO> createTaskVOList(List<Task> tasks) {
+	public List<ProcessBean> createTaskVOList(List<Task> tasks) {
 		if(tasks==null) return null;
-		List<TaskVO> result=new ArrayList<TaskVO>();
+		List<ProcessBean> result=new ArrayList<ProcessBean>();
 		if(tasks==null) return result;
 		for(Task task:tasks){
 			ProcessInstance pi=this.getProcessInstance(task.getId());
 	
 			//查询流程参数
-			//ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
-			ProcessBean arg=responsibilityService.selectEvaluationWithProcessInstanceId(pi.getId()).getProcessBean();
+			ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
+			if(arg==null) break; 
+//			ProcessBean arg=responsibilityService.selectEvaluationWithProcessInstanceId(pi.getId()).getProcessBean();
 			//封装值对象
-			TaskVO vo=new TaskVO();
-			vo.setProcessInstanceId(task.getProcessInstanceId());
-			vo.setCreateTime(arg.getRequestedDate());
-			
-			vo.setTaskName(arg.getTitle());
-			vo.setTaskId(task.getId());
-            
-			vo.setExecutionId(task.getExecutionId());
-			result.add(vo);
+			arg.setProcessInstanceId(task.getProcessInstanceId());
+			arg.setTaskId(task.getId());
+			arg.setExecutionId(task.getExecutionId());
+			result.add(arg);
 		}
 		return result;
 	}
@@ -338,8 +338,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public PageInfo listCandidatePageInfo(String userId,List<String> processInstanceIds, Integer pageIndex, Integer pageSize) {
-
-	    if(processInstanceIds.size()==0) return null;
+        
 		return this.getPageInfo(createTaskVOList(this.listCandidateTasks(userId,processInstanceIds, pageIndex, pageSize)), this.countListCandidateTasks(userId,processInstanceIds));
 	}
 
@@ -350,8 +349,13 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public long countListCandidateTasks(String userId,List<String> processInstanceIds) {
-		List<String> candidateGroups=this.candidateGroups(userId);
 		if(processInstanceIds==null || processInstanceIds.size()==0) return 0;
+		List<String> candidateGroups=this.candidateGroups(userId);
+
+		if(candidateGroups==null ||candidateGroups.size()==0) return 0;
+		
+		System.out.println("count="+taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskCandidateGroupIn(candidateGroups).count());
+		
 		return taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskCandidateGroupIn(candidateGroups).count();
 	}
 
@@ -511,6 +515,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public PageInfo getPageInfo(List<?> list, long totalSize) {
+		if(list==null||list.size()==0) return null;
 		PageInfo pageInfo=new PageInfo(list);
 		pageInfo.setTotal(totalSize);
 		return pageInfo;
@@ -652,9 +657,9 @@ public class ActivitiServiceImpl implements ActivitiService{
 	}
 
 	@Override
-	public Object getVariableFromProcessInstance(String processInstanceId) {
+	public Object getVariableFromProcessInstance(String processInstanceId,String variableName) {
 		
-		return this.runtimeService.getVariable(processInstanceId, "arg");
+		return this.runtimeService.getVariable(processInstanceId, variableName);
 	}
 
 	@Override

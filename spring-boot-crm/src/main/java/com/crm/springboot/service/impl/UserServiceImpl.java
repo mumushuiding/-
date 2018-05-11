@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.aspectj.weaver.ast.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -111,7 +112,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public List<UserLinkDept> selectUserLinkDeptWithUserId(Serializable userId) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -123,11 +124,6 @@ public class UserServiceImpl implements UserService{
 		
 	}
 
-	@Override
-	public void updateUserLinkDeptWithUserIdAndDeptIds(String userId, String deptIds) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public String[] getDeptNames(User user) {
@@ -145,9 +141,7 @@ public class UserServiceImpl implements UserService{
 		}
 		String[] deptNames=new String[dept.size()];
 		dept.toArray(deptNames);
-		for (String string : deptNames) {
-			System.out.println("================="+string);
-		}
+
 		return deptNames;
 	}
 
@@ -167,6 +161,11 @@ public class UserServiceImpl implements UserService{
 	public void saveDeptIdentityLink(DeptIdentityLink deptIdentityLink) {
 		userMapper.saveDeptIdentityLink(deptIdentityLink);
 		
+	}
+	@Override
+	public void saveUserLinkDept(UserLinkDept userLinkDept) {
+		
+		this.saveUserLinkDept(userLinkDept.getUserId(), userLinkDept.getFirstLevelIds(), String.valueOf(userLinkDept.getSecondLevel().getDid()), String.valueOf(userLinkDept.getThirdLevel().getDid()));
 	}
 
 
@@ -233,6 +232,52 @@ public class UserServiceImpl implements UserService{
 		userMapper.deleteUserLinkDept(params);
 		
 	}
+
+	@Override
+	public List<String> selectAllUserLinkDeptIds(HashMap<String, Object> params) {
+		
+		return userMapper.selectAllUserLinkDeptIds(params);
+	}
+
+	@Override
+	public void deleteUserLinkDeptByIds(String[] ids) {
+		userMapper.deleteUserLinkDeptByIds(ids);
+		
+	}
+
+	@Override
+	public UserLinkDept getSingleUserLinkDept(User user, String deptName) {
+		
+		UserLinkDept result=null;
+		List<UserLinkDept> userLinkDepts=user.getUserLinkDepts();
+		
+		
+		if(userLinkDepts==null && userLinkDepts.size()==0) return null;
+		
+		if(userLinkDepts.size()==1){
+			if(deptName==null) return userLinkDepts.get(0);
+			
+		}
+		if(deptName==null) return null;
+		
+		for (UserLinkDept userLinkDept : userLinkDepts) {
+			if(userLinkDept.getFirstLevel().getName().equals(deptName)){
+				result=userLinkDept;break;
+			}
+		}
+		if(result==null){
+			for (UserLinkDept userLinkDept : userLinkDepts) {
+				if(userLinkDept.getSecondLevel().getName().equals(deptName)){
+					result=userLinkDept;break;
+				}
+			}
+		}
+		
+        
+		return result;
+	}
+
+
 
 
 

@@ -51,6 +51,8 @@ public interface UserMapper extends BaseMapper<User> {
 	//查询用户当前所在一个部门或分管的多个部门
 	List<UserLinkDept> selectUserLinkDeptWithResutltType(HashMap<String, Object> params);
 	void deleteUserLinkDept(HashMap<String, Object> params);
+	List<String> selectAllUserLinkDeptIds(HashMap<String, Object> params);
+	void deleteUserLinkDeptByIds(String[] ids);
 	/**
 	 * ***********************组织架构（部门之间的上下级关系）*******************************************
 	 */

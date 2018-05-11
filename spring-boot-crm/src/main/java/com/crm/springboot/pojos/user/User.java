@@ -21,7 +21,10 @@ public class User implements Serializable{
 	private String username;
 	private String sex;
     private List<UserLinkDept> userLinkDepts;
+    //员工职级
     private Post post;
+    //员工的职务
+    private String position;
     //用户所属的审批管理组
     private List<GroupManager> userLinkGroup;
     private String email;
@@ -36,6 +39,29 @@ public class User implements Serializable{
     private UserLinkDept userLinkDept;//主要是注册时接收员工部门属性，没有其它作用
     
     private String deptIds;////主要是接收注册时员工的部门信息;
+
+    
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", loginname=" + loginname + ", password=" + password + ", username=" + username
+				+ ", sex=" + sex + ", userLinkDepts=" + userLinkDepts + ", post=" + post + ", position=" + position
+				+ ", userLinkGroup=" + userLinkGroup + ", email=" + email + ", birthday=" + birthday + ", phone="
+				+ phone + ", avatar=" + avatar + ", userLinkDept=" + userLinkDept + ", deptIds=" + deptIds + "]";
+	}
+
+
+
+	public String getPosition() {
+		return position;
+	}
+
+
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+
 
 	public String getDeptIds() {
 		return deptIds;

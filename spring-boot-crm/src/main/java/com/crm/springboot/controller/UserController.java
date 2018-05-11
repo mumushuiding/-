@@ -37,7 +37,6 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import com.alibaba.druid.sql.visitor.functions.Locate;
 import com.crm.springboot.mapper.UserMapper;
-import com.crm.springboot.pojos.TaskVO;
 import com.crm.springboot.pojos.user.Dept;
 import com.crm.springboot.pojos.user.Post;
 import com.crm.springboot.pojos.user.User;
@@ -86,6 +85,12 @@ public class UserController {
 			List<Post> posts=userService.selectAllPost();
 			model.addAttribute("depts", depts);
 			model.addAttribute("posts", posts);
+		}
+       if("updateForm".equals(location)){
+			User user=(User) session.getAttribute("sysuser");
+			List<Post> posts=userService.selectAllPost();
+			model.addAttribute("posts", posts);
+			model.addAttribute("user", user);
 		}
 		//用户申请的任务列表
 		if("applyList".equals(location)){
@@ -260,6 +265,7 @@ public class UserController {
 	 */
 	@RequestMapping("/update")
 	public String update(@ModelAttribute("user") User user){
+		
 		
 		
 		userService.update(user);

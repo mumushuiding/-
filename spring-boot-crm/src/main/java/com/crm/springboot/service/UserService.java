@@ -31,13 +31,16 @@ public interface UserService{
 
 	User save(User user);
 	List<User> selectAllUserWithHashMap(HashMap<String, Object> params);
+
 	/**
 	 * ***********************部门***********************************************
 	 */
 	
 	void saveDept(Dept dept);
+	//获取用户三级部门信息
+	UserLinkDept getSingleUserLinkDept(User user,String condition);
 	/**
-	 * ***********************用户和职位*******************************************
+	 * ***********************用户和职级*******************************************
 	 */
 	List<UserLinkPost> selectUserLinkPostWithUserId(Serializable userId);
 	/**
@@ -58,15 +61,20 @@ public interface UserService{
 	 * 根据用户Id 和 部门id来更新
 	 * @param params
 	 */
-	void updateUserLinkDeptWithUserIdAndDeptIds(String userId,String deptIds);
 	List<Dept> selectDistinctSecondLevelDept();
 	//根据二级部门Id查询一级部门
 	List<Dept> selectDistinctFirstLevelDept(HashMap<String, Object> params);
 	List<UserLinkDept> selectUserLinkDeptWithResutltType(HashMap<String, Object> params);
+	
 	void deleteUserLinkDept(HashMap<String, Object> params);
+	
+	//查询所有id
+	List<String> selectAllUserLinkDeptIds(HashMap<String, Object> params);
+	void deleteUserLinkDeptByIds(String[] ids);
 	/**
 	 * ***********************组织架构（部门之间的上下级关系）*******************************************
 	 */
 	void saveDeptIdentityLink(DeptIdentityLink deptIdentityLink);
+	void saveUserLinkDept(UserLinkDept userLinkDept);
 	void saveUserLinkDept(Integer userId,String firstLevelId,String secondLevelId,String thirdLevelId);
 }

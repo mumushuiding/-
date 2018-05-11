@@ -279,7 +279,7 @@
                   <small th:each="d:${session.sysuser.userLinkDepts}" th:text="${d.secondLevel.name}"></small>
                 </p>
               </li>
-              <!-- Menu Body -->
+              <!-- Menu Body
               <li class="user-body">
                 <div class="row">
                   <div class="col-xs-4 text-center">
@@ -292,8 +292,8 @@
                     <a href="#">Friends</a>
                   </div>
                 </div>
-                <!-- /.row -->
-              </li>
+          
+              </li> -->
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left" th:if="${session.sysuser!=null}">
@@ -361,15 +361,15 @@
           <ul class="treeview-menu">
             
             <h5><li><a href="/responsibility/assessmentList/month" target="mainFrame">日常一线干部考核表</a></li></h5>
-             <h5><li>
+             <li>
 	          <a href="/system/activiti/taskList/candidate" target="mainFrame">
 	            <i class="fa fa-envelope"></i> <span>待审批</span>
 	            <span class="pull-right-container">
-	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber!=0}">待办<small th:text="${candidateTaskNumber}"></small></small>
-	              <small class="label pull-right bg-red" th:if="${assigneeTaskNumber!=0}">需审批<small th:text="${assigneeTaskNumber}"></small></small>
+	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber} ne 0">待办<small th:text="${candidateTaskNumber}"></small></small>
 	            </span>
 	          </a>
-		    </li></h5>
+		    </li>
+		     <h5><li><a href="/user/updateForm" target="mainFrame">修改密码和个人信息</a></li></h5>
             <!-- <li><a href="/responsibility/projectList/completed" target="mainFrame">日常工作项目管理</a></li>
             <li><a href="/system/activiti/processInstanceList/now" target="mainFrame">日常工作流程申请列表</a></li>-->
 

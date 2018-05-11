@@ -11,8 +11,8 @@ import org.activiti.engine.task.Task;
 
 import com.crm.springboot.pojos.FormField;
 import com.crm.springboot.pojos.GroupManager;
+import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
-import com.crm.springboot.pojos.TaskVO;
 import com.github.pagehelper.PageInfo;
 
 public interface ActivitiService extends BaseActivitiService{
@@ -71,7 +71,7 @@ public interface ActivitiService extends BaseActivitiService{
  	long countListAssigneeTasks(String userId);
  	PageInfo listAssigneePageInfo(String userId,Integer pageIndex, Integer pageSize);
  // 将Task集合转为TaskVO集合
- 	List<TaskVO> createTaskVOList(List<Task> tasks);
+ 	List<ProcessBean> createTaskVOList(List<Task> tasks);
  	//查询一个任务所在流程的全部评论
  	List<Comment> getComments(String taskId);
     //查询当前任务的审批用户组

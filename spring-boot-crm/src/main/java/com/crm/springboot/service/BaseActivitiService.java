@@ -16,7 +16,7 @@ import org.activiti.engine.task.Task;
 
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
-import com.crm.springboot.pojos.TaskVO;
+
 
 public interface BaseActivitiService {
 	/**
@@ -67,7 +67,7 @@ public interface BaseActivitiService {
 	 */
 	void deleteProcessInstance(String processInstanceId,String deleteReason);
 	ProcessInstance selectProcessInstance(String processInstanceId);
-	Object getVariableFromProcessInstance(String processInstanceId);
+	Object getVariableFromProcessInstance(String processInstanceId,String variableName);
     /**
      * *********************************设置变量****************************************
      */
