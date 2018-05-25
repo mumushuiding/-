@@ -72,7 +72,15 @@
 	        <option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}"></option>
 	      </select>
 	     </div>
-
+          <label style="text-align:center;">----------修改部门-----------</label>
+          <div class="form-group">
+		      <select id="second" class="selectpicker" data-live-search="true" title="请选择部门"  th:field="*{userLinkDept.secondLevel.did}" >
+		        <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+		      </select>
+		       <select id="first" class="selectpicker" data-live-search="true" title="请选择子部门"  th:field="*{userLinkDept.firstLevelIds}" multiple="multiple">
+		         
+		        </select>
+	     </div>
 	      <label style="text-align:center;">----------修改密码-----------</label>
 	      <div class="form-group">
             <input  type="password" class="form-control input-lg" placeholder="旧密码"  maxlength="16"/>
@@ -94,6 +102,25 @@
     </div>
   </div>
 </div>
+<script>
+    //修改部门
+	$('#second').change(function(){
+		$.ajax({
+		  type: 'POST',
+		  url: "/user/selectFirstLevelDept/"+$('#second').val(),
+		  dataType: "text",
+		  success: function(data){
+		        
+		        $("#first").empty();
+		        $("#first").html('');
+		        $("#first").append(data);
+		        $("#first").selectpicker('refresh');
+		         
 
+		  }
+		 
+		});
+	});
+</script>
 </body>
 </html>

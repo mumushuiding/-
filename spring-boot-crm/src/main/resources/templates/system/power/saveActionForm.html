@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>一线考核系统</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom styles for this template -->
+    <link href="/css/carousel.css" rel="stylesheet"/>
+</head>
+<body>
+
+  
+  <div id="loginDiv" class="modal show" style="top:10%">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" onclick="javascript:history.back(-1);">X</button>
+        <h1 class="text-center text-primary">添加action</h1>
+      </div>
+      <div class="modal-body">
+         <form action="#" method="post" th:action="@{/system/power/syspower/saveAction}" th:object="${action}">
+          <div class="form-group">
+            <input type="text" class="form-control input-lg" placeholder="action名称" th:field="*{actionname}"    maxlength="16"/>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control input-lg" placeholder="action所属栏目" th:field="*{actionColumn.actioncolumnid}"   maxlength="16"/>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control input-lg" placeholder="url" th:field="*{action}"   maxlength="16"/>
+          </div>
+          <div class="form-group">
+            <div th:text="${msg}" style="font:red;text-align:center"></div>
+            <button class="btn btn-primary btn-lg btn-block" >提交</button>
+            <span><a href="#">返回</a></span>
+            <span><a  class="pull-right" href="/user/registerForm">取消</a></span>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

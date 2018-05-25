@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crm.springboot.mapper.EvaluationMapper">
+  <!--*****************************processBean*************************************** -->  
+  <resultMap type="processBean" id="processBeanResultMap">
+  	<id property="processInstanceId" column="processInstanceId"/>
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.getById"></association>
+  </resultMap>
+  <select id="selectProcessBeanWithProcessInstanceId" resultMap="processBeanResultMap">
+  	select * from process where processInstanceId=#{processInstanceId}
+  </select>
+  <!--*****************************evaluation*************************************** -->
+  <resultMap type="evaluation" id="evaluationResultMap">
+    <association property="processBean" javaType="processBean" column="processInstanceId" select="selectProcessBeanWithProcessInstanceId"></association>
+  	<collection property="projects" javaType="ArrayList" column="userId" ofType="project" select="selectProjectWithUserId"></collection>
+  </resultMap>
+
+
+  <select id="selectAllEvaluation" resultMap="evaluationResultMap" parameterType="hashmap">
+  	select * from res_evaluation
+  	<where>
+  		<if test="processInstanceId!=null">
+  			processInstanceId=#{processInstanceId}
+  		</if>
+  		
+  	</where>
+  </select>
+  <insert id="saveEvaluation" parameterType="evaluation" keyProperty="eId" useGeneratedKeys="true">
+  	insert into res_evaluation (
+  	startDate,endDate,processInstanceId,
+  	selfEvaluation,attendance,overseerEvaluation,leadershipEvaluation,
+  	publicEvaluation,organizationEvaluation,totalMark,evaluationType,
+  	createTime,sparation,leadershipRemark,shortComesAndPlan,committed) values (
+  	#{startDate},#{endDate},#{processBean.processInstanceId},
+  	#{selfEvaluation},#{attendance},#{overseerEvaluation},#{leadershipEvaluation},
+  	#{publicEvaluation},#{organizationEvaluation},#{totalMark},#{evaluationType},
+  	#{createTime},#{sparation},#{leadershipRemark},#{shortComesAndPlan},#{committed})
+  </insert>
+  <update id="updateEvaluation" parameterType="evaluation">
+  	update res_evaluation
+  	<set>
+  	  
+  	  <if test="startDate!=null">startDate=#{startDate},</if>
+  	  <if test="endDate!=null">endDate=#{endDate},</if>
+  	  <if test="processBean.processInstanceId!=null">processInstanceId=#{processBean.processInstanceId},</if>
+  	  <if test="selfEvaluation!=null">selfEvaluation=#{selfEvaluation},</if>
+  	  <if test="attendance!=null">attendance=#{attendance},</if>
+  	  <if test="overseerEvaluation!=null">overseerEvaluation=#{overseerEvaluation},</if>
+  	  <if test="leadershipEvaluation!=null">leadershipEvaluation=#{leadershipEvaluation},</if>
+  	  <if test="publicEvaluation!=null">publicEvaluation=#{publicEvaluation},</if>
+  	  <if test="organizationEvaluation!=null">organizationEvaluation=#{organizationEvaluation},</if>
+  	  <if test="totalMark!=null">totalMark=#{totalMark},</if>
+  	  <if test="evaluationType!=null">evaluationType=#{evaluationType},</if>
+  	  <if test="createTime!=null">createTime=#{createTime},</if>
+  	  <if test="sparation!=null">sparation=#{sparation},</if>
+  	  <if test="leadershipRemark!=null">leadershipRemark=#{leadershipRemark},</if>
+  	  <if test="shortComesAndPlan!=null">shortComesAndPlan=#{shortComesAndPlan},</if>
+  	  <if test="committed!=null">committed=#{committed}</if>
+  	</set>
+  	where eId=#{eId}
+  </update>
+  <!--*****************************responsibility*************************************** -->
+  <resultMap type="responsibility" id="responsibilityResultMap">
+  	<id property="id" column="id"/>
+  	<association property="processBean" javaType="processBean" column="processInstanceId" select="selectProcessBeanWithProcessInstanceId"></association>
+   </resultMap>
+  <insert id="saveResponsibility" parameterType="responsibility">
+  	insert into res_responsibility (
+  	startDate,endDate,processInstanceId,sparation,
+  	currentJobDescription,currentJob,newJobDescription,
+  	newJob,ajustDate,createTime,secondLevelId,firstLevelIds,position,thirdLevelId,oldPosition) values (
+  	#{startDate},#{endDate},#{processBean.processInstanceId},#{sparation},
+  	#{currentJobDescription},#{currentJob},#{newJobDescription},
+  	#{newJob},#{ajustDate},#{createTime},#{secondLevelId},#{firstLevelIds},#{position},#{thirdLevelId},#{oldPosition})
+  </insert>
+ <select id="selectAllResponsibility" resultMap="responsibilityResultMap" parameterType="hashmap">
+  	select * from res_responsibility
+  	<where>
+  		<if test="processInstanceId!=null">
+  			processInstanceId=#{processInstanceId}
+  		</if>
+  		
+  	</where>
+  </select>
+<update id="updateResponsibility" parameterType="responsibility">
+	update res_responsibility
+	<set>
+		<if test="startDate!=null">startDate=#{startDate},</if>
+  	    <if test="endDate!=null">endDate=#{endDate},</if>
+		<if test="processBean.processInstanceId!=null and processBean.processInstanceId!=''">processInstanceId=#{processBean.processInstanceId},</if>
+		<if test="sparation!=null and sparation!=''">sparation=#{sparation},</if>
+		<if test="currentJobDescription!=null and currentJobDescription!=''">currentJobDescription=#{currentJobDescription},</if>
+		<if test="currentJob!=null and currentJob!=''">currentJob=#{currentJob},</if>
+		<if test="newJobDescription!=null and newJobDescription!=''">newJobDescription=#{newJobDescription},</if>
+		<if test="newJob!=null and newJob!=''">newJob=#{newJob},</if>
+		<if test="ajustDate!=null">ajustDate=#{ajustDate},</if>
+		<if test="createTime!=null">createTime=#{createTime},</if>
+		<if test="firstLevelIds!=null and firstLevelIds!=''">firstLevelIds=#{firstLevelIds},</if>
+		<if test="secondLevelId!=null and secondLevelId!=''">secondLevelId=#{secondLevelId},</if>
+		<if test="thirdLevelId!=null and thirdLevelId!=''">thirdLevelId=#{thirdLevelId},</if>
+		<if test="position!=null and position!=''">position=#{position},</if>
+		<if test="oldPosition!=null and oldPosition!=''">oldPosition=#{oldPosition}</if>
+	</set>
+	where id=#{id}
+</update>
+  <!--*****************************project*************************************** -->
+  
+  <resultMap type="project" id="projectResultMap">
+    <id property="projectId" column="projectId"/>
+    <collection property="marks" javaType="ArrayList" ofType="mark" column="projectId" select="selectMarkWithProjectId"></collection>
+    
+    
+  </resultMap>
+  <select id="selectProjectWithUserId" parameterType="string" resultMap="projectResultMap">
+  	select * from res_project where userId=#{id}
+  </select>
+  <select id="selectProjectWithProjectId" parameterType="string" resultMap="projectResultMap">
+  	select * from res_project where projectId=#{id}
+  </select>
+  <select id="selectAllProject" resultMap="projectResultMap" parameterType="hashmap">
+  	select * from res_project where 
+  	<if test="userId!=null">
+  		userId=#{userId}
+  	</if>
+  	<if test="completed!=null">
+  		and completed=#{completed}
+  	</if>
+  	<if test="startDate!=null and startDate!=''">
+  	   and startDate &gt;=#{startDate}
+  	</if>
+  	<if test="endDate!=null and endtDate!=''">
+  	   and endDate &lt;=#{endDate}
+  	</if>
+    <if test="selfEvaluated!=null and selfEvaluated!=''">
+    	and selfEvaluated=#{selfEvaluated}
+    </if>
+    <if test="orderByClause!=null and orderByClause!=''">
+    	order by #{orderByClause}
+    </if>
+  </select>
+  <insert id="saveProject" parameterType="project" keyProperty="projectId" useGeneratedKeys="true">
+  	insert into res_project (
+  	projectName,projectContent,userId,startDate,
+  	endDate,progress,createTime,selfEvaluated,completed) values (
+  	#{projectName},#{projectContent},#{userId},#{startDate},
+  	#{endDate},#{progress},#{createTime},#{selfEvaluated},#{completed})
+  </insert>
+  <update id="updateProject" parameterType="project">
+  	update res_project
+  	<set>
+  		<if test="projectName!=null">projectName=#{projectName},</if>
+  		<if test="projectContent!=null">projectContent=#{projectContent},</if>
+  		<if test="userId!=null">userId=#{userId},</if>
+  		<if test="startDate!=null">startDate=#{startDate},</if>
+  		<if test="endDate!=null">endDate=#{endDate},</if>
+  		<if test="progress!=null">progress=#{progress},</if>
+  		<if test="completed!=null">completed=#{completed},</if>
+  		<if test="selfEvaluated!=null and selfEvaluated!='' and selfEvaluated!='0'">selfEvaluated=#{selfEvaluated}</if>
+  	</set>
+  	where projectId=#{projectId}
+  </update>
+  <delete id="deleteProject" parameterType="string">
+  	delete from res_project where projectId=#{id}
+  </delete>
+  <!--*****************************mark*************************************** -->
+  <resultMap type="mark" id="markResultMap">
+  	<id property="markId" column="markId"/>
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.getById"></association>
+  </resultMap>
+  <resultMap type="mark" id="markResultMap2">
+  	<id property="markId" column="markId"/>
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.selectUserByUserIdAsType"></association>
+  </resultMap>
+  <select id="selectTotalMarkAndUser" resultMap="markResultMap2" parameterType="hashmap">
+   	select userId,startDate,endDate,round(sum(markNumber),2) totalMark from res_mark
+   	<where>
+	  	<if test="userId!=null">
+	 		userId=#{userId}
+	 	</if>
+	 	<if test="checked!=null and checked!=''">
+	 		and checked=#{checked}
+	 	</if>
+	 	<if test="startDate!=null and startDate!=''">
+	 	   and startDate &gt;=#{startDate}
+	 	</if>
+	 	<if test="endDate!=null and endtDate!=''">
+	 	   and endDate &lt;=#{endDate}
+	 	</if>
+	 	<!-- 查询在二级部门的用户和一级部门的用户并集-->
+	 	<choose>
+	 		<when test="secondLevelIds!=null and firstLevelIds!=null">
+	 			and userId in (select userId from info_user_dept where secondLevelId in
+	 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	 		  OR firstLevelId in
+	 		  <foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	 		)
+	 		</when>
+	 		<when test="secondLevelIds!=null and firstLevelIds==null">
+		 		and userId in (select userId from info_user_dept where secondLevelId in
+		 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		) 
+	 		</when>
+	 		<when test="secondLevelIds==null and firstLevelIds!=null">
+		 		and userId in (select userId from info_user_dept where firstLevelId in
+		 		<foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		)
+	 		</when>
+	 	</choose>
+        <if test="postNames!=null">
+        	and userId in (select id from info_user where postId in(select pId from info_post where name  in 
+        		<foreach collection="postNames" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+        	))
+        </if>
+	 	<if test="postNameLike!=null and postNameLike!=''">
+	 	  <bind name="pattern" value="'%'+_parameter.postNameLike+'%'"/>
+	 		and userId in (select id from info_user where postId in(select pId from info_post where name  like #{pattern}))
+	 	</if>
+   	</where>
+    group by userId order by totalMark desc
+    <if test="limitClause!=null and limitClause!=''">
+	 		limit ${limitClause}
+	 </if>
+  </select>
+    <select id="selectAllMarkAsType" resultType="mark" parameterType="hashmap">
+   	select * from res_mark
+   	<where>
+	  	<if test="userId!=null and userId!=''">
+	 		userId=#{userId}
+	 	</if>
+	 	<if test="startDate!=null and startDate!=''">
+	 	   and startDate &gt;=#{startDate}
+	 	</if>
+	 	<if test="endDate!=null and endtDate!=''">
+	 	   and endDate &lt;=#{endDate}
+	 	</if>
+
+   	</where>
+    <if test="orderByClause!=null and orderByClause!=''">
+    	order by #{orderByClause}
+    </if>
+  </select>
+  <select id="selectMarkWithProjectId" parameterType="string" resultType="mark">
+  	select * from res_mark where projectId=#{id}
+  </select>
+  <select id="selectMarkByMarkId" parameterType="string" resultType="mark">
+  	select * from res_mark where markId=#{markId}
+  </select>
+  <select id="selectCountMark" parameterType="hashmap" resultType="string">
+  	select sum(markNumber) from res_mark
+  	 
+  </select>
+  <insert id="saveMark" parameterType="mark" keyProperty="markId">
+  	insert into res_mark (projectId,markNumber,markReason,accordingly,createTime,
+  	startDate,endDate,userId,checked) values (#{projectId},#{markNumber},#{markReason},#{accordingly},#{createTime},
+  	#{startDate},#{endDate},#{userId},#{checked})
+  </insert>
+  <update id="updateMark" parameterType="mark">
+    update res_mark
+    <set>
+    	<if test="markNumber!=null and markNumber!=''">markNumber=#{markNumber},</if>
+    	<if test="markReason!=null and markReason!=''">markReason=#{markReason},</if>
+    	<if test="accordingly!=null and accordingly!=''">accordingly=#{accordingly},</if>
+    	<if test="startDate!=null">startDate=#{startDate},</if>
+    	<if test="endDate!=null">endDate=#{endDate},</if>
+    	<if test="userId!=null and userId!=''">userId=#{userId},</if>
+    	<if test="checked!=null and checked!=''">checked=#{checked}</if>
+    </set>
+    where markId=#{markId}
+  </update>
+  <delete id="deleteMark" parameterType="string">
+  	delete from res_mark where markId=#{markId}
+  </delete>
+</mapper>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>一线考核系统</title>
+
+    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+     <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+    
+    <link href="/css/plugins/slider.css" rel="stylesheet"/>
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+   
+  </head>
+<body>
+	 <div id="loginDiv" class="modal show" style="top:10%">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" onclick="javascript:history.go(-1);">X</button>
+	        <h1 class="text-center text-primary">项目自评</h1>
+	      </div>
+	      <div class="modal-body">
+	         <form action="#" method="post" th:action="@{''+${action}}" th:object="${mark}">
+              <input type="text"  th:value="*{projectId}" th:field="*{projectId}" style="display:none;"/>
+              <input type="text"  th:value="*{markId}" th:field="*{markId}" style="display:none;"/>
+              <div class="form-group">
+                <textarea name="" id="" cols="30" rows="3" class="form-control input-lg" placeholder="加分或者减分原因" th:value="*{markReason}" th:field="*{markReason}"></textarea>
+              </div>
+              <div class="form-group">
+                <select  class="selectpicker show-tick form-control" data-live-search="true"  th:value="*{accordingly}" th:field="*{accordingly}">
+                	<option th:each="a:${accordingList}" th:value="${a}" th:text="${a}"></option>
+                </select>
+              </div>
+              <div class="form-group">
+                  <label>评分</label>
+                  <input type="text" value="50" class="slider form-control" data-slider-min="-50" data-slider-max="50"
+                         data-slider-step="1"  data-slider-orientation="horizontal"
+                          data-slider-tooltip="show" data-slider-id="aqua"
+                          th:value="*{markNumber}" th:field="*{markNumber}"/>
+               </div>
+              <div class="form-group">
+                <div th:text="${msg}" style="font:red;text-align:center"></div>
+                <button class="btn btn-primary btn-lg btn-block" >添加</button>
+              </div>
+	        </form>
+	      </div>
+	      <div class="modal-footer">
+	        
+	      </div>
+	    </div>
+	  </div>
+	</div>
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-slider.js"></script>
+    <script>
+    $(document).ready(function () {
+     
+  var trigger = $('.hamburger'),
+      overlay = $('.overlay'),
+     isClosed = false;
+
+    trigger.click(function () {
+      hamburger_cross();      
+    });
+
+    function hamburger_cross() {
+
+      if (isClosed == true) {          
+        overlay.hide();
+        trigger.removeClass('is-open');
+        trigger.addClass('is-closed');
+        isClosed = false;
+      } else {   
+        overlay.show();
+        trigger.removeClass('is-closed');
+        trigger.addClass('is-open');
+        isClosed = true;
+      }
+  }
+  
+  $('[data-toggle="offcanvas"]').click(function () {
+        $('#wrapper').toggleClass('toggled');
+  });
+  $('[data-toggle="offcanvas"]').click(); 
+  
+  //日期控件
+  $('#datetimepicker1').datetimepicker({  
+        format: 'YYYY-MM-DD',  
+        locale: moment.locale('zh-cn')  
+    });   
+   $('#datetimepicker2').datetimepicker({  
+        format: 'YYYY-MM-DD',  
+        locale: moment.locale('zh-cn')  
+    }); 
+    //slider
+    $('.slider').slider();  
+});</script>
+</body>
+</html>

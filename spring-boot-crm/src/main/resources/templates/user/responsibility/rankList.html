@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>排名</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+     <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom styles for this template -->
+   
+   
+  </head>
+<!-- NAVBAR
+================================================== -->
+  <body>
+    
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    
+    <div class="container"> 
+    <h3> 
+       <ul  class="nav nav-tabs">
+			<li id="month"><a href="/responsibility/selectHistoryTotalMark/month" data-toggle="tab">月考排名</a></li>
+			<li id="halfYear"><a href="/responsibility/selectHistoryTotalMark/halfYear" data-toggle="tab">半年考核排名</a></li>
+			<li id="fullYear"><a href="/responsibility/selectHistoryTotalMark/fullYear" data-toggle="tab">年度考核排名</a></li>
+			
+	    
+			
+		</ul> </h3>
+		<div  class="tab-content">
+			 <div class="tab-pane fade in active" id="home">
+			  <nav class="navbar navbar-default" role="navigation">
+			   <div class="container-fluid">
+			     <div class="navbar-header">
+			       <span class="navbar-brand">搜索</span>
+			     </div>
+			
+			     <div class="navbar-form navbar-left" role="search">
+			      
+			
+					   <div class="form-group">  
+		                    <!--指定 date标记-->  
+		                    <div class='input-group date' id='datetimepicker1'>  
+		                        <input  id="startDate" type='text' class="form-control" placeholder="开始日期" th:value="${startDate}"/>  
+		                        <span class="input-group-addon">  
+		                            <span class="glyphicon glyphicon-calendar"></span>  
+		                        </span>  
+		                    </div>  
+		              </div>  
+		              <div class="form-group">  
+		                    <!--指定 date标记-->  
+		                    <div class='input-group date' id='datetimepicker2'>  
+		                        <input id="endDate" type='text' class="form-control" placeholder="结束日期" th:value="${endDate}" />  
+		                        <span class="input-group-addon">  
+		                            <span class="glyphicon glyphicon-calendar"></span>  
+		                        </span>  
+		                    </div>  
+		              </div>  
+			          <div class="form-group">
+			          	 <select id="groups" class="selectpicker" data-style="btn-warning" data-live-search="true" title="请选择考核组"  multiple="multiple">
+		         			<option th:each="g:${groups}" th:value="${g}" th:text="${g}"></option>
+		               </select>
+			          </div>
+			          
+			          <div class="form-group">
+			          	 <select id="posts" class="selectpicker" data-style="btn-success" data-live-search="true" title="请选择职级"  multiple="multiple">
+		         			<option th:each="p:${posts}" th:value="${p.name}" th:text="${p.name}" th:if="${p.name} ne '高层正职' and ${p.name} ne '高层副职'"></option>
+		                </select>
+			          </div>
+			     </div>
+			         
+			   </div>
+			   <!-- .container-fluid -->
+			 </nav>
+			
+			   <!-- 工具栏 -->
+			  <div id="toolbar" class="btn-group pull-left" >
+			    
+			  </div>
+			  <!-- /工具栏 -->
+			  <table id="mytab" class="table table-hover"></table>
+			</div>
+			
+		</div>
+    
+    
+
+</div>
+
+ <script th:inline="javascript">
+//<![CDATA[
+      
+
+    //下拉框加载时初始值设定
+    if([[${group}]]){
+       
+    	$('#groups').selectpicker('val',[[${group}]].replace(/'/g,""));
+    }
+    if([[${postNameLike}]]){
+        var postNameLike=[[${postNameLike}]];
+      
+        var ids=[];
+        $("#posts option").each(function(){
+            if($(this).text().indexOf(postNameLike)>-1) {
+                
+            	ids.push($(this).text());
+            }
+        	
+        }); 
+        $('#posts').selectpicker('val',ids);
+    	
+    }
+    
+    //bootstrapTable保存pageIndex
+    var state={};
+    if(window.history.state){
+    	state=window.history.state;
+    }else{
+       state = { 
+        'pageIndex':1, 
+        'pageSize':10,
+        };
+        window.history.pushState(state,'rankList',[[${taskType}]]);
+    }
+   //当搜索框中的值 改变时 自动刷新
+   $('select').each(function(){
+   	 $(this).change(function(){
+   	 	$('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectHistoryTotalMark/'+[[${taskType}]]});
+   	 });
+   });
+   $('input').each(function(){
+     
+   	 $(this).change(function(){
+   	    alert($(this).val());
+   	 	$('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectHistoryTotalMark/'+[[${taskType}]]});
+   	 });
+   });
+    //根据窗口调整表格高度
+    $(window).resize(function() {
+        $('#mytab').bootstrapTable('resetView', {
+            height: tableHeight()
+        })
+    })
+    //生成用户数据
+    var monthColumns=[
+            {
+                title:'全选',
+                field:'select',
+                //复选框
+                checkbox:true,
+                align:'center',
+                valign:'middle'
+            },
+            {
+                title:'名次',
+                field:'',
+                
+            },
+            {
+            	title:"姓名",
+            	field:'',
+            },
+            {
+            	title:"所属部门",
+            	field:'',
+            },
+            {
+            	title:"考效总分",
+            	field:'',
+            }
+          
+        ];
+     var yearColumns=[
+            {
+                title:'全选',
+                field:'select',
+                //复选框
+                checkbox:true,
+                align:'center',
+                valign:'middle'
+            },
+            {
+                title:'名次',
+                field:'',
+                
+            },
+            {
+            	title:"姓名",
+            	field:'',
+            },
+            {
+            	title:"所属部门",
+            	field:'',
+            },
+            {
+            	title:"考效总分",
+            	field:'',
+            }
+            ,
+            {
+            	title:"群众评议",
+            	field:'',
+            },
+            {
+            	title:"领导点评",
+            	field:'',
+            },
+            {
+            	title:"组织考察",
+            	field:'',
+            },
+            {
+            	title:"总分",
+            	field:'',
+            }
+          
+        ];
+        
+   
+    $('#mytab').bootstrapTable({
+        method: 'post',
+        contentType: "application/x-www-form-urlencoded",//必须要有！！！！
+        url:"/responsibility/selectHistoryTotalMark/"+[[${taskType}]],//要请求数据的文件路径
+        //height:tableHeight(),//高度调整
+        toolbar: '#toolbar',//指定工具栏
+        striped: true, //是否显示行间隔色
+        pageNumber:window.history.state.pageIndex, //初始化加载第一页，默认第一页
+        pagination:true,//是否分页
+        queryParamsType:'limit',//查询参数组织方式
+        queryParams:queryParams,//请求服务器时所传的参数
+        sidePagination:'server',//指定服务器端分页
+        pageSize:10,//单页记录数
+        pageList:[5,10,20,30],//分页步进值
+        showRefresh:true,//刷新按钮
+        showColumns:true,
+        clickToSelect: true,//是否启用点击选中行
+        toolbarAlign:'left',//工具栏对齐方式
+        buttonsAlign:'left',//按钮对齐方式
+        toolbar:'#toolbar',//指定工作栏
+        columns:[
+            {
+                title:'全选',
+                field:'select',
+                //复选框
+                checkbox:true,
+                align:'center',
+                valign:'middle'
+            },
+            {
+            	title:'排名',
+            	formatter:function(value,row,index){
+            		var pageSize=$('#mytab').bootstrapTable('getOptions').pageSize;
+            		var pageNumber=$('#mytab').bootstrapTable('getOptions').pageNumber;
+            		return pageSize*(pageNumber-1)+index+1;
+            	},
+            },
+            {
+                title:'用户Id',
+                field:'user.id',
+                
+            },
+            {
+            	title:'用户姓名',
+            	field:'user.username',
+            	formatter:function(value,row,index){
+            	    var startDate=$('#startDate').val();
+            	    var endDate=$('#endDate').val();
+            		var aLink='<a href="/responsibility/projectList?userId='+row.user.id+'&startDate='+startDate+'&endDate='+endDate+'">'+row.user.username+'</a>';
+            		return aLink;
+            	}
+            },
+            {
+            	title:'部门',
+            	formatter:function(value,row,index){
+            	
+            	}
+            },
+            
+            {
+            	title:'总分',
+            	field:'totalMark'
+            }
+          
+        ],
+        locale:'zh-CN',//中文支持,
+        responseHandler:function(result){
+	
+		    return result;
+        }
+    })
+
+
+
+    //请求服务数据时所传参数
+    function queryParams(params){
+        state = { 
+        'pageIndex':params.pageNumber, 
+        'pageSize': params.limit,
+        };
+        window.history.replaceState(state,'rankList',[[${taskType}]]);
+        return{
+            //每页多少条数据
+            pageSize: params.limit,
+            //请求第几页
+            pageIndex:params.pageNumber,
+            groups:$('#groups').val().join(','),
+            startDate:$('#startDate').val(),
+            endDate:$('#endDate').val(),
+            posts:$('#posts').val().join(','),
+            taskType:[[${taskType}]],
+        }
+    }
+     //查询按钮事件
+    $('#search_btn').click(function(){
+        $('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectHistoryTotalMark/'+[[${taskType}]]});
+    })
+    //tableHeight函数
+    function tableHeight(){
+        //可以根据自己页面情况进行调整
+        return $(window).height() -280;
+    }
+    //删除用户
+    
+   
+
+    var taskType = [[${taskType}]];
+    $("#" + taskType).attr("class", "active");
+    $(".nav nav-tabs li").each(function(){
+    	$(this).click(function(){
+    		 $("li").attr("class","");
+    		 $(this).attr("class","active");
+    		 alert($(this).attr("id"));
+    		//location.href="/responsibility/selectHistoryTotalMark/"+$(this).attr("id");
+    	});
+    });
+    
+    var msg=[[${msg}]];
+    if(msg!=null) alert(msg);
+    
+      //日期控件
+  $('#datetimepicker1').datetimepicker({  
+        format: 'YYYY-MM-DD',  
+        locale: moment.locale('zh-cn'),
+    });   
+   $('#datetimepicker2').datetimepicker({  
+        format: 'YYYY-MM-DD',  
+        locale: moment.locale('zh-cn')  
+    }); 
+//]]>
+    </script>
+
+  </body>
+</html>

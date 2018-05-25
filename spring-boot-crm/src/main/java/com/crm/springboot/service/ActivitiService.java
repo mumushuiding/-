@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
@@ -13,6 +14,7 @@ import com.crm.springboot.pojos.FormField;
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
+import com.crm.springboot.pojos.user.User;
 import com.github.pagehelper.PageInfo;
 
 public interface ActivitiService extends BaseActivitiService{
@@ -40,6 +42,7 @@ public interface ActivitiService extends BaseActivitiService{
 	List<ProcessInstance> selectAllProcessInstances(Integer pageIndex, Integer pageSize);
 	PageInfo selectAllProcessInstancesPageInfo(Integer pageIndex, Integer pageSize);
 	List<ProcessVO> createProcessVOs(List<ProcessInstance> processInstances);
+
 	/**
 	 * ********************************历史流程实例查询*************************************
 	 */
@@ -53,6 +56,9 @@ public interface ActivitiService extends BaseActivitiService{
 	 */
 	Task selectTask(String processInstanceId,String taskDefinitionKey);
 	void setTaskCandidateGroup(String processInstanceId,String taskDefinitionKey,String delegateTaskName);
+	//召回任务
+	void withdrawTask(String processInstanceId,String userId);
+	boolean canIwithdrawTask(String processInstanceId,String userId);
    /**
     * *********************************待办业务列表****************************************
     */
@@ -70,11 +76,24 @@ public interface ActivitiService extends BaseActivitiService{
  	List<Task> listAssigneeTasks(String userId,Integer pageIndex, Integer pageSize);
  	long countListAssigneeTasks(String userId);
  	PageInfo listAssigneePageInfo(String userId,Integer pageIndex, Integer pageSize);
+ 	//查询受理的候选组的任务
+ 	List<Task> listCandidateAndAssigneeTasks(String userId,List<String> processInstanceIds,Integer pageIndex, Integer pageSize);
+ 	long countListCandidateAndAssigneeTasks(String userId,List<String> processInstanceIds);
+ 	PageInfo listCandidateAndAssigneePageInfo(String userId,List<String> processInstanceIds,Integer pageIndex, Integer pageSize);
  // 将Task集合转为TaskVO集合
  	List<ProcessBean> createTaskVOList(List<Task> tasks);
  	//查询一个任务所在流程的全部评论
  	List<Comment> getComments(String taskId);
     //查询当前任务的审批用户组
  	List<String> selectCandidateGroup(String taskId);
-
+ 	/**
+	 * ********************************历史任务查询*************************************
+	 */
+ 	long countAllHistoricTaskInstancesByUserId(String userId);
+ 	List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserId(String userId,Integer pageIndex, Integer pageSize);
+ 	PageInfo listAllHistoricTaskInstancesPageInfoByUserId(String userId,Integer pageIndex, Integer pageSize);
+ 	
+ 	List<ProcessBean> createAllHistoricProcess(List<HistoricTaskInstance> historicTaskInstances);
+ 	
+ 	HistoricTaskInstance selectSingleHistoricTaskInstance(String userId,String processInstanceId);
 }

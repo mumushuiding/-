@@ -1,14 +1,14 @@
 package com.crm.springboot.controller;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
@@ -16,34 +16,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.impl.cmd.DeleteTaskCmd;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
-import com.arjuna.ats.internal.arjuna.objectstore.jdbc.drivers.postgres_driver;
-import com.crm.springboot.pojos.CommentVO;
-import com.crm.springboot.pojos.FormField;
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessType;
-import com.crm.springboot.pojos.Vacation;
 import com.crm.springboot.pojos.assess.Evaluation;
-import com.crm.springboot.pojos.assess.Mark;
 import com.crm.springboot.pojos.assess.Project;
 import com.crm.springboot.pojos.assess.Responsibility;
 import com.crm.springboot.pojos.user.Dept;
@@ -54,16 +43,9 @@ import com.crm.springboot.service.ProcessService;
 import com.crm.springboot.service.ResponsibilityService;
 import com.crm.springboot.service.SysPowerService;
 import com.crm.springboot.service.UserService;
-import com.crm.springboot.service.VacationService;
-import com.crm.springboot.service.impl.VacationServiceImpl;
 import com.crm.springboot.utils.DateUtil;
 import com.crm.springboot.utils.JsonUtils;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.gson.Gson;
-
-import javassist.expr.NewArray;
 
 
 
@@ -76,6 +58,7 @@ public class ActivitiController {
 	@Autowired
 	private ProcessService processService;
 	@Autowired
+	
 	private ActivitiService activitiService;
     @Autowired
     private UserService userService;
@@ -88,7 +71,8 @@ public class ActivitiController {
     	return "system/activiti/"+location;
     }
     @RequestMapping("/{location}/{sub}")
-    public String loacate1(@PathVariable String location,@PathVariable String sub,Model model){
+    public String loacate1(@RequestParam(required=false) String msg,@PathVariable String location,@PathVariable String sub,Model model,HttpSession session) throws UnsupportedEncodingException{
+    	User user=(User) session.getAttribute("sysuser");
 		//用户待办任务列表
 		if("taskList".equals(location)){
 			if("all".equals(sub)){
@@ -100,6 +84,21 @@ public class ActivitiController {
 			}else {
 				model.addAttribute("taskType", ProcessType.CANDIDATE);
 			}
+			//查询当前员工，他所在的部门有哪些任务
+			HashMap<String , Object> params=new HashMap<String, Object>();
+			params.put("completed","0");
+        	List<String> processInstanceIds=processService.getProcessInstanceIdsWithUser(user, params);
+        	
+			long candidateTaskNumber=activitiService.countListCandidateTasks(String.valueOf(user.getId()), processInstanceIds);
+			model.addAttribute("candidateTaskNumber", candidateTaskNumber);
+			
+			//查询
+			long assigneeTaskNumber=activitiService.countListAssigneeTasks(String.valueOf(user.getId()));
+			model.addAttribute("assigneeTaskNumber", assigneeTaskNumber);
+			if(msg!=null && !"".equals(msg)) {
+				model.addAttribute("msg", URLDecoder.decode(msg, "UTF-8"));
+			};
+			
 			return "system/activiti/"+location;
 		}
 		//用户申请任务列表 
@@ -174,7 +173,7 @@ public class ActivitiController {
 		processBeans=processService.selectAllProcess(params);
 
 		if(processBeans==null || processBeans.size()==0) return null;
-		System.out.println(JsonUtils.formatListForPagination(processBeans, pageIndex, pageSize));
+		
 		return JsonUtils.formatListForPagination(processBeans, pageIndex, pageSize);
 	
 	
@@ -183,7 +182,7 @@ public class ActivitiController {
 	@RequestMapping("/deleteProcessInstance/{id}")
 	public String deleteProcessInstance(@PathVariable String id,HttpServletRequest request){
 		String referer=request.getHeader("referer");
-		
+		if(referer.indexOf("?msg")!=-1) referer=referer.substring(0, referer.indexOf("?msg"));
 		
 		
 	    this.activitiService.deleteProcessInstance(id, "废弃");
@@ -222,6 +221,7 @@ public class ActivitiController {
 	@RequestMapping("/delete/{taskId}")
 	public String DeleteTask(@PathVariable String taskId,HttpServletRequest request){
 		String referer=request.getHeader("referer");
+		if(referer.indexOf("?msg")!=-1) referer=referer.substring(0, referer.indexOf("?msg"));
 		activitiService.deleteTaskById(taskId);
 		return "redirect:"+referer;
 	}
@@ -234,49 +234,32 @@ public class ActivitiController {
 			PageInfo pageInfo = null;
 			
 			model.addAttribute("taskType", taskType);
-			HashMap<String , Object> params=new HashMap<String, Object>();
-			params.put("taskName", taskName);
 			
-			params.put("deptNames", userService.getDeptNames(user));
-			
-			List<String> processInstanceIds=new ArrayList<String>();
-			
-			processInstanceIds.addAll(processService.selectAllProcessInstanceIds(params));
 
-			List<String> candidateGroups=activitiService.candidateGroups(String.valueOf(user.getId()));
-			List<String> list=sysPowerService.selectAllGroupIds("考查组");
-			List<String> assessGroups=new ArrayList<String>();
-			//添加候选组
-		    for (String string : list) {
-				if(candidateGroups.contains(string)){
-					assessGroups.add(string);
-				}
-			}
-            if(assessGroups!=null&&assessGroups.size()>0){
-            	HashMap<String, Object> paramMap=new HashMap<String, Object>();
-            	paramMap.put("candidateGroups",assessGroups.toArray(new String[assessGroups.size()]));
-            	processInstanceIds.addAll(processService.selectAllProcessInstanceIds(paramMap));
-            }
-            
-            
-            
             if(ProcessType.CANDIDATE.equals(taskType)){
+            	
+    			HashMap<String , Object> params=new HashMap<String, Object>();
+    			
+    			params.put("taskName", taskName);
+    			//检索未完结的流程
+    			params.put("completed","0");
+    			
+            	List<String> processInstanceIds=processService.getProcessInstanceIdsWithUser(user, params);
+    			
             	if(processInstanceIds!=null && processInstanceIds.size()>0){
                     
-            		pageInfo=activitiService.listCandidatePageInfo(String.valueOf(user.getId()), processInstanceIds, pageIndex, pageSize);
+            		//pageInfo=activitiService.listCandidatePageInfo(String.valueOf(user.getId()), processInstanceIds, pageIndex, pageSize);
+            		pageInfo=activitiService.listCandidateAndAssigneePageInfo(String.valueOf(user.getId()), processInstanceIds, pageIndex, pageSize);
             	}
             }
-			if(ProcessType.ASSIGNEE.equals(taskType)){
-				pageInfo=activitiService.listAssigneePageInfo(String.valueOf(user.getId()), pageIndex, pageSize);
-			}else{
-				if(processInstanceIds!=null){
-					pageInfo=activitiService.listCandidatePageInfo(String.valueOf(user.getId()),processInstanceIds, pageIndex, pageSize);
-				}
-				model.addAttribute("taskType", ProcessType.CANDIDATE);
+			if(ProcessType.HISTORY_ASSIGNEE.equals(taskType)){
+				
+            		//pageInfo=activitiService.listCandidatePageInfo(String.valueOf(user.getId()), processInstanceIds, pageIndex, pageSize);
+                	pageInfo=activitiService.listAllHistoricTaskInstancesPageInfoByUserId(String.valueOf(user.getId()), pageIndex, pageSize);
+        		
 			}
 			if(pageInfo==null) return null;
-            System.out.println(JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(pageInfo.getList()), pageInfo.getTotal(), pageIndex, pageSize));
-			return JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(pageInfo.getList()), pageInfo.getTotal(), pageIndex, pageSize);
+            return JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(pageInfo.getList()), pageInfo.getTotal(), pageIndex, pageSize);
 		}
 /**
  * *****************************流程******************************************
@@ -289,8 +272,7 @@ public class ActivitiController {
 			
 			//判断能否启动当前流程
         	if(!responsibilityService.canIStartEvaluationProcess(user)){
-        		System.out.println("referer="+request.getHeader("referer"));
-        		session.setAttribute("msg", "你的职级，无法启动这个流程");
+
         		return "redirect:"+request.getHeader("referer");
         	}
 			
@@ -347,28 +329,29 @@ public class ActivitiController {
 			if(user==null)return "redirect:/user/loginForm";
 			
 			ProcessBean processBean=responsibility.getProcessBean();
+
 			
 			//获取流程部署ID
 			String deploymentId=activitiService.getDeploymentIdByBusinessKey(responsibility.getProcessBean().getBusinessKey());
 			processBean.setDeploymentId(deploymentId);
 			processBean.setUser(user);
-			if("EvaluationProcess".equals(responsibility.getProcessBean().getBusinessKey())){
-				//将开始时间startDate和endDate放入params
-				
-				HashMap<String, Object> params =responsibilityService.getStartDateStrAndEndDateDateStr(responsibility.getSparation());
-				
-				responsibility.setStartDate(DateUtil.parseDefaultDate(String.valueOf(params.get("startDate"))));
-				responsibility.setEndDate(DateUtil.parseDefaultDate(String.valueOf(params.get("endDate"))));
+			
+			//将开始时间startDate和endDate放入params
+			
+			HashMap<String, Object> params =responsibilityService.getStartDateStrAndEndDateDateStr(responsibility.getSparation());
+			responsibility.setOldPosition(user.getPosition());
+			responsibility.setStartDate(DateUtil.parseDefaultDate(String.valueOf(params.get("startDate"))));
+			responsibility.setEndDate(DateUtil.parseDefaultDate(String.valueOf(params.get("endDate"))));
 
-				Date createTime=new Date();
-				responsibility.setProcessBean(processBean);
-				responsibility.setCreateTime(createTime);
-				model.addAttribute("evaluation", responsibility);
-				
-				//查询所有不同的二级部门
-				List<Dept> depts=userService.selectDistinctSecondLevelDept();
-				model.addAttribute("depts", depts);
-			}
+			Date createTime=new Date();
+			responsibility.setProcessBean(processBean);
+			responsibility.setCreateTime(createTime);
+			model.addAttribute("evaluation", responsibility);
+			
+			//查询所有不同的二级部门
+			List<Dept> depts=userService.selectDistinctSecondLevelDept();
+			model.addAttribute("depts", depts);
+			
 			
 			return "/system/activiti/"+processBean.getBusinessKey()+"/"+taskType;
         }
@@ -387,7 +370,8 @@ public class ActivitiController {
 			userLinkDept.setUserId(user.getId());
 			userLinkDept.setFirstLevelIds(responsibility.getFirstLevelIds());
 			Dept dept=new Dept();
-			dept.setDid(Integer.parseInt(responsibility.getSecondLevelId()));
+			
+			if(responsibility.getSecondLevelId()!=null&&responsibility.getSecondLevelId().trim()!="")dept.setDid(Integer.parseInt(responsibility.getSecondLevelId()));
 			userLinkDept.setSecondLevel(dept);
 			
 			Dept dept2=new Dept();
@@ -452,6 +436,14 @@ public class ActivitiController {
 			User user=(User)session.getAttribute("sysuser");
 			if(user==null)return "redirect:/user/loginForm";
 			
+			//判断当前用户是否有重复提交月度考核申请表，防止重复添
+			String title=user.getUsername()+"-"+evaluation.getSparation();
+			
+			if(processService.isProcessExists(String.valueOf(user.getId()), title)){
+                String msg1=URLEncoder.encode("该月申请已经提交过了，请不要重复提交", "utf-8");
+				return "redirect:/responsibility/assessmentList/month?msg="+msg1;
+			}
+			
 			
 			if (evaluation.getProcessBean()==null) {
 				evaluation=(Evaluation) session.getAttribute("evaluation");
@@ -461,34 +453,41 @@ public class ActivitiController {
 			ProcessBean processBean=evaluation.getProcessBean();
 			Date createTime=new Date();
 			String deploymentId=activitiService.getDeploymentIdByBusinessKey(evaluation.getProcessBean().getBusinessKey());
-			if("EvaluationProcess".equals(evaluation.getProcessBean().getBusinessKey())){
-				//将开始时间startDate和endDate放入params
-				HashMap<String, Object> params =responsibilityService.getStartDateStrAndEndDateDateStr(evaluation.getSparation());
-				
-				evaluation.setStartDate(DateUtil.parseDefaultDate(String.valueOf(params.get("startDate"))));
-				evaluation.setEndDate(DateUtil.parseDefaultDate(String.valueOf(params.get("endDate"))));
-				
-				params.put("userId",user.getId());
-         
+		
+			//将开始时间startDate和endDate放入params
+			HashMap<String, Object> params =responsibilityService.getStartDateStrAndEndDateDateStr(evaluation.getSparation());
+			
+			evaluation.setStartDate(DateUtil.parseDefaultDate(String.valueOf(params.get("startDate"))));
+			evaluation.setEndDate(DateUtil.parseDefaultDate(String.valueOf(params.get("endDate"))));
+			
+			params.put("userId",user.getId());
+           
+			
 
-				List<Project> projects=responsibilityService.selectAllProject(params);
-			    int totalMark =responsibilityService.getTotalMarkOfProjects(projects);
-			    
-			 
-			    
-			    evaluation.setTotalMark(String.valueOf(totalMark));
+			List<Project> projects=responsibilityService.selectAllProject(params);
+		    int totalMark =responsibilityService.getTotalMarkOfProjects(projects);
+		    
+		 
+		    
+		    evaluation.setTotalMark(String.valueOf(totalMark));
+		   
+			if("startmonth".equals(taskType)){
+				evaluation.setCreateTime(createTime);
+				processBean.setDeploymentId(deploymentId);
+				
+				processBean.setUser(user);
+				evaluation.setProcessBean(processBean);
+				evaluation.setAttendance("旷工()天，请假()天");
+				model.addAttribute("projects", projects);
+				model.addAttribute("evaluation", evaluation);
+				
+			   //获取当前候选组，传递给页面，使对应的内容可以编辑
 			   
-				if("startmonth".equals(taskType)){
-					evaluation.setCreateTime(createTime);
-					processBean.setDeploymentId(deploymentId);
-					
-					processBean.setUser(user);
-					evaluation.setProcessBean(processBean);
-					evaluation.setAttendance("旷工()天，请假()天");
-					model.addAttribute("projects", projects);
-					model.addAttribute("evaluation", evaluation);
-				}
+			   String identity=responsibilityService.getIdentity(evaluation, user);
+			   model.addAttribute("identity", identity);
+			   
 			}
+
 			if(msg!=null) model.addAttribute("msg", URLDecoder.decode(msg, "UTF-8"));
 			return "/system/activiti/"+processBean.getBusinessKey()+"/"+taskType;
 		}
@@ -520,6 +519,8 @@ public class ActivitiController {
 			//任务参数初始化
 			HashMap<String, Object> variables=new HashMap<String, Object>();
 			variables.put("arg", processBean);
+			
+			
 			//将部门信息存入
 			UserLinkDept dept1=userService.getSingleUserLinkDept(user, evaluation.getProcessBean().getDeptName());
 			variables.put("dept",dept1);
@@ -531,6 +532,7 @@ public class ActivitiController {
 			processBean.setCommitted("1");
 			processService.updateProcess(processBean);
 			responsibilityService.updateEvaluation(evaluation);
+			
 			this.activitiService.complete(this.activitiService.getFirstTask(evaluation.getProcessBean().getProcessInstanceId()).getId());
 		}
 
@@ -542,21 +544,17 @@ public class ActivitiController {
 	//办理任务
 	@RequestMapping("/claim/{taskId}/{buisinessType}")
 	public String claim(@PathVariable String taskId,HttpSession session,@PathVariable String buisinessType) throws UnsupportedEncodingException{
-		User user=(User)session.getAttribute("sysuser");
-		if(user==null) return "redirect:/user/loginForm";
-		activitiService.claim(taskId, String.valueOf(user.getId()));
-		
-		
 		return "redirect:/system/activiti/perform/"+taskId+"/?buisinessType="+URLEncoder.encode(buisinessType, "UTF-8");
 	}
     @RequestMapping("/perform/{taskId}")
-    public String perform(@PathVariable String taskId,Model model,@RequestParam String buisinessType) throws UnsupportedEncodingException{
+    public String perform(@PathVariable String taskId,Model model,@RequestParam String buisinessType,HttpSession session) throws UnsupportedEncodingException{
+    	User user=(User)session.getAttribute("sysuser");
     	String x=URLDecoder.decode(buisinessType, "UTF-8");
     	buisinessType=x;
     	model.addAttribute("actionType", "perform");
     	ProcessInstance pInstance=activitiService.getProcessInstance(taskId);
     	model.addAttribute("candidateGroupList", activitiService.selectCandidateGroup(taskId));
-    	System.out.println("buisinessType="+buisinessType);
+    	
         //考核审批流程
     	if(ProcessType.PROCESS_EVALUATION.equals(pInstance.getProcessDefinitionKey())){
     		HashMap<String, Object> params = new HashMap<String,Object>();
@@ -574,17 +572,21 @@ public class ActivitiController {
     		    evaluation.setTotalMark(String.valueOf(totalMark));
     		    model.addAttribute("projects", projects);
         		model.addAttribute("evaluation", evaluation);
+        		
+        		//获取当前候选组，传递给页面，使对应的内容可以编辑
+ 			   
+ 			    String identity=responsibilityService.getIdentity(evaluation, user);
+ 			    model.addAttribute("identity", identity);
+ 			    
         		return "/system/activiti/"+ProcessType.PROCESS_EVALUATION+"/audit";
     		    
     		}
     		if(ProcessType.RESPONSIBILITY_TYPE.equals(buisinessType)){
     			Responsibility responsibility=responsibilityService.selectSingleResponsibility(params);
     			//如果审批时，发现生效时间已经过时，自动更新为当下
+    			if(responsibility.getAjustDate()==null) responsibility.setAjustDate(new Date());
     			if(responsibility.getAjustDate().getTime()<new Date().getTime()) responsibility.setAjustDate(new Date());
-    			
-//    			ProcessBean processBean=(ProcessBean) activitiService.getVariableFromProcessInstance(pInstance.getId(),"arg");
-//    			
-//    			responsibility.setProcessBean(processBean);
+
     			model.addAttribute("evaluation", responsibility);
     			
     			List<Dept> depts=userService.selectDistinctSecondLevelDept();
@@ -614,9 +616,10 @@ public class ActivitiController {
         	processService.update(processBean);
         	responsibilityService.updateResponsibility(evaluation);
         }
+        activitiService.claim(taskId, String.valueOf(user.getId()));
     	this.activitiService.complete(taskId,varsHashMap);
     	
-		return "redirect:/system/activiti/taskList/"+ProcessType.ASSIGNEE;
+		return "redirect:/system/activiti/taskList/"+ProcessType.CANDIDATE;
     }
     @RequestMapping("/complete/{taskId}/{isPass}")
     public String complete(@PathVariable String taskId,@PathVariable String isPass,Evaluation evaluation,HttpSession session,Model model){
@@ -637,9 +640,24 @@ public class ActivitiController {
         	processService.update(processBean);
         	responsibilityService.updateEvaluation(evaluation);
         }
+        activitiService.claim(taskId, String.valueOf(user.getId()));
     	this.activitiService.complete(taskId,varsHashMap);
     	
-		return "redirect:/system/activiti/taskList/"+ProcessType.ASSIGNEE;
+		return "redirect:/system/activiti/taskList/"+ProcessType.CANDIDATE;
+    }
+    @RequestMapping("/withdrawTask/{processInstanceId}")
+    public String withdrawTask(@PathVariable String processInstanceId,HttpServletRequest request,HttpSession session) throws UnsupportedEncodingException{
+    	User user=(User)session.getAttribute("sysuser");
+    	String referer=request.getHeader("referer");
+    	if(referer.indexOf("?msg")!=-1) referer=referer.substring(0, referer.indexOf("?msg"));
+    	if(activitiService.canIwithdrawTask(processInstanceId, String.valueOf(user.getId()))){
+    		activitiService.withdrawTask(processInstanceId,String.valueOf(user.getId()));
+    		return "redirect:"+referer;
+    	}else {
+    		return "redirect:"+referer+"?msg="+URLEncoder.encode("你的申请已经被审批或无法撤回", "UTF-8");
+		}
+    	
+		
     }
 /**
  * ***********************************查看流程图*****************************

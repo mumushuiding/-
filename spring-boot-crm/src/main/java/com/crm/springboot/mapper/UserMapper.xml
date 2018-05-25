@@ -16,18 +16,23 @@
   </resultMap>
 
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
-    INSERT INTO info_USER
+    INSERT INTO info_user
     (loginname,password,phone,username,email,sex,postId,avatar,position) 
     VALUES
     (#{loginname},#{password},#{phone},#{username},#{email},#{sex},#{post.pId},#{avatar},#{position})
   </insert>
   
- 
+  <select id="selectUserIdByPhone" resultType="string" parameterType="string">
+  	select id from info_user where phone=#{phone}
+  </select>
   <select id="getById" parameterType="string" resultMap="userResultMap">
-    SELECT * FROM info_USER WHERE ID=#{id}
+    SELECT * FROM info_user WHERE ID=#{id}
+  </select>
+  <select id="selectUserByUserIdAsType" parameterType="string" resultType="user">
+    SELECT * FROM info_user WHERE ID=#{id}
   </select>
   <select id="findUserWithNameAndPass" parameterType="user" resultMap="userResultMap">
-    SELECT * FROM info_USER WHERE loginname=#{loginname} and password=#{password}
+    SELECT * FROM info_user WHERE loginname=#{loginname} and password=#{password}
   </select>
   <select id="getBySomething" parameterType="user" resultMap="userResultMap">
   	select * from info_user 
@@ -71,10 +76,10 @@
     select * from info_user where loginname Like#{pattern}
   </select>
   <select id="selectAllUser" resultMap="userResultMap">
-    SELECT * FROM info_USER
+    SELECT * FROM info_user
   </select>
   <select id="selectAllUserWithHashMap" resultMap="userResultMap" parameterType="hashmap">
-    SELECT * FROM info_USER
+    SELECT * FROM info_user
     <where>
     	<if test="username!=null and username!=''">
     		<bind name="pattern" value="'%'+_parameter.get('username')+'%'"/>
@@ -109,18 +114,18 @@
   		#{id}
   	</foreach>
   </delete>
-<!-- =================================部门之间联系info_dept_identityLink========================================== -->
+<!-- =================================部门之间联系info_dept_identitylink========================================== -->
 <insert id="saveDeptIdentityLink" parameterType="deptIdentityLink" useGeneratedKeys="true">
-	insert into info_dept_identityLink
+	insert into info_dept_identitylink
 	 (firstLevelId,secondLevelId,thirdLevelId) values (#{firstLevel.did},#{secondLevel.did},#{thirdLevel.did})
 </insert>
 <!-- 查询不重复二级部门 -->
 <select id="selectDistinctSecondLevelDept" resultType="dept">
-	select * from info_dept where did in (select  distinct secondLevelId from info_dept_identityLink)
+	select * from info_dept where did in (select  distinct secondLevelId from info_dept_identitylink)
 </select>
 <!-- 根据二级部门，查询不重复一级部门 -->
 <select id="selectDistinctFirstLevelDept" parameterType="hashmap" resultType="dept">
-	select * from info_dept where did in (select distinct firstLevelId from info_dept_identityLink
+	select * from info_dept where did in (select distinct firstLevelId from info_dept_identitylink
 	<where>
 		<if test="secondLevelId!=null and secondLevelId!=''">secondLevelId=#{secondLevelId}</if>
 	</where>
@@ -199,6 +204,8 @@
   <select id="selectDeptWithId" resultType="dept">
     select * from info_dept where did=#{id}
   </select>
+  
+
   <!-- 根据部门ID查询所有用户 -->
   <select id="selectUsersWithDeptId" parameterType="int" resultMap="userResultMap">
     select * from info_user_dept where deptId=#{id}
@@ -207,8 +214,24 @@
   <select id="selectAllDept" resultType="dept">
     select * from info_dept
   </select>
+  <select id="selectAllDepts" resultType="dept" parameterType="hashmap">
+    select * from info_dept
+    <where>
+    	<if test="name!=null and name!=''">
+    	   name=#{name}
+    	</if>
+    </where>
+  </select>
+  <select id="selectAllDeptsAsHashMap" resultType="hashmap" parameterType="hashmap">
+    select * from info_dept
+    <where>
+    	<if test="name!=null and name!=''">
+    	   name=#{name}
+    	</if>
+    </where>
+  </select>
   <insert id="saveDept" parameterType="dept" useGeneratedKeys="true">
-  	insert into info_dept (name) values (#{name})
+  	insert into info_dept (name,level) values (#{name},#{level})
   </insert>
   <!-- ===============================职务post表=============================== -->
   <select id="selectPostWithId" resultType="post">

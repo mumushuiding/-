@@ -17,15 +17,20 @@ public interface UserMapper extends BaseMapper<User> {
 	
 	List<Dept> selectAllDept();
 	List<Post> selectAllPost();
+	
+	
     /**
      * ***********************用户***********************************************
      */
 	void deleteUsersByUserIds(String[] ids);
 	List<User> selectAllUserWithHashMap(HashMap<String, Object> params);
+	String selectUserIdByPhone(String phone);
 	 /**
-     * ***********************用户***********************************************
+     * ***********************部门***********************************************
      */
 	void saveDept(Dept dept);
+	List<Dept> selectAllDepts(HashMap<String, Object> params);
+	List<HashMap<String, Object>> selectAllDeptsAsHashMap(HashMap<String, Object> params);
 	/**
 	 * ***********************用户和职位*******************************************
 	 */

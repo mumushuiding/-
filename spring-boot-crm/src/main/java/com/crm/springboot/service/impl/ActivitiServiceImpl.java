@@ -19,6 +19,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.repository.Deployment;
@@ -34,19 +35,16 @@ import org.apache.logging.log4j.core.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.crm.springboot.mapper.VacationMapper;
-import com.crm.springboot.pojos.FormField;
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
-import com.crm.springboot.pojos.Vacation;
-import com.crm.springboot.pojos.assess.Evaluation;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.ProcessService;
 import com.crm.springboot.service.ResponsibilityService;
 import com.crm.springboot.service.SysPowerService;
 import com.crm.springboot.utils.DateUtil;
+import com.crm.springboot.utils.RegexUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 @Service
@@ -62,9 +60,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 	
 	@Autowired
 	private HistoryService historyService;
-    
-	@Autowired
-	private VacationMapper vacationMapper;
+
     
 	@Autowired ProcessService processService;
 
@@ -243,7 +239,6 @@ public class ActivitiServiceImpl implements ActivitiService{
 				.singleResult();
 	    
 		BpmnModel bpmnModel= repositoryService.getBpmnModel(pi.getProcessDefinitionId());
-
 	    InputStream is=new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png",
 	    		runtimeService.getActiveActivityIds(executionId), Collections.<String>emptyList(), "宋体", "宋体", "宋体", null, 2.0);
 	    showDiagram(is, out);
@@ -285,6 +280,34 @@ public class ActivitiServiceImpl implements ActivitiService{
 		return groupIds;
 	}
 	@Override
+	public List<Task> listCandidateAndAssigneeTasks(String userId, List<String> processInstanceIds, Integer pageIndex,
+			Integer pageSize) {
+        if(processInstanceIds==null||processInstanceIds.size()==0){
+			
+			return null;
+		}else {
+			
+			return taskService.createTaskQuery()
+					.processInstanceIdIn(processInstanceIds).taskCandidateOrAssigned(userId).orderByTaskCreateTime().desc()
+					.listPage((pageIndex-1)*pageSize, pageSize);
+		}
+	}
+
+	@Override
+	public long countListCandidateAndAssigneeTasks(String userId, List<String> processInstanceIds) {
+		if(processInstanceIds==null || processInstanceIds.size()==0) return 0;
+		
+		return taskService.createTaskQuery()
+				.processInstanceIdIn(processInstanceIds).taskCandidateOrAssigned(userId).count();
+	}
+
+	@Override
+	public PageInfo listCandidateAndAssigneePageInfo(String userId, List<String> processInstanceIds, Integer pageIndex,
+			Integer pageSize) {
+		
+		return this.getPageInfo(createTaskVOList(this.listCandidateAndAssigneeTasks(userId,processInstanceIds, pageIndex, pageSize)), this.countListCandidateAndAssigneeTasks(userId, processInstanceIds));
+	}
+	@Override
 	public List<Task> listCandidateTasks(String userId,List<String> processInstanceIds, Integer pageIndex, Integer pageSize) {
 		//查询用户所在的所有用户组
 
@@ -319,13 +342,16 @@ public class ActivitiServiceImpl implements ActivitiService{
 		if(tasks==null) return null;
 		List<ProcessBean> result=new ArrayList<ProcessBean>();
 		if(tasks==null) return result;
+		
+		HashMap<String, Object> params=new HashMap<String, Object>();
 		for(Task task:tasks){
 			ProcessInstance pi=this.getProcessInstance(task.getId());
 	
 			//查询流程参数
 			ProcessBean arg=(ProcessBean) this.runtimeService.getVariable(pi.getId(), "arg");
 			if(arg==null) break; 
-//			ProcessBean arg=responsibilityService.selectEvaluationWithProcessInstanceId(pi.getId()).getProcessBean();
+//			params.put("processInstanceId", pi.getProcessInstanceId());
+//			ProcessBean arg=processService.selectSingleProcessBean(params);
 			//封装值对象
 			arg.setProcessInstanceId(task.getProcessInstanceId());
 			arg.setTaskId(task.getId());
@@ -353,9 +379,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 		List<String> candidateGroups=this.candidateGroups(userId);
 
 		if(candidateGroups==null ||candidateGroups.size()==0) return 0;
-		
-		System.out.println("count="+taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskCandidateGroupIn(candidateGroups).count());
-		
+
 		return taskService.createTaskQuery().processInstanceIdIn(processInstanceIds).taskCandidateGroupIn(candidateGroups).count();
 	}
 
@@ -387,7 +411,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 		Task task=this.taskService.createTaskQuery()
 				.processInstanceId(processInstanceId).orderByTaskCreateTime().desc()
 				.singleResult();
-		System.out.println(task.getCreateTime());
+		
 		return this.taskService.createTaskQuery()
 				.processInstanceId(processInstanceId).orderByTaskCreateTime().desc()
 				.singleResult();
@@ -694,6 +718,90 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
 		return taskService.createTaskQuery().taskId(taskId).singleResult();
 	}
+
+	@Override
+	public long countAllHistoricTaskInstancesByUserId(String userId) {
+		
+		return historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).count();
+	}
+
+	@Override
+	public List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserId(String userId,Integer pageIndex,
+			Integer pageSize) {
+		
+		
+		return historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).listPage((pageIndex-1)*pageSize, pageSize);
+	}
+
+	@Override
+	public PageInfo listAllHistoricTaskInstancesPageInfoByUserId(String userId, Integer pageIndex, Integer pageSize) {
+
+		return this.getPageInfo(createAllHistoricProcess(this.listAllHistoricTaskInstancesByUserId(userId, pageIndex, pageSize)), this.countAllHistoricTaskInstancesByUserId(userId));
+	}
+
+	@Override
+	public List<ProcessBean> createAllHistoricProcess(List<HistoricTaskInstance> historicTaskInstances) {
+		List<ProcessBean> result=new ArrayList<ProcessBean>();
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+			params.put("processInstanceId", historicTaskInstance.getProcessInstanceId());
+			ProcessBean processBean=processService.selectSingleProcessBean(params);
+			if(processBean==null) {
+				ProcessBean processBean2=new ProcessBean();
+				processBean2.setTitle("相关流程已经删除了");
+				result.add(processBean2);
+				continue;
+			};
+			processBean.setTaskId(historicTaskInstance.getId());
+			result.add(processBean);
+		}
+		return result;
+	}
+
+	@Override
+	public void withdrawTask(String processInstanceId,String userId) {
+		HashMap<String, Object> variables = new HashMap<String,Object>();
+		variables.put("pass", "false");
+
+		Task fTask=this.getFirstTask(processInstanceId);
+		
+		this.complete(fTask.getId(), variables);
+
+	}
+
+	@Override
+	public HistoricTaskInstance selectSingleHistoricTaskInstance(String userId, String processInstanceId) {
+		List<HistoricTaskInstance> historicTaskInstances=historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId)
+				.taskAssignee(userId).orderByTaskCreateTime().desc().list();
+		if(historicTaskInstances!=null && historicTaskInstances.size()>0) return historicTaskInstances.get(0);
+		return null;
+	}
+
+	@Override
+	public boolean canIwithdrawTask(String processInstanceId, String userId) {
+		
+        HistoricTaskInstance historicTaskInstance=this.selectSingleHistoricTaskInstance(userId, processInstanceId);
+		
+		System.out.println("his.TaskDefinitionKey"+historicTaskInstance.getTaskDefinitionKey());
+		
+		Task fTask=this.getFirstTask(processInstanceId);
+		if(fTask==null) return false;
+		System.out.println("fTask="+fTask.getTaskDefinitionKey());
+		//默认当前流程的上一个流程名为(当前为usertask2)usertask1
+		String nextTaskDefinitionKey="";
+		
+		if(RegexUtils.isMatch(historicTaskInstance.getTaskDefinitionKey(), "usertask(.*)")){
+			Integer num=Integer.parseInt(RegexUtils.getFirstGroup(historicTaskInstance.getTaskDefinitionKey(), "usertask(.*)"));
+			nextTaskDefinitionKey="usertask"+(num+1);
+			System.out.println("nextTaskDefinitionKey="+nextTaskDefinitionKey);
+		}
+		if(nextTaskDefinitionKey.equals(fTask.getTaskDefinitionKey())) return true;
+		return false;
+	}
+
+	
+
+
 
 
 

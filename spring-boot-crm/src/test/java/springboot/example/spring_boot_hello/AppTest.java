@@ -1,5 +1,12 @@
 package springboot.example.spring_boot_hello;
 
+import java.util.HashMap;
+
+import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.crm.springboot.service.DictionaryService;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -10,6 +17,7 @@ import junit.framework.TestSuite;
 public class AppTest 
     extends TestCase
 {
+	@Autowired DictionaryService dictionaryService;
     /**
      * Create the test case
      *
@@ -33,6 +41,14 @@ public class AppTest
      */
     public void testApp()
     {
-        assertTrue( true );
+    	String expectedResult="第一考核组";
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("name", "日报");
+		params.put("type", "考核组");
+		String result=dictionaryService.selectSingleDic(params).getValue();
+		System.out.println("result="+result);
+		Assert.assertTrue("数据一致", expectedResult.equals(result));  
+        Assert.assertFalse("数据不一致", !expectedResult.equals(result)); 
+       
     }
 }

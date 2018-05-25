@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="SendEmail" name="发送邮件子流程" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <serviceTask id="sendEmailService" name="Mail Task" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${arg.user.email}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[这是一封来自一线考核系统的邮件，请不要回复]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="charset">
+          <activiti:string><![CDATA[utf-8]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="html">
+          <activiti:string><![CDATA[{$html}]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow5" name="收件地址不为空" sourceRef="exclusivegateway1" targetRef="sendEmailService">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${arg.user.email!=null}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" name="收件地址为空" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${arg.user.email==null}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="sendEmailService" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SendEmail">
+    <bpmndi:BPMNPlane bpmnElement="SendEmail" id="BPMNPlane_SendEmail">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="280.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="360.0" y="258.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="555.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendEmailService" id="BPMNShape_sendEmailService">
+        <omgdc:Bounds height="55.0" width="105.0" x="520.0" y="249.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="315.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="278.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="400.0" y="278.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="276.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="421.0" y="304.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="380.0" y="258.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="167.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="167.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="421.0" y="185.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="572.0" y="249.0"></omgdi:waypoint>
+        <omgdi:waypoint x="572.0" y="185.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

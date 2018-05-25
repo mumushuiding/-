@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- 指向UserMapper.xml文件 -->
+<mapper namespace="com.crm.springboot.mapper.SysPowerMapper">
+  <!-- ****************************Action***************************** -->
+	<resultMap type="action" id="actionResultMap">
+		<id property="actionid" column="actionid"></id>
+		<result property="actionname" column="actionname"></result>
+		<result property="action" column="action"/>
+		<association property="actionColumn" column="actioncolumnid" javaType="actionColumn" select="selectActionColumnWithId"/>
+	</resultMap>
+
+    <insert id="save" parameterType="action" keyProperty="actionid" useGeneratedKeys="true">
+    	insert into power_action (actionname,action,actioncolumnid) values(#{actionname},#{action},#{actionColumn.actioncolumnid})
+    </insert>
+    <update id="updateAction" parameterType="action">
+    	update power_action
+    	<set>
+    		<if test="actionname!=null and actionname!=''">actionname=#{actionname},</if>
+    		<if test="action!=null and action!=''">action=#{action},</if>
+    		<if test="actionColumn.actioncolumnid!=null and actionColumn.actioncolumnid!=''">actioncolumnid=#{actionColumn.actioncolumnid},</if>
+    	</set>
+    	where actionid=#{actionid}
+    </update>
+    <select id="selectActionWithActionColumnId" parameterType="string" resultType="action">
+    	select * from power_action where actioncolumnid=#{id}
+    </select>
+    <select id="selectActionWithActionId" parameterType="string" resultMap="actionResultMap">
+    	select * from power_action where actionid=#{id}
+    </select>
+    <delete id="deleteAction" parameterType="string">
+    	delete from power_action where actionid=#{id}
+    </delete>
+
+     <!-- ****************************ActionColumn***************************** -->
+     
+     <resultMap type="actionColumn" id="actionColumnResultMap">
+	    <id property="actioncolumnid" column="actioncolumnid"></id>
+	    <result property="actioncolumnname" column="actioncolumnname"/>
+	    <collection property="actions" javaType="ArrayList" column="actionColumnid" ofType="action" select="selectActionWithActionColumnId">
+	    	<id property="actionid" column="actionid"></id>
+			<result property="actionname" column="actionname"></result>
+			<result property="action" column="action"/>
+	    </collection>
+	 </resultMap>
+	 <select id="selectActionColumnWithId" parameterType="string" resultType="actionColumn">
+    	select * from power_actioncolumn where actioncolumnid=#{id}
+     </select>
+     <select id="selectAllColumns" resultMap="actionColumnResultMap">
+    	select * from power_actioncolumn
+     </select>
+     <insert id="saveActionColumn" parameterType="actionColumn" keyProperty="actioncolumnid" useGeneratedKeys="true">
+    	insert into power_actioncolumn(actioncolumnname) values(#{actioncolumnname})
+     </insert>
+     
+     <!-- ****************************ActionGroup***************************** -->
+     
+	 <resultMap type="actionGroup" id="actionGroupResultMap">
+	 	<id property="actiongroupid"     column="actiongroupid"></id>
+
+	 	<association property="action"   column="actionid" javaType="action" select="selectActionWithActionId"></association>
+	 </resultMap>
+     <insert id="saveActionGroup" parameterType="actionGroup" keyProperty="actiongroupid" useGeneratedKeys="true">
+     	insert into power_actiongroup (actionid,groupid,creatorid,creatorname,createdate) values (#{action.actionid},#{groupid},#{creatorid},#{creatorname},#{createdate})
+     </insert>
+     <insert id="saveActionGroupWithActionIds" parameterType="hashmap">
+     	insert into power_actiongroup (actionid,groupid,creatorid,creatorname,createdate)
+     	values
+     	<foreach collection="ids" item="id"  index="index" separator=",">
+     		(#{id},#{actionGroup.groupid},#{actionGroup.creatorid},#{actionGroup.creatorname},#{actionGroup.createdate})
+     	</foreach>
+     </insert>
+     <select id="selectActionGroupWithGroupId" parameterType="string" resultMap="actionGroupResultMap">
+     	select * from power_actiongroup where groupid=#{id}
+     </select>
+     <!-- ****************************GroupTable***************************** -->
+     <resultMap type="groupTable" id="groupResultMap">
+     	<id property="groupid" column="groupid"/>
+     	<result property="groupname" column="groupname"/>
+     	<result property="groupinfo" column="groupinfo"/>
+     	<result property="creatorid" column="creatorid"/>
+     	<result property="creatorname" column="creatorname"/>
+     	<result property="createDate" column="createDate"/>
+     	<collection property="actionGroups" javaType="ArrayList" column="groupid" ofType="actionGroup" select="selectActionGroupWithGroupId" >
+     	   <id property="actiongroupid" column="actiongroupid"></id>
+     	   <result property="actionid" column="actionid"/>
+     	   <result property="creatorid"     column="creatorid"></result>
+	 	   <result property="creatorname"   column="creatorname"></result>
+	 	   <result property="createdate"    column="creatorid"></result>
+	 	   <result property="groupid"    column="groupid"></result>
+     	</collection>
+     </resultMap>
+     <insert id="saveGroup" parameterType="groupTable" keyProperty="groupid" useGeneratedKeys="true">
+     	insert into power_grouptable (groupname,groupinfo,groupType,creatorid,creatorname,createddate) values (#{groupname},#{groupinfo},#{groupType},#{creatorid},#{creatorname},#{createdDate})
+     </insert>
+     <select id="selectAllGroups" resultMap="groupResultMap">
+     	select * from power_grouptable
+     </select>
+     <select id="selectOnlyAllGroups" resultType="groupTable">
+     	select * from power_grouptable
+     </select>
+     <select id="selectGroupWithGroupId" parameterType="string" resultMap="groupResultMap">
+     	select * from power_grouptable where groupid=#{id}
+     </select>
+      <select id="selectGroupWithGroupIdResultAsType" parameterType="string" resultType="groupTable">
+     	select * from power_grouptable where groupid=#{id}
+     </select>
+     <select id="selectGroupIdWithGroupName" parameterType="string" resultType="string">
+     	select groupid from power_grouptable where groupname=#{groupname}
+     </select>
+     <update id="updateGroup" parameterType="groupTable">
+     	update power_groupTable set
+     	     groupname=#{groupname},
+     	     groupinfo=#{groupinfo},
+     	     creatorid=#{creatorid},
+     	     creatorname=#{creatorname},
+     	     createdDate=#{createdDate},
+     	     groupType=#{groupType} where groupid=#{groupid}
+     </update>
+     <delete id="deleteGroupById" parameterType="string">
+     	delete from power_grouptable where groupid=#{id}
+     </delete>
+     <select id="selectAllGroupIds" parameterType="string" resultType="string">
+        <bind name="pattern" value="'%' + _parameter + '%'" />
+     	select groupid from power_grouptable where groupname like #{pattern}
+     </select>
+     <!-- ****************************GroupManager***************************** -->
+     <resultMap type="groupManager" id="groupManagerResultMap">
+     	<id     property="groupmanagerid"   column="groupmanagerid"/>
+     	<result property="userid"           column="userid"/>
+     	<result property="username"         column="username"/>
+     	<result property="creatorid"        column="creatorid"/>
+     	<result property="creatorname"      column="creatorname"/>
+     	<result property="createdate"       column="createdate"/>
+     	<association property="groupTable"       column="groupid" 
+     	             javaType="groupTable" select="selectGroupWithGroupId"></association>
+     </resultMap>
+     <resultMap type="groupManager" id="groupManagerResultMap2">
+     	<id     property="groupmanagerid"   column="groupmanagerid"/>
+     	<association property="groupTable"       column="groupid" 
+     	             javaType="groupTable" select="selectGroupWithGroupIdResultAsType"></association>
+     </resultMap>
+  
+     
+     <insert id="saveGroupManager" parameterType="groupManager" keyProperty="groupmanagerid" useGeneratedKeys="true">
+     	insert into power_groupmanager (userid,username,groupid,creatorid,creatorname,createdate) values 
+     	                         (#{userid},#{username},#{groupTable.groupid},#{creatorid},#{creatorname},#{createdate})	
+     </insert>
+     <insert id="saveGroupManagerWithGroupIds" parameterType="hashmap">
+     	insert into power_groupmanager (userid,username,groupid,creatorid,creatorname,createdate)
+     	values
+     	<foreach collection="ids" item="id"  index="index" separator=",">
+     		(#{groupManager.userid},#{groupManager.username},#{id},#{groupManager.creatorid},#{groupManager.creatorname},#{groupManager.createdate})	
+     	</foreach>
+     </insert>
+     <select id="selectGroupManagerByUserId" parameterType="string" resultMap="groupManagerResultMap">
+     	select *  from power_groupmanager   where userid=#{id}
+     </select>
+     <select id="selectGroupManagerByUserId2" parameterType="string" resultMap="groupManagerResultMap2">
+     	select *  from power_groupmanager   where userid=#{id}
+     </select>
+     <delete id="deleteGroupManagerById" parameterType="string">
+     	delete from power_groupmanager where groupmanagerid=#{id}
+     </delete>
+     <!-- 查询一个用户组下面存在的用户 -->
+     <resultMap type="groupManager" id="groupManagerWithUserResultMap">
+     	<id     property="groupmanagerid"   column="groupmanagerid"/>
+     	<association property="user"       column="userid" 
+     	             javaType="user" select="selectUserWithUserId"></association>
+     </resultMap>
+     <select id="selectUserWithUserId" parameterType="string" resultType="user">
+     	select * from info_user where id=#{id}
+     </select>
+     <select id="selectGroupManagerWithGroupId" parameterType="string" resultMap="groupManagerWithUserResultMap">
+     	select * from power_groupmanager where groupid=#{id}
+     </select>
+     <select id="selectAllGroupManagers" resultType="groupManager" >
+     	select * from power_groupmanager
+     </select>
+     <select id="selectAllGroupManagersWithHashMap" resultType="groupManager" parameterType="hashmap">
+     	select * from power_groupmanager
+     	<where>
+     		<if test="userId!=null">userId=#{userId}</if>
+     	</where>
+     </select>
+</mapper>

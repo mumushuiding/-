@@ -9,9 +9,12 @@ import java.util.List;
 public class Dept implements Serializable{
 	private Integer did;
 	private String name;
+
+
+
 	@Override
 	public String toString() {
-		return "Dept [did=" + did + ", name=" + name;
+		return "Dept [did=" + did + ", name=" + name + "]";
 	}
 
 	public Integer getDid() {

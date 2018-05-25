@@ -32,6 +32,7 @@ import com.crm.springboot.service.SysPowerService;
 import com.crm.springboot.service.UserService;
 
 
+
 /**
  * 该注解指定项目为springboot,由此类当作程序入口自动装备web依赖环境
  * @author Administrator
@@ -55,60 +56,61 @@ public class Application {
 	}
 
 
-	//以下为测试用,启动application会运行一次
-	 @Bean
-	   InitializingBean deploymentInitializer(){
-		return new InitializingBean() {
-			@Autowired
-			private ActivitiService activitiService;
-			@Override
-			public void afterPropertiesSet() throws Exception {
-				
-				activitiService.deleteLowerVersionProcessDefinitions(false);
-				
-			}
-		};
-		 
-	 }
-	
-	 @Bean
-	    InitializingBean usersAndGroupsInitializer() {
-	        return new InitializingBean() {
-	            @Autowired
-	            private SysPowerService sysPowerService;
-	            @Autowired
-	            private UserService userService;
-	            @Autowired
-	            
-	            private ActivitiService activitiService;
-	            public void afterPropertiesSet() throws Exception {
-	            	
-	            	//用户自己的表格同activiti表格内容同步
-	                List<User> users=userService.selectAllUser();
-	                List<GroupTable> groupTables=sysPowerService.selectAllGroups();
-	                HashMap<String,Object> params=new HashMap<String, Object>();
-	                
-	                List<GroupManager> groupManagers=sysPowerService.selectAllGroupManagers();
-	                //同步表格user同act_id_user内容 
-	                for(User u:users){
-	                	org.activiti.engine.identity.User au=activitiService.selectUser(String.valueOf(u.getId()));
-	                	if(au==null){
-	                		activitiService.saveUser(String.valueOf(u.getId()));
-	                	}
-	                }
-	                //同步用户组
-	                for(GroupTable groupTable:groupTables){
-	                	Group group=activitiService.selectGroupById(groupTable.getGroupid());
-	                	if(group==null){
-	                		activitiService.saveGroup(groupTable);
-	                	}
-	                }
-	                //同步act_id_membership和groupmanager表格的内容
-	                for(GroupManager gm:groupManagers){
-	                	activitiService.asnyMembership(gm);
-	                }
-	            }
-	        };
-	    }
+//	以下为测试用,启动application会运行一次
+//	 @Bean
+//	   InitializingBean deploymentInitializer(){
+//		return new InitializingBean() {
+//			@Autowired
+//			private ActivitiService activitiService;
+//			@Override
+//			public void afterPropertiesSet() throws Exception {
+//				
+//				activitiService.deleteLowerVersionProcessDefinitions(false);
+//				
+//			}
+//		};
+//		 
+//	 }
+//	
+//	 @Bean
+//	    InitializingBean usersAndGroupsInitializer() {
+//	        return new InitializingBean() {
+//	            @Autowired
+//	            private SysPowerService sysPowerService;
+//	            @Autowired
+//	            private UserService userService;
+//	            @Autowired
+//	            
+//	            private ActivitiService activitiService;
+//	            public void afterPropertiesSet() throws Exception {
+//	            	
+//	            	//用户自己的表格同activiti表格内容同步
+//	                List<User> users=userService.selectAllUser();
+//	                List<GroupTable> groupTables=sysPowerService.selectAllGroups();
+//	                HashMap<String,Object> params=new HashMap<String, Object>();
+//	                
+//	                List<GroupManager> groupManagers=sysPowerService.selectAllGroupManagers();
+//	                //同步表格user同act_id_user内容 
+//	                for(User u:users){
+//	                	org.activiti.engine.identity.User au=activitiService.selectUser(String.valueOf(u.getId()));
+//	                	if(au==null){
+//	                		activitiService.saveUser(String.valueOf(u.getId()));
+//	                	}
+//	                }
+//	                //同步用户组
+//	                for(GroupTable groupTable:groupTables){
+//	                	Group group=activitiService.selectGroupById(groupTable.getGroupid());
+//	                	if(group==null){
+//	                		activitiService.saveGroup(groupTable);
+//	                	}
+//	                }
+//	                //同步act_id_membership和groupmanager表格的内容
+//	                for(GroupManager gm:groupManagers){
+//	                	activitiService.asnyMembership(gm);
+//	                }
+//	            }
+//	        };
+//	    }
 
+	 
 }

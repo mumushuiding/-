@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+  <!-- 指向UserMapper.xml文件 -->
+  
+<mapper namespace="com.crm.springboot.mapper.DictionaryMapper">
+    <select id="selectDistinctNameWithType" parameterType="string" resultType="string">
+    	select distinct name from info_dic where type=#{type}
+    </select>
+	<select id="selectAllDictionaryWithName" parameterType="string" resultType="string">
+		select value from info_dic where name=#{name}
+	</select> 
+    <select id="selectAllDics" parameterType="hashmap" resultType="dictionary">
+    	select * from info_dic 
+    	<where>
+    		<if test="name!=null and name!=''">
+    			name=#{name}
+    		</if>
+    		<if test="value!=null and value!=''">
+    			and value=#{value}
+    		</if>
+    		<if test="type!=null and type!=''">
+    			and type=#{type}
+    		</if>
+    		<if test="names!=null">
+    			and name in
+    			<foreach collection="names" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+    		</if>
+    		<if test="values!=null">
+    		   and value in
+    		   <foreach collection="values" item="id" index="no" separator="," open="(" close=")">
+  		            #{id}
+  	         </foreach>
+    		</if>
+    	</where>
+    </select>
+</mapper>

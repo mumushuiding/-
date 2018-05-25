@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>待办和受理的业务</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+     <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom styles for this template -->
+   
+   
+  </head>
+<!-- NAVBAR
+================================================== -->
+  <body>
+    
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    
+     <script src="/js/plugins/moment.min.js"></script>
+    
+    <div class="container">  
+		<div  class="tab-content">
+			 <div class="tab-pane fade in active" id="home">
+			  <nav class="navbar navbar-default" role="navigation">
+			   <div class="container-fluid">
+			     <div class="navbar-header">
+			       <a class="navbar-brand" href="#">搜索</a>
+			     </div>
+			
+			     <div class="navbar-form navbar-left" role="search">
+			       <div class="form-group">
+			         <select class="selectpicker" multiple="multiple" data-live-search="true">
+			          
+			             <option value="createTime">创建日期</option>
+			             <option>option2</option>
+			             <option>option3</option>
+			             <option>option4</option>
+			          
+			         </select>
+			       </div>
+			
+			     </div>
+			         
+			   </div>
+			   <!-- .container-fluid -->
+			 </nav>
+			
+			   <!-- 工具栏 -->
+			  <div id="toolbar" class="btn-group pull-right" style="margin-right: 20px;">
+
+			  </div>
+			  <!-- /工具栏 -->
+			  <table id="mytab" class="table table-hover"></table>
+			</div>
+			
+		</div>
+    
+        <!-- Button trigger modal -->
+        <button  id="modalButton" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalTable" style="display:none;">点击查看</button>
+        <div class="modal fade" id="modalTable" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">项目加减分明细</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="table"
+                               data-toggle="table"
+                               data-height="299"
+                              >
+                            <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>评分原因</th>
+                                <th>评分依据</th>
+                                <th>评分</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+</div>
+<script  type="text/javascript" th:inline="javascript"> 
+ /*<![CDATA[*/
+    
+    //modal table
+    var $table = $('#table');
+    function test(marks){
+    
+    
+          marks=marks.replace(/\r\n/g, '$');
+         
+          
+        
+          marks=JSON.parse(marks);
+        
+          
+      	  $('#table tbody').html('');
+      	   var result="";
+         
+      	   for(x in marks){
+      	       
+      	   		result+='<tr><td>'+marks[x].markId+'</td><td>'+marks[x].markReason+'</td><td>'+marks[x].accordingly+'</td><td>'+marks[x].markNumber+'</td></tr>';
+      	   }
+      	   $('#table tbody').html(result);
+      	  $('#modalButton').click();
+    
+    }
+  
+
+ 
+    //根据窗口调整表格高度
+    $(window).resize(function() {
+        $('#mytab').bootstrapTable('resetView', {
+            height: tableHeight()
+        })
+    })
+//生成用户数据
+    var startDate=[[${startDate}]];
+    
+    var endDate=[[${endDate}]];
+    
+    var userId=[[${userId}]];
+
+    $('#mytab').bootstrapTable({
+        method: 'post',
+        contentType: "application/x-www-form-urlencoded",//必须要有！！！！
+        url:"/responsibility/selectAllProject?userId="+userId+"&amp;startDate="+startDate+"&amp;endDate="+endDate,//要请求数据的文件路径
+        //height:tableHeight(),//高度调整
+        toolbar: '#toolbar',//指定工具栏
+        striped: true, //是否显示行间隔色
+        pageNumber: 1, //初始化加载第一页，默认第一页
+        pagination:true,//是否分页
+        queryParamsType:'limit',//查询参数组织方式
+        queryParams:queryParams,//请求服务器时所传的参数
+        sidePagination:'server',//指定服务器端分页
+        pageSize:10,//单页记录数
+        pageList:[5,10,20,30],//分页步进值
+        showRefresh:true,//刷新按钮
+        showColumns:true,
+        toolbarAlign:'right',//工具栏对齐方式
+        buttonsAlign:'right',//按钮对齐方式
+        toolbar:'#toolbar',//指定工作栏
+        columns:[
+
+            {
+                title:'ID',
+                field:'projectId',
+                
+            },
+
+            {
+                title:'用户I',
+                field:'userId',
+                visible:false
+            }, 
+            {
+                title:'开始时间',
+                field:'startDate',
+                 width:'100px',
+                formatter:function(value,row,index){
+                    var m=moment(row.startDate).format('YYYY-MM-DD');
+                    
+                	return m;
+                }
+            },
+            {
+                title:'结束时间',
+                field:'endDate',
+                width:'100px',
+                formatter:function(value,row,index){
+                 var m=moment(row.endDate).format('YYYY-MM-DD');
+                    
+                 return m;
+                }
+            },
+
+            {
+            	title:"项目总分",
+            	formatter:function(value,row,index){
+            		var marks=row.marks;
+            		var totalMark="";
+            		for(x in marks){
+            			if(marks[x].checked=="1"){
+            				totalMark+=marks[x].markNumber;
+            			}
+            		}
+            		return totalMark;
+            	}
+            },
+            {
+            	title:"评分明细",
+            	align:'center',
+                valign:'middle',
+            	formatter:function(value,row,index){
+            	  
+                   return '<a class="btn btn-primary" href="javascript:void(0)" onclick="javascript:test(\''+JSON.stringify(row.marks).replace(/"/g, '&quot;')+'\')">点击查看</a>';
+            	}
+            },
+            
+            {
+                title:'项目内容',
+                field:'projectContent',
+                
+            },
+            {
+                title:'进展情况',
+                field:'progress',
+               
+            }
+        ],
+        locale:'zh-CN',//中文支持,
+        responseHandler:function(result){
+
+		    return result;
+        }
+    })
+
+    //三个参数，value代表该列的值
+    function operateFormatter(value, row, index) {
+        
+        return [  
+            '<a id="claim" href="/responsibility/selectProjectWithProjectId/'+row.projectId+'" class="">具体内容</a>',
+            '<a id="claim" href="/responsibility/project/markForm/'+row.projectId+'" class="">自评</a>',
+        ].join('');
+       
+          
+    }
+
+    //请求服务数据时所传参数
+    function queryParams(params){
+        return{
+            //每页多少条数据
+            pageSize: params.limit,
+            //请求第几页
+            pageIndex:params.pageNumber,
+            userId:userId,
+            startDate:startDate,
+            endDate:endDate
+        }
+    }
+
+    //tableHeight函数
+    function tableHeight(){
+        //可以根据自己页面情况进行调整
+        return $(window).height() -280;
+    }
+
+    var msg=[[${msg}]];
+
+    if(msg!=null) alert(msg);
+
+/*]]>*/
+    </script>
+
+  </body>
+</html>

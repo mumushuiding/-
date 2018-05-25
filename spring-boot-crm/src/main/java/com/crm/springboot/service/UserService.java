@@ -31,7 +31,9 @@ public interface UserService{
 
 	User save(User user);
 	List<User> selectAllUserWithHashMap(HashMap<String, Object> params);
-
+	String selectUserIdByPhone(String phone);
+    //根据用户职级设置审批组
+	void saveGroupManagerWithUser(User user);
 	/**
 	 * ***********************部门***********************************************
 	 */
@@ -39,6 +41,10 @@ public interface UserService{
 	void saveDept(Dept dept);
 	//获取用户三级部门信息
 	UserLinkDept getSingleUserLinkDept(User user,String condition);
+	Dept selectSingleDept(HashMap<String, Object> params);
+	List<Dept> selectAllDepts(HashMap<String, Object> params);
+	HashMap<String, Object> selectSingleDeptAsHashMap(HashMap<String, Object> params);
+	List<HashMap<String, Object>> selectAllDeptsAsHashMap(HashMap<String, Object> params);
 	/**
 	 * ***********************用户和职级*******************************************
 	 */
@@ -55,7 +61,7 @@ public interface UserService{
 	 */
 	String[] getDeptNames(User user);
 	List<UserLinkDept> selectUserLinkDeptWithUserId(Serializable userId);
-	
+	void saveAndUpdateUserLinkDeptWithUser(User user);
 	void saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(HashMap<String, Object> params);
 	/**
 	 * 根据用户Id 和 部门id来更新

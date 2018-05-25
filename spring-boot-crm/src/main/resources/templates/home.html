@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+<title>一线考察系统</title>
+<style type="text/css">
+body, ul, li, p, span, h1, h2, img, div, footer, header, section, aside, dl, dt, dd, a, form, input, textarea, i { margin:0; padding:0; border:0; }
+body { font-size:14px; color:#333; font-family:"Microsoft YaHei", "微软雅黑", "SimSun", "宋体", "Arial Narrow"; background:#fff; }
+ul, ol, li { list-style-type:none; }
+select, input, img { vertical-align:middle; }
+a { text-decoration:none; color:#333; }
+a:hover, a:active, a:focus { text-decoration:underline; }
+.clean:after { display: block; clear: both; content: ""; visibility: hidden; height: 0; }
+.clean { zoom: 1; }
+.mainbox { width: 1205px; margin: 0px auto; padding-bottom: 100px; box-shadow: 0px 0px 30px 5px darkgrey; }
+.main { width: 1000px; margin: 0px auto; }
+.parta { margin-bottom: 50px; }
+.parta .nav{ width:1205px; height:40px; line-height:40px; font-size: 18px; background:#C8000B; color:#FFFFFF; }
+.parta .nav a{line-height:40px; font-size: 18px; color:#FFFFFF; text-align:center;}
+
+.partb { margin-bottom: 20px; }
+.partb .left { width: 640px; float: left; }
+.partb .left .tit { font-size: 18px; background: url(/images/home/bkmore.jpg) no-repeat 0px center; padding-right: 40px; padding-left: 16px; margin-bottom: 10px; }
+.partb .left .tit a { text-decoration: none; color: #c6010b; display: block; }
+.partb .left ul { margin-bottom: 30px; }
+.partb .left ul li { line-height: 30px; width: 126px; float: left; }
+.partb .left ul li span { margin-right: 14px; }
+.partb .right { width: 358px; float: right; padding-bottom: 10px; border: 1px solid #e0e0e0; }
+.partb .right .tit { background: #f4f3ef url(/images/home/ggl.png) no-repeat center center; height: 50px; margin-bottom: 10px; }
+.partb .right ul li { line-height: 40px; background: url(/images/home/dian.png) no-repeat 0px center; padding-left: 20px; margin-left: 26px; }
+.partc { margin-bottom: 50px; }
+.partc .left, .partc .right { width: 486px; height: 342px; float: left; }
+.partc .left { background: url(/images/home/bj2.jpg) no-repeat left top; margin-right: 22px; }
+.partc .left .tit { background: url(/images/home/bt1.png) no-repeat center 24px; height: 76px; }
+.partc .left table { color: #FFF; background-color: #fdd494; }
+.partc .left tr { line-height: 30px; background-color: #cf1a29; }
+.partc .left td { text-align: center; }
+.partc .left .more { display: block; width: 90px; height: 20px; margin: 14px auto 0px; }
+.partc .right { line-height: 30px; color: #FFF; background: url(/images/home/bj3.jpg) no-repeat left top; }
+.partc .right .tit { height: 70px; }
+.partc .right p { padding-left: 61px; }
+.partc .right .p2 { text-indent: 56px; }
+.partd .tit { line-height: 30px; color: #c8000d; background: #f0f0f0 url(/images/home/bk2.jpg) no-repeat left center; height: 30px; padding-left: 26px; margin-bottom: 20px; }
+.partd .tit a { text-decoration: none; color: #c8000d; background-color: #FFF; float: left; cursor: pointer; }
+.partd .tit .default1, .partd .tit .default2 { font-size: 18px; }
+.partd .tit .active1, .partd .tit .active2 { font-size: 24px; }
+.partd .tit span { font-size: 24px; background-color: #FFF; float: left; }
+.partd .set { height: 30px; padding-left: 30px; margin-bottom: 20px; position: relative; }
+.partd .set select { background: url(/images/home/xiala.jpg) no-repeat 55px center; width: 98px; height: 30px; float: left; border: 1px solid #949494; }
+.partd .set span { background-color: #FFF; width: 20px; height: 30px; position: absolute; top: 0px; z-index: 66; }
+.partd .set .sp1 { left: 108px; }
+.partd .set .sp2 { left: 206px; }
+.partd .set .chaxun { background: url(/images/home/chaxun.jpg) no-repeat left top; width: 87px; height: 30px; float: left; cursor: pointer; }
+.partd tr { height: 40px; }
+.partd th { font-size: 18px; }
+.partd td { text-align: center; }
+
+	.examples pre {
+		margin-top: 0;
+	}
+	
+	.marquee .author {
+		display: none;
+	}
+	
+	.marquee-author {
+		float: left; 
+		width: 90px; 
+		text-align: right; 
+		padding: 4px 5px 1px 0;
+	}
+table,td,tr,th{
+	border:solid 1px black;
+	
+	
+}
+tr{
+	height:38px;
+}
+table{
+	height:300px;
+}
+
+</style>
+
+<!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+    <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+   
+   
+    <!-- 滚动 -->
+    <link href="/css/plugins/jquery.marquee.css" rel="stylesheet"/>
+     
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+       <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/plugins/bootstrap-table.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    
+    <!-- scroll -->
+    <script src="/js/plugins/jquery.marquee.min.js"></script>
+    
+</head>
+
+<body>
+<div class="mainbox">
+     <!-- head -->
+  <div class="parta">
+        <img src="/images/home/bj1.jpg" />
+      <div class="nav">
+        <a href="/user/loginForm" target="_blank" style=" width:105px; float:right;background:#FFD908; font-weight:900; color:#C8000B;" th:if="${session.sysuser==null}">登入</a>
+        <a href="/index" target="_blank" style=" width:100px; float:left;background:#FFD908; font-weight:900; color:#C8000B;"  th:if="${session.sysuser!=null}">
+              
+                进入填表
+          </a>
+       <!-- 显示本月前10名 -->
+		<ul id="marquee5" class="marquee">
+			<li>4月份加分前10名：王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 </li>
+		</ul>
+          
+      </div>
+    </div>
+    
+     <!-- /head -->
+   <div class="main">
+       <!-- container -->
+      <div class="container">
+        <!-- 月度累计和未填写 -->
+      	<div class="row">
+             <div class="col-md-8">
+                <div class="alert alert-success" role="alert"><h3>中层干部2018年一线考核加减分排行榜（累计）</h3></div>
+                 <div class="row">
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-1_post1">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第一考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                          </table>
+                      </div>
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-2_post1">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第二考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              	
+
+                              </tbody>
+                          </table>
+                      </div>
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-3_post1">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第三考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                          </table>
+                      </div>
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-4_post1">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第四考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+        
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+                  <a th:href="@{/responsibility/rankList/month?group=第一考核组&amp;postNameLike=中层}" style="color:red;" class="pull-right"><span class="glyphicon glyphicon-hand-right"></span>&nbsp;&nbsp;更多</a>
+                  <div style="height:26px;"></div>
+                  <div class="alert alert-success" role="alert"><h3>工作人员2018年一线考核加减分排行榜（累计）</h3></div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-1_post2">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第一考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+ 
+                              </tbody>
+                          </table>
+                          
+                      </div>
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-2_post2">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第二考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                    
+                              </tbody>
+                          </table>
+                          
+                      </div>
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-3_post2">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第三考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+         
+                              </tbody>
+                          </table>
+                          
+                      </div>
+                      <div class="col-md-3">
+                          <table class="table table-hover" id="group-4_post2">
+                              <thead>
+                              <tr>
+                                  <th colspan="2">第四考核组</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+       
+                              </tbody>
+                          </table>
+                          
+                      </div>
+                  </div> 
+               <a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike=普通员工" style="color:red;" class="pull-right"><span class="glyphicon glyphicon-hand-right"></span>&nbsp;&nbsp;更多</a>
+             </div>
+             <div class="col-md-3">
+                <!-- row -->
+             	<div class="row">
+             	   <!-- col -->
+	        	   <div class="col-md-10">
+	        	      <div class="alert alert-danger" role="alert"><h3>未填表名单</h3>
+	        	      </div>
+	        	      <div class="panel-body" id="month"> 
+		                  
+		                  
+	                  </div>
+	                  <div class="alert alert-info" role="alert"><h4>一线考核相关文件</h4></div>
+	                  <div id="fileLinks">
+	                  	
+	                  </div>
+	             </div>
+	              <!-- /col -->
+              </div>
+              <!-- /row -->
+             </div>
+        </div>
+        
+        <!-- /月度累计和未填写 -->
+      </div>
+      <!-- /container -->
+
+       <!-- container -->
+        <div class="container">
+           <div class="col-md-8">
+				 <div id="myTab" class="nav nav-tabs">
+					<div class="partd">
+                          <div class="tit">
+	                         <a href="#halfYear" class="active1" data-toggle="tab">半年考评排行</a><span>丨</span>
+	                          <a href="#fullYear" class="default2" data-toggle="tab">年度考评排行</a>
+                          </div>
+					</div>	
+				</div>
+				<div id="myTabContent" class="tab-content">
+					<div class="tab-pane fade in active" id="halfYear">
+						<p>暂无数据</p>
+					</div>
+					<div class="tab-pane fade" id="fullYear">
+						<p>暂无数据</p>
+					</div>
+				</div>
+	       </div> 
+        </div> 
+       <!-- /container -->
+
+
+      
+     
+   </div> 
+</div>
+
+</body>
+<script th:inline="javascript">
+//<![CDATA[      
+	     
+            
+     //multiple table
+     var group="group";
+     $("[id^="+group+"]").each(function(){
+          var id=$(this).attr("id");
+         
+		  getData(id);
+     });
+     function getData(id){
+         var ids=id.split("_");
+         var group=ids[0];
+         var post=ids[1];
+         var total;
+         if("post1"==ids[1]) {
+         	post="中层";
+         	total=5;
+         }
+         if("post2"==ids[1]){
+         	post="普通";
+         	total=10;
+         }
+         //考核组
+         var groups=["第一考核组","第二考核组","第三考核组","第四考核组"];
+         var index=ids[0].split("-")[1];
+        
+     	 $.ajax({
+		  type: 'POST',
+		  url: "/responsibility/selectTotalMarkForEachGroup/"+groups[index-1]+"/"+post+"/"+total,
+		  dataType: "json",
+		  success: function(data){
+		     var result="";
+		    
+		     for(x in data){
+		       
+		       var aLink='<a href="/responsibility/projectList?userId='+data[x].user.id+'&startDate='+[[${startDateOfYear}]]+'&endDate='+[[${endDateOfYear}]]+'">'+data[x].user.username+'</a>';
+		       
+		     	result+="<tr><td>"+aLink+"</td><td>"+data[x].totalMark+"</td></tr>";
+		     }
+		     var length=data.length;
+		     
+             if(length<total){
+               
+             	for(var i=0;i<total-length;i++){
+             	   
+             		 result+="<tr><td><td></tr>";
+             		 
+             	}
+             }
+		      $("#"+id+" tbody").html(result);
+		  }
+		 
+		});
+     }
+    //获取存储在/upload/public文件中的公共文件
+    getFileLinks("public");
+    function getFileLinks(pathname){
+        
+    	 $.ajax({
+		  type: 'POST',
+		  url: "/file/getFileLinks/"+pathname,
+		  dataType: "json",
+		  success: function(data){
+		     var result="";
+		     for(x in data){
+		        var y;
+		        //获取文件名
+		          //linux
+		        if(data[x].indexOf("/")!="-1") y=data[x].split("/");
+		          //windows
+		        if(data[x].indexOf("\\")!="-1") y=data[x].split("\\");
+		     	//去掉后缀名
+		  
+		     	var z=y[y.length-1].substring(0,y[y.length-1].lastIndexOf("."));
+		     	
+		     	result+='<a href="/file/download?filename='+data[x]+'">'+z+'</a><br/><br/>';
+		     
+		     }
+		      $("#fileLinks").html(result);   
+
+		  }
+		 
+		});
+    }
+    
+    //未提交名单
+    getUnsubmitted('month');    
+    function getUnsubmitted(taskType){
+    	$.ajax({
+		  type: 'POST',
+		  url: "/responsibility/selectAllUsersWhoUnsubmittedProcess/"+taskType,
+		  dataType: "json",
+		  success: function(data){
+		     var result="";
+		     for(x in data){
+                
+		     	result+='<a href="/file/download?filename=">'+data[x].username+'</a>';
+		     
+		     }
+		      if(result) $("#"+taskType).html(result);   
+
+		  } 
+		 
+		});
+    }
+ //]]>      
+</script>
+ <script th:inline="javascript">
+    
+    //半年和全年数据
+    $(".tit a").each(function(){
+    	$(this).click(function(){
+    		 $(".tit a").attr("class","default2");
+    		 $(this).attr("class","active1");
+    		
+    	});
+    });
+    
+
+    
+    var msg=[[${msg}]];
+    if(msg!=null) alert(msg);
+    
+    
+	var use_debug = false;
+
+	function debug(){
+		
+	}
+
+	// on DOM ready
+	$(document).ready(function (){
+		$("#marquee5").marquee({
+			loop: -1
+			// this callback runs when the marquee is initialized
+			, init: function ($marquee, options){
+				debug("init", arguments);
+
+				// shows how we can change the options at runtime
+				if( $marquee.is("#marquee2") ) options.yScroll = "bottom";
+			}
+			// this callback runs before a marquee is shown
+			, beforeshow: function ($marquee, $li){
+				debug("beforeshow", arguments);
+
+				// check to see if we have an author in the message (used in #marquee6)
+				var $author = $li.find(".author");
+
+			}
+			// this callback runs when a has fully scrolled into view (from either top or bottom)
+			, show: function (){
+				debug("show", arguments);
+			}
+			// this callback runs when a after message has being shown
+			, aftershow: function ($marquee, $li){
+				debug("aftershow", arguments);
+
+				// find the author
+				var $author = $li.find(".author");
+				// hide the author
+				if( $author.length ) $("#marquee-author").find("> span").fadeOut(250);
+			}
+		});
+	});
+	
+	var iNewMessageCount = 0;
+	
+	function addMessage(selector){
+		// increase counter
+		iNewMessageCount++;
+
+		// append a new message to the marquee scrolling list
+		var $ul = $(selector).append("<li>New message #" + iNewMessageCount + "</li>");
+		// update the marquee
+		$ul.marquee("update");
+	}
+	
+	function pause(selector){
+		$(selector).marquee('pause');
+	}
+	
+	function resume(selector){
+		$(selector).marquee('resume');
+	}
+    
+	
+    </script>
+
+</html>

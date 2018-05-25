@@ -256,63 +256,7 @@
               </li>
             </ul>
           </li>
-          <!-- User Account: style can be found in dropdown.less -->
 
-          <li class="dropdown user user-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" th:if="${session.sysuser!=null}">
-              
-              <img th:src="${session.sysuser.avatar}" class="user-image" alt="User Image" />
-              <span class="hidden-xs" th:text="${session.sysuser.username}" th:if="${session.sysuser!=null}"></span>
-            </a>
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" th:if="${session.sysuser==null}">
-             
-              <span class="hidden-xs">登陆</span>
-            </a>
-            <ul class="dropdown-menu">
-              <!-- User image -->
-              <li class="user-header">
-                <img src="/images/user/avatar04.png" class="img-circle" alt="User Image" th:if="${session.sysuser==null}"/>
-                <img th:src="${session.sysuser.avatar}" class="img-circle" alt="User Image" th:if="${session.sysuser!=null}"/>
-                
-                <p th:text="${session.sysuser.username}">
-              
-                  <small th:each="d:${session.sysuser.userLinkDepts}" th:text="${d.secondLevel.name}"></small>
-                </p>
-              </li>
-              <!-- Menu Body
-              <li class="user-body">
-                <div class="row">
-                  <div class="col-xs-4 text-center">
-                    <a href="#">Followers</a>
-                  </div>
-                  <div class="col-xs-4 text-center">
-                    <a href="#">Sales</a>
-                  </div>
-                  <div class="col-xs-4 text-center">
-                    <a href="#">Friends</a>
-                  </div>
-                </div>
-          
-              </li> -->
-              <!-- Menu Footer-->
-              <li class="user-footer">
-                <div class="pull-left" th:if="${session.sysuser!=null}">
-                  <a th:href="@{'/user/updateForm/'+${session.sysuser.id}}"  class="btn btn-default btn-flat">修改资料</a>
-                </div>
-                <div class="pull-right" th:if="${session.sysuser!=null}">
-                  <a href="/user/logout" class="btn btn-default btn-flat" >退出系统</a>
-                </div>
-                <div class="pull-left" th:if="${session.sysuser==null}">
-                  <a href="/user/registerForm" target="mainFrame" class="btn btn-default btn-flat">注册</a>
-                </div>
-                <div class="pull-right" th:if="${session.sysuser==null}">
-                    <a href="/user/loginForm" class="btn btn-default btn-flat">登录系统</a>
-                  </div>
-                
-              </li>
-            </ul>
-          </li>
-          <!-- Control Sidebar Toggle Button -->
           <li>
             <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
           </li>
@@ -349,10 +293,26 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">功能导航</li>
+        <li>
+          <a href="/responsibility/assessmentList/month" target="mainFrame">
+            <h4><i class="fa fa-files-o"></i>
+              <span>日常一线考核工作手册</span></h4>
+          </a>
+        </li>
+        <li>
+          <a href="/system/activiti/taskList/candidate" target="mainFrame">
+            <h4><i class="fa fa-files-o"></i>
+              <span>待办</span></h4>
+              <span class="pull-right-container">
+	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber>0}">待审<small th:text="${candidateTaskNumber}"></small></small>
+	          </span>
+          </a>
+        </li>
+       
         <li class="treeview">
           <a href="#">
-            <h3><i class="fa fa-files-o"></i>
-              <span>个人中心</span></h3>
+            <h4><i class="fa fa-files-o"></i>
+              <span>个人中心</span></h4>
             <span class="pull-right-container">
               <span class="label label-primary pull-right">4</span>
             </span>
@@ -360,15 +320,8 @@
          
           <ul class="treeview-menu">
             
-            <h5><li><a href="/responsibility/assessmentList/month" target="mainFrame">日常一线干部考核表</a></li></h5>
-             <li>
-	          <a href="/system/activiti/taskList/candidate" target="mainFrame">
-	            <i class="fa fa-envelope"></i> <span>待审批</span>
-	            <span class="pull-right-container">
-	              <small class="label pull-right bg-yellow" th:if="${candidateTaskNumber} ne 0">待办<small th:text="${candidateTaskNumber}"></small></small>
-	            </span>
-	          </a>
-		    </li>
+            
+
 		     <h5><li><a href="/user/updateForm" target="mainFrame">修改密码和个人信息</a></li></h5>
             <!-- <li><a href="/responsibility/projectList/completed" target="mainFrame">日常工作项目管理</a></li>
             <li><a href="/system/activiti/processInstanceList/now" target="mainFrame">日常工作流程申请列表</a></li>-->
@@ -379,8 +332,8 @@
        
         <li class="treeview">
           <a href="#">
-            <h3><i class="fa fa-files-o"></i>
-            <span>维护中心</span></h3>
+            <h4><i class="fa fa-files-o"></i>
+            <span>维护中心</span></h4>
             <span class="pull-right-container">
               <span class="label label-primary pull-right">4</span>
             </span>
@@ -398,10 +351,23 @@
               <li>
                     <a href="/system/power/syspower/addGroupForm" target="mainFrame"><i class="fa fa-fw fa-twitter"></i> 添加用户组</a>
               </li>
+              <li>
+                    <a href="/file/fileUploadForm" target="mainFrame"><i class="fa fa-fw fa-twitter"></i>文件中心</a>
+                 
+              </li>
 
           </ul>
         </li>
-       
+         <li>
+          <a href="/user/logout" th:if="${session.sysuser!=null}">
+            <h4><i class="fa fa-files-o"></i>
+              <span>退出系统</span></h4>
+          </a>
+          <a href="/user/loginForm" th:if="${session.sysuser==null}">
+            <h4><i class="fa fa-files-o"></i>
+              <span>登录系统</span></h4>
+          </a>
+        </li>
       </ul>
     </section>
     <!-- /.sidebar -->
@@ -414,7 +380,7 @@
       <h1>
 	     <ol class="breadcrumb">
 	        <li><a href="/index"><span class="glyphicon glyphicon-home"></span></a></li>
-	        <li><a href="javascript:history.back(-2)">前一页</a></li>
+	        <li><a href="/home">首页</a></li>
 	        <li><a href="javascript:history.back(-1)">上一页</a></li>
 	        <li><a href="javascript:history.go(1)">下一页</a></li>
 	      </ol>
@@ -430,7 +396,7 @@
     <!-- Main content -->
     <section class="content">
        
-       <iframe src="/user/ini" width="100%" height="900" frameborder="0" scrolling="auto" name="mainFrame"></iframe>
+       <iframe src="/responsibility/assessmentList/month" width="100%" height="900" frameborder="0" scrolling="auto" name="mainFrame"></iframe>
 
     </section>
     <!-- /.content -->
@@ -439,10 +405,10 @@
 
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 2.4.0
+      <b>福州新闻网</b> 
     </div>
-    <strong>Copyright &copy; 2014-2016 <a href="https://adminlte.io">Almsaeed Studio</a>.</strong> All rights
-    reserved.
+    <strong>Copyright</strong> 
+   
   </footer>
 
   <!-- Control Sidebar -->

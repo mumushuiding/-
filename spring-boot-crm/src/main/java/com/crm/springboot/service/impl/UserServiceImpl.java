@@ -23,6 +23,7 @@ import com.crm.springboot.pojos.user.User;
 import com.crm.springboot.pojos.user.UserLinkDept;
 import com.crm.springboot.pojos.user.UserLinkPost;
 import com.crm.springboot.service.ActivitiService;
+import com.crm.springboot.service.SysPowerService;
 import com.crm.springboot.service.UserService;
 /**
  * User服务接口实现类
@@ -40,12 +41,16 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private ActivitiService activitiService;
 
+    @Autowired SysPowerService sysPowerService;
 	@Override
 //	@CachePut(key="#t.id")
 	public User save(User user) {
 		
 		userMapper.save(user);
+		
 		activitiService.saveUser(user.getId());
+		//根据职级设置用户组
+		
 		return user;
 	}
 
@@ -128,18 +133,21 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String[] getDeptNames(User user) {
 		List<UserLinkDept> userLinkDepts=user.getUserLinkDepts();
-		
+		if(userLinkDepts==null||userLinkDepts.size()==0) return null;
 		List<String> dept=new ArrayList<String>();
 		for (int i = 0; i < userLinkDepts.size(); i++) {
+			
 			
 			if(!dept.contains((userLinkDepts.get(i)).getFirstLevel().getName())){
 				dept.add((userLinkDepts.get(i)).getFirstLevel().getName());
 			}
+			
 			if(!dept.contains((userLinkDepts.get(i)).getSecondLevel().getName())){
 				dept.add((userLinkDepts.get(i)).getSecondLevel().getName());
 			}
 		}
 		String[] deptNames=new String[dept.size()];
+		if(dept.size()==0) return null;
 		dept.toArray(deptNames);
 
 		return deptNames;
@@ -275,6 +283,75 @@ public class UserServiceImpl implements UserService{
 		
         
 		return result;
+	}
+
+	@Override
+	public String selectUserIdByPhone(String phone) {
+		
+		return userMapper.selectUserIdByPhone(phone);
+	}
+
+	@Override
+	public void saveAndUpdateUserLinkDeptWithUser(User user) {
+		UserLinkDept userLinkDept=user.getUserLinkDept();
+		System.out.println(userLinkDept.toString());
+		if(userLinkDept==null||userLinkDept.getFirstLevelIds()==null||userLinkDept.getFirstLevelIds()=="") return;
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		
+		params.put("userId", user.getId());
+		List<UserLinkDept> userLinkDepts=this.selectUserLinkDeptWithResutltType(params);
+		
+		params.remove("userId");
+		
+		//先删除全部旧有数据
+		if(userLinkDepts!=null&&userLinkDepts.size()>0){
+			for (UserLinkDept userLinkDept2 : userLinkDepts) {
+				params.put("id", userLinkDept2.getId());
+				this.deleteUserLinkDept(params);
+			}
+		}
+		params.remove("id");
+		//添加新数据
+		userLinkDept.setUserId(user.getId());
+		params.put("firstLevelIds",userLinkDept.getFirstLevelIds().split(","));
+		params.put("userLinkDept", userLinkDept);
+		this.saveUserLinkDeptWithUserLinkDeptAndFirstLevelIds(params);
+		
+	}
+
+	@Override
+	public void saveGroupManagerWithUser(User user) {
+		//设置一个普通员工组给任一员工
+		
+		sysPowerService.saveGroupToUser(user, null, new String[30]);
+		if(user.getPost()==null||user.getPost().getName()==null||user.getPost().getName()=="") return;
+			
+	}
+
+	@Override
+	public Dept selectSingleDept(HashMap<String, Object> params) {
+		List<Dept> depts=this.selectAllDepts(params);
+		if(depts==null && depts.size()==0) return null;
+		return depts.get(0);
+	}
+
+	@Override
+	public List<Dept> selectAllDepts(HashMap<String, Object> params) {
+		
+		return userMapper.selectAllDepts(params);
+	}
+
+	@Override
+	public HashMap<String, Object> selectSingleDeptAsHashMap(HashMap<String, Object> params) {
+		List<HashMap<String, Object>> dMaps=this.selectAllDeptsAsHashMap(params);
+		if(dMaps==null&&dMaps.size()==0)return null;
+		return dMaps.get(0);
+	}
+
+	@Override
+	public List<HashMap<String, Object>> selectAllDeptsAsHashMap(HashMap<String, Object> params) {
+		
+		return userMapper.selectAllDeptsAsHashMap(params);
 	}
 
 

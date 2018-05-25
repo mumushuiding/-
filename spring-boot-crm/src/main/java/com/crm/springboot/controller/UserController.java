@@ -76,18 +76,21 @@ public class UserController {
 			
 			
 			if(referer==null||referer.contains("/user/updateForm")){
-				session.setAttribute("referer", "/index");
+				session.setAttribute("referer", "/home");
 			}
 			
 		}
        if("registerForm".equals(location)){
-			List<Dept> depts=userService.selectAllDept();
+//			List<Dept> depts=userService.selectDistinctSecondLevelDept();
+//			model.addAttribute("depts", depts);
 			List<Post> posts=userService.selectAllPost();
-			model.addAttribute("depts", depts);
+			
 			model.addAttribute("posts", posts);
 		}
        if("updateForm".equals(location)){
 			User user=(User) session.getAttribute("sysuser");
+			List<Dept> depts=userService.selectDistinctSecondLevelDept();
+			model.addAttribute("depts", depts);
 			List<Post> posts=userService.selectAllPost();
 			model.addAttribute("posts", posts);
 			model.addAttribute("user", user);
@@ -117,7 +120,7 @@ public class UserController {
 				deptIds+=userLinkDept.getFirstLevel().getDid()+","+userLinkDept.getSecondLevel().getDid();
 			}
 			
-			System.out.println("deptIds="+deptIds);
+			
 			List<Post> posts=userService.selectAllPost();
 			List<Dept> depts=userService.selectAllDept();
 			model.addAttribute("deptIds", deptIds);
@@ -150,7 +153,7 @@ public class UserController {
 		for (Dept dept : fdepts) {
 			result.append("<option value=\""+dept.getDid()+"\">"+dept.getName()+"</option>");
 		}
-		System.out.println(result.toString());
+		
 		return result.toString();
 	}
 
@@ -196,14 +199,14 @@ public class UserController {
 		
 	    if(u!=null){
 	    	msg="登录成功";
-	    	System.out.println("登录成功");
+	    	
 	    	model.addAttribute("msg",msg);
 	    	model.addAttribute("sysuser", u);
 	    	String servletPath=request.getServletPath();
-	    	System.out.println("servletPath="+servletPath);
-	    	System.out.println(referer.split("/")[referer.split("/").length-1]);
+	        System.out.println("servletPath="+servletPath);
+	        System.out.println("referer="+referer);
 	    	if(Arrays.asList(toIndex).contains(referer.split("/")[referer.split("/").length-1])){
-	    		System.out.println("跳转到index");
+	    		
 	    		return "/index";
 	    	}
 	    	if(referer!=null)return "redirect:"+referer;
@@ -269,6 +272,8 @@ public class UserController {
 		
 		
 		userService.update(user);
+		
+		userService.saveAndUpdateUserLinkDeptWithUser(user);
 		
 		return "redirect:/user/loginForm";
 	}

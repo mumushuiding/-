@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>一线考核系统</title>
+
+    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+     <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+    
+    <link href="/css/plugins/slider.css" rel="stylesheet"/>
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+   
+  </head>
+<body>
+	 <div id="loginDiv" class="modal show" style="scroll-behavior: auto;">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" onclick="javascript:history.go(-1);">X</button>
+	        <h1 class="text-center text-primary">添加 新项目</h1>
+	      </div>
+	      <div class="modal-body">
+	         <form action="#" method="post" th:action="@{''+${action}}" th:object="${project}">
+	           <input type='text' th:field="*{projectId}" th:value="*{projectId}" style="display:none;"/>
+              <div class="form-group">  
+                    <!--指定 date标记-->  
+                    <div class='input-group date' id='datetimepicker1'>  
+                        <input type='text' class="form-control" placeholder="项目开始日期" th:field="*{startDate}" th:value="*{startDate}" readonly="true"/>  
+                        <span class="input-group-addon">  
+                            <span class="glyphicon glyphicon-calendar"></span>  
+                        </span>  
+                    </div>  
+              </div>  
+              <div class="form-group">  
+                    <!--指定 date标记-->  
+                    <div class='input-group date' id='datetimepicker2'>  
+                        <input type='text' class="form-control" placeholder="项目结束日期" th:value="*{endDate}" th:field="*{endDate}" readonly="true"/>  
+                        <span class="input-group-addon">  
+                            <span class="glyphicon glyphicon-calendar"></span>  
+                        </span>  
+                    </div>  
+              </div>  
+              <!--<div class="form-group">
+                <input type="text" class="form-control input-lg" placeholder="项目名称"  th:value="*{projectName}" th:field="*{projectName}"/>
+              </div>-->
+              <div class="form-group">
+                <textarea name="" id="" cols="30" rows="5" class="form-control input-lg" placeholder="项目内容" th:value="*{projectContent}" th:field="*{projectContent}"></textarea>
+              </div>
+              <div class="form-group">
+                  
+                  <textarea name="" id="" cols="30" rows="5" class="form-control input-lg" placeholder="进展情况" th:value="*{progress}" th:field="*{progress}"></textarea>
+               </div>
+                
+			   <div class="form-group" >
+			      <select  class="form-control"  th:value="*{completed}" th:field="*{completed}" style="display:none;">
+			        <option value="0">已完成</option>
+			        <option value="1">未完成</option>
+			        
+			        
+			      </select>
+			    </div>
+			    
+              <div class="form-group">
+                <div th:text="${msg}" style="font:red;text-align:center"></div>
+                <button class="btn btn-primary btn-lg btn-block" >添加</button>
+              </div>
+	        </form>
+	      </div>
+	      <div class="modal-footer">
+	        
+	      </div>
+	    </div>
+	  </div>
+	</div>
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-slider.js"></script>
+    
+    <script src="/js/plugins/moment.min.js"></script>
+    <script>
+    $(document).ready(function () {
+     
+ 
+  
+  //日期控件
+  $('#datetimepicker1').datetimepicker({  
+        format: 'YYYY-MM-DD',  
+        locale: moment.locale('zh-cn')  
+    });   
+   $('#datetimepicker2').datetimepicker({  
+        format: 'YYYY-MM-DD',  
+        locale: moment.locale('zh-cn')  
+    }); 
+
+});</script>
+</body>
+</html>
