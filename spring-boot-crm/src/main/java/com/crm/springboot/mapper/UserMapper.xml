@@ -5,7 +5,15 @@
   <!-- 指向UserMapper.xml文件 -->
   
 <mapper namespace="com.crm.springboot.mapper.UserMapper">
+<!--  -->
+  <cache
+  		flushInterval="60000" size="512" readOnly="true"></cache>
+  <resultMap type="user" id="userWithDeptResultMap">
+    <id property="id" column="id"></id>
+    <association property="post" column="postId" javaType="post"  select="selectPostWithId"></association>
+    <collection property="userLinkDepts" column="id" javaType="ArrayList"  ofType="userLinkDept" select="selectUserLinkDeptWithUserId"></collection>
   
+  </resultMap>
   <resultMap type="user" id="userResultMap">
     <id property="id" column="id"></id>
     <association property="post" column="postId" javaType="post"  select="selectPostWithId"></association>
@@ -14,48 +22,93 @@
     
     <collection property="userLinkGroup" column="id" javaType="ArrayList" ofType="groupManager" select="com.crm.springboot.mapper.SysPowerMapper.selectGroupManagerByUserId2"></collection>
   </resultMap>
-
+    <resultMap type="user" id="userResultMap1">
+    <id property="id" column="id"></id>
+    <collection property="userLinkDepts" column="id" javaType="ArrayList"  ofType="userLinkDept" select="selectUserLinkDeptWithUserId"></collection>
+   </resultMap>
+<select id="selectUser" parameterType="hashmap" resultMap="userWithDeptResultMap">
+	select <choose><when test="columns!=null and columns!=''">${columns}</when><otherwise><include refid="User_Column_List"></include></otherwise></choose> from info_user
+	<where>
+		<if test="whereClause!=null and whereClause!=''">${whereClause}</if>
+	</where>
+</select>
+   <sql id="User_Column_List" >  
+    id,loginname,phone,username,email,sex,postId,avatar,position
+  </sql>
+  <sql id="User_Column_List1" >  
+    id,phone,username
+  </sql>   
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
     INSERT INTO info_user
     (loginname,password,phone,username,email,sex,postId,avatar,position) 
     VALUES
     (#{loginname},#{password},#{phone},#{username},#{email},#{sex},#{post.pId},#{avatar},#{position})
   </insert>
+  <select id="selectUserWithNameAndPhone" parameterType="string" resultType="user">
+  	select <include refid="User_Column_List1" /> from info_user where id=#{id}
+  </select>
   
+  <select id="selectUserIdWithDeptNameAndGroupName" parameterType="hashmap" resultType="string">
+  	select <include refid="User_Column_List1" /> from info_user where id in (
+  		select info_user_dept.userId from info_user_dept join power_groupmanager 
+  			on info_user_dept.userId=power_groupmanager.userId 
+  			and firstLevelId in (
+  			select did from info_dept 
+  			
+  			<where>
+  				<if test="deptName!=null">
+  				   name in <foreach collection="deptName" index="no" item="id" separator="," open="(" close=")">#{id}</foreach>
+  				</if>
+  			</where> 
+  			
+  			) 
+  			and groupid in (select groupid from power_grouptable where groupname in <foreach collection="groupName" index="no" item="id1" separator="," open="(" close=")">#{id1}</foreach>)
+  	)
+  </select>
+  <select id="selectUserAsResultType" parameterType="hashmap" resultType="user">
+  	select <include refid="User_Column_List1" /> from info_user
+  	<where>
+  		<if test="phone!=null and phone!=''">
+  			phone=#{phone}
+  		</if>
+  		<if test="email!=null and email!=''">
+  			and email=#{email}
+  		</if>
+  	</where>
+  </select>
+  <select id="selectUserWithDeptNameAndGroupName" parameterType="hashmap" resultType="user">
+  	select <include refid="User_Column_List1" /> from info_user where id in (
+  		select info_user_dept.userId from info_user_dept join power_groupmanager 
+  			on info_user_dept.userId=power_groupmanager.userId 
+  			and firstLevelId in (select did from info_dept where name=#{deptName}) 
+  			and groupid in (select groupid from power_grouptable where groupname=#{groupName})
+  	)
+  </select>
   <select id="selectUserIdByPhone" resultType="string" parameterType="string">
   	select id from info_user where phone=#{phone}
   </select>
   <select id="getById" parameterType="string" resultMap="userResultMap">
-    SELECT * FROM info_user WHERE ID=#{id}
+    SELECT <include refid="User_Column_List" />  FROM info_user WHERE ID=#{id}
+  </select>
+
+  <select id="getById1" parameterType="string" resultMap="userResultMap1">
+    SELECT <include refid="User_Column_List1" />  FROM info_user WHERE ID=#{id}
   </select>
   <select id="selectUserByUserIdAsType" parameterType="string" resultType="user">
-    SELECT * FROM info_user WHERE ID=#{id}
+    SELECT <include refid="User_Column_List" /> FROM info_user WHERE ID=#{id}
+  </select>
+  <select id="selectUserByUserIdWithDept" parameterType="string" resultMap="userWithDeptResultMap">
+    SELECT <include refid="User_Column_List" /> FROM info_user WHERE ID=#{id}
   </select>
   <select id="findUserWithNameAndPass" parameterType="user" resultMap="userResultMap">
-    SELECT * FROM info_user WHERE loginname=#{loginname} and password=#{password}
+    SELECT <include refid="User_Column_List" /> FROM info_user WHERE loginname=#{loginname} and password=#{password}
   </select>
   <select id="getBySomething" parameterType="user" resultMap="userResultMap">
-  	select * from info_user 
-  	<where>
-  		<if test="id!=null">
-  			id=#{id}
-  		</if>
-  		<if test="phone!=null">
-  			and phone=#{phone}
-  		</if>
-  		<if test="loginname!=null">
-  			and loginname=#{loginname}
-  		</if>
-  		<if test="password!=null">
-  			and password=#{password}
-  		</if>
-  		<if test="username!=null">
-  			and username=#{username}
-  		</if>
-  	</where>
+  	select <include refid="User_Column_List" /> from info_user WHERE phone=#{phone} and password=#{password}
+  	
   </select>
   <select id="selectUsersLike" parameterType="hashmap" resultMap="userResultMap">
-    select * from info_user
+    select <include refid="User_Column_List" /> from info_user
     <where>
       <if test="id!=null">
         id=#{id}
@@ -73,18 +126,22 @@
   </select>
   <select id="selectUserLikeName" resultMap="userResultMap">
     <bind name="pattern" value="'%'+_parameter.getLoginname()+'%'"/>
-    select * from info_user where loginname Like#{pattern}
+    select <include refid="User_Column_List" /> from info_user where loginname Like#{pattern}
   </select>
   <select id="selectAllUser" resultMap="userResultMap">
-    SELECT * FROM info_user
+    SELECT <include refid="User_Column_List" /> FROM info_user
   </select>
   <select id="selectAllUserWithHashMap" resultMap="userResultMap" parameterType="hashmap">
-    SELECT * FROM info_user
+    SELECT <include refid="User_Column_List" /> FROM info_user
     <where>
+
     	<if test="username!=null and username!=''">
     		<bind name="pattern" value="'%'+_parameter.get('username')+'%'"/>
     		 username like #{pattern}
     	</if>
+    	<if test="phone!=null">
+          and phone=#{phone}
+        </if>
     </where>
   </select>
   <update id="update" parameterType="user">
@@ -114,11 +171,51 @@
   		#{id}
   	</foreach>
   </delete>
+<!-- =================================部门分类================================================================== -->
+<resultMap type="deptType" id="deptTypeResultMap">
+    <id property="id" column="id"/>
+	<association property="dictionary" column="dicId" javaType="dictionary" select="com.crm.springboot.mapper.DictionaryMapper.selectDictionaryWithId"></association>
+	 
+</resultMap>
+<insert id="saveDeptType" parameterType="deptType">
+	insert into info_dept_type
+		(deptId,dicId) values (#{deptId},#{dicId})
+</insert>
+<select id="selectAllDeptType" parameterType="hashmap" resultMap="deptTypeResultMap">
+	select * from info_dept_type
+	<where>
+		<if test="id!=null">id=#{id}</if>
+		<if test="deptId!=null">and deptId=#{deptId}</if>
+		<if test="dicId!=null">and dicId=#{dicId}</if>
+	</where>
+</select>
+
 <!-- =================================部门之间联系info_dept_identitylink========================================== -->
 <insert id="saveDeptIdentityLink" parameterType="deptIdentityLink" useGeneratedKeys="true">
 	insert into info_dept_identitylink
 	 (firstLevelId,secondLevelId,thirdLevelId) values (#{firstLevel.did},#{secondLevel.did},#{thirdLevel.did})
 </insert>
+<insert id="saveDeptIdentityLinkWithHashMap" parameterType="hashmap">
+	insert into info_dept_identitylink
+	 (firstLevelId,secondLevelId,thirdLevelId) values (#{firstId},#{secondId},#{thirdId})
+</insert>
+
+<!-- 根据部门级别，查询部门名字 -->
+<select id="selectSingleColumnFromInfoDept" resultType="string" parameterType="hashmap">
+	select ${column} from info_dept 
+	<where>
+		<if test="level!=null and deptName==null">level=#{level}</if>
+		<!-- 一级部门的上级部门名 -->
+		<if test="deptName!=null and level!=null">
+			and did in (select distinct 
+			           <choose><when test="level=='second'">firstLevelId</when>
+			           		   <when test="level=='third'">secondLevelId</when>
+			           </choose> from info_dept_identitylink where ${level}LevelId in 
+				(select did from info_dept where name=#{deptName})
+			)
+		</if>
+	</where>
+</select>
 <!-- 查询不重复二级部门 -->
 <select id="selectDistinctSecondLevelDept" resultType="dept">
 	select * from info_dept where did in (select  distinct secondLevelId from info_dept_identitylink)
@@ -126,6 +223,13 @@
 <!-- 根据二级部门，查询不重复一级部门 -->
 <select id="selectDistinctFirstLevelDept" parameterType="hashmap" resultType="dept">
 	select * from info_dept where did in (select distinct firstLevelId from info_dept_identitylink
+	<where>
+		<if test="secondLevelId!=null and secondLevelId!=''">secondLevelId=#{secondLevelId}</if>
+	</where>
+	)
+</select>
+<select id="selectDistinctFirstDeptNames" parameterType="hashmap" resultType="string">
+	select name from info_dept where did in (select distinct firstLevelId from info_dept_identitylink
 	<where>
 		<if test="secondLevelId!=null and secondLevelId!=''">secondLevelId=#{secondLevelId}</if>
 	</where>
@@ -141,7 +245,30 @@
   <select id="selectUserLinkDeptWithUserId" resultMap="userLinkDeptResultMap">
   	select * from info_user_dept where userId=#{id}
   </select>
-  
+  <select id="selectAllUserLinkDept" parameterType="hashmap" resultMap="userLinkDeptResultMap">
+  		select * from info_user_dept
+  	<where>
+  		<if test="firstDeptName!=null and firstDeptName!=''">
+  			firstLevelId in (select did from info_dept where level='first' and name=#{firstDeptName})
+  		</if>
+  	</where>
+  </select>
+  <select id="selectCountUserNumber" parameterType="hashmap" resultType="integer">
+  	select count(distinct userId) from info_user_dept 
+  	<where>
+  		<if test="firstLevelId!=null and firstLevelId!=''">firstLevelId=#{firstLevelId}</if>
+  		<if test="secondLevelId!=null and secondLevelId!=''">and secondLevelId=#{secondLevelId}</if>
+  		<if test="thirdLevelId!=null and thirdLevelId!=''">and thirdLevelId=#{thirdLevelId}</if>
+  		<if test="deptLevel!=null and deptId!=null">and ${deptLevel}LevelId=#{deptId}</if>
+  		<if test="postIds!=null and postIds!=''">
+  	  	 	and userId in (select id from info_user where postId in
+  	  	 		<foreach collection="postIds" item="id" index="no" open="(" close=")" separator=",">
+  	  	 			#{id}
+  	  	 		</foreach>
+  	  	 	)
+  	  	 </if>
+  	</where>
+  </select>
   <insert id="saveUserLinkDeptWithUserLinkDept" parameterType="userLinkDept">
   	insert into info_user_dept (userId,secondLevelId,thirdLevelId) values
   	(#{userId},#{secondLevel.did},#{thirdLevel.did})
@@ -168,7 +295,7 @@
   		<if test="userId!=null and userId!=''">userId=#{userId}</if>
   	</where>
   </select>
-  
+
   <delete id="deleteUserLinkDept" parameterType="hashmap">
   	delete from info_user_dept 
   	<where>
@@ -205,7 +332,18 @@
     select * from info_dept where did=#{id}
   </select>
   
-
+  <select id="selectDeptWithDepartment" parameterType="department" resultType="dept">
+  	select * from info_dept
+    <where>
+        <if test="did!=null">did=#{did}</if>
+    	<if test="name!=null and name!=''">
+    	  and name=#{name}
+    	</if>
+    	<if test="level!=null and level!=''">
+    		and level=#{level}
+    	</if>
+    </where>
+  </select>
   <!-- 根据部门ID查询所有用户 -->
   <select id="selectUsersWithDeptId" parameterType="int" resultMap="userResultMap">
     select * from info_user_dept where deptId=#{id}
@@ -217,8 +355,12 @@
   <select id="selectAllDepts" resultType="dept" parameterType="hashmap">
     select * from info_dept
     <where>
+        <if test="did!=null">did=#{did}</if>
     	<if test="name!=null and name!=''">
-    	   name=#{name}
+    	  and name=#{name}
+    	</if>
+    	<if test="level!=null and level!=''">
+    		and level=#{level}
     	</if>
     </where>
   </select>
@@ -231,6 +373,9 @@
     </where>
   </select>
   <insert id="saveDept" parameterType="dept" useGeneratedKeys="true">
+  	insert into info_dept (name,level) values (#{name},#{level})
+  </insert>
+  <insert id="saveDepartment" parameterType="department" useGeneratedKeys="true" keyProperty="did">
   	insert into info_dept (name,level) values (#{name},#{level})
   </insert>
   <!-- ===============================职务post表=============================== -->

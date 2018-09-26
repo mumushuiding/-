@@ -22,7 +22,9 @@ public interface SysPowerService extends BaseService<Action>{
 	void deleteAction(Serializable id);
 	//================group=========================
 	public GroupTable saveGroup(GroupTable group);
+	
 	List<String> selectAllGroupIds(String groupname);
+	List<String> selectAllGroupIds(HashMap<String, Object> params);
 	/**
 	 * 级联查询
 	 * @return
@@ -42,14 +44,16 @@ public interface SysPowerService extends BaseService<Action>{
 	
 	public String selectGroupIdWithGroupName(String groupname);
 	
-	public String getGroupNameWithDepartmentNameAndGroupType(String departmentName,String groupType);
+	
 	public String getGroupNameWithDepartmentNameAndGroupType(String[] departmentNames,String groupType);
 	
-	public String getGroupIdWithDepartmentNameAndGroupType(String departmentName,String groupType);
+
 	
 	public HashMap<String, Object> getDepartmentsWithGroupname(String groupname,String groupType);
 	//查询用户包含哪些考核组
 	public List<String> getGroupsOfOvereerWithUserId(String userId);
+	//查询用户包含哪些领导组
+	public List<String> getGroupsOfLeaderWithUserId(String userId);
 	//=================actionGroup==================
 	public ActionGroup saveActionGroup(ActionGroup actionGroup);
 	public void saveActionGroupWithActionIds(HashMap<String, Object> hashMap);
@@ -59,11 +63,22 @@ public interface SysPowerService extends BaseService<Action>{
 	public void saveGroupToUser(User user,User createtor,String[] groupIds);
 	public GroupManager saveGroupManager(GroupManager groupManager);
 	public void saveGroupManagerWithGroupIds(HashMap<String, Object> hashMap);
+	public void saveGroupManagerWithGroupIds(GroupManager groupManager,String[] ids);
 	public List<GroupManager> selectGroupManagerByUserId(Serializable userid);
 	public void deleteGroupManagerById(Serializable id);
+	public void deleteGroupManager(HashMap<String, Object> params);
+	public void deleteGroupManager(Integer userid,String groupids);
+	public void deleteGroupManager(Integer userid,List<String> groupids);
 	public List<GroupManager> selectGroupManagerWithGroupId(Serializable groupId);
 	public List<GroupManager> selectAllGroupManagers();
 	List<GroupManager> selectAllGroupManagersWithHashMap(HashMap<String, Object> params);
+	List<GroupManager> selectGroupManager(HashMap<String, Object> params);
+	GroupManager selectSingleGroupManager(HashMap<String, Object> params);
+	GroupManager selectSingleGroupManager(Integer userid,String groupid);
 	List<String> selectAllGroupIdsWithHashMap(HashMap<String, Object> params);
 	List<String> selectAllActionsWithUserId(Serializable userId);
+	List<String> getGroupIds(User user);
+	List<String> selectAllGroupIdsFromGroupManager(HashMap<String, Object> params);
+	List<String> selectAllGroupIdsFromGroupManager(String userId);
+	
 }

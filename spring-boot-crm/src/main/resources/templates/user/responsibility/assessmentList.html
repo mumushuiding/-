@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -19,18 +18,10 @@
      <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
-
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="/css/ie-emulation-modes-warning.js"></script>
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <!-- Custom styles for this template -->
+    
+    <link href="/css/font-awesome.min.css" rel="stylesheet"/>
+    <!-- nav -->
+    <link href="/css/plugins/bootsnav.css" rel="stylesheet"/>
    
    
   </head>
@@ -56,6 +47,8 @@
     
     <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
     
+    <!-- nav -->
+     <script src="/js/plugins/bootsnav.js"></script>
     <div class="container"> 
     <h3> 
        <ul  class="nav nav-tabs">
@@ -63,29 +56,91 @@
 			<li id="month"><a href="/responsibility/assessmentList/month" data-toggle="tab">月考核表</a></li>
 			<li id="halfYear"><a href="/responsibility/assessmentList/halfYear" data-toggle="tab">半年考核</a></li>
 			<li id="fullYear"><a href="/responsibility/assessmentList/fullYear" data-toggle="tab">年度考核</a></li>
-			<li id="all"><a href="/responsibility/assessmentList/all" data-toggle="tab">所有考核表</a></li>
-	    
 			
+			<li>
+				<nav class="navbar navbar-default navbar-mobile bootsnav">
+			     
+							<div class="navbar-header">
+								<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-menu">
+									<i class="fa fa-bars"></i>
+								</button>
+							</div>
+					
+							<div class="collapse navbar-collapse" id="navbar-menu">
+								<ul class="nav navbar-nav" data-in="fadeInDown" data-out="fadeOutUp">
+									<li class="dropdown">
+										<a href="/responsibility/assessmentList/others" class="dropdown-toggle" data-toggle="dropdown" style="padding:15px 10px;">我的申请</a>
+										<ul class="dropdown-menu">
+										 
+											<li class="dropdown">
+												<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">用户管理</a>
+												<ul class="dropdown-menu">
+													<li><a href="/process/activiti/toStart/others/Process/deleteUser">删除用户</a></li>
+												</ul>
+											</li>
+											<li class="dropdown">
+												<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">权限管理</a>
+												<ul class="dropdown-menu">
+													<li><a href="/process/activiti/toStart/others/Process/groupManager">添加、删除、修改权限</a></li>
+												</ul>
+											</li>
+											<li class="dropdown">
+												<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">加减分管理</a>
+												<ul class="dropdown-menu">
+													<li><a href="/process/activiti/toStart/others/Process/deleteMarksByOverTime">删除超时扣分</a></li>
+													<li><a href="/process/activiti/toStart/others/Process/addMarks">添加加减分申请</a></li>
+													<li><a href="/process/activiti/toStart/others/Process/updateMark">修改加减分申请</a></li>
+													<li><a href="/process/activiti/toStart/others/Process/deleteMark">删除加减分申请</a></li>
+												</ul>
+											</li>
+											<li class="dropdown">
+												<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">部门管理</a>
+												<ul class="dropdown-menu">
+													<li><a href="/process/activiti/toStart/others/Process/addDepartment">添加部门</a></li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+							
+								</ul>
+							</div>
+						</nav>
+			</li>
+	    
+		<li id="all"><a href="/responsibility/assessmentList/all" data-toggle="tab">所有考核表</a></li>	
 		</ul> </h3>
 		<div  class="tab-content">
 			 <div class="tab-pane fade in active" id="home">
 			  <nav class="navbar navbar-default" role="navigation">
 			   <div class="container-fluid">
 			     <div class="navbar-header">
-			       <span class="navbar-brand">搜索标题</span>
+			       <span class="navbar-brand">搜索</span>
 			     </div>
 			
 			     <div class="navbar-form navbar-left" role="search">
 			      
 			
 			       <div class="input-group">
-			         <input type="text" class="form-control" placeholder="输入标题" id="title"/>
-			
-			         <div class="input-group-btn">
-			           <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+			        <div class="form-group">
+				      <select id="second" class="form-control" title="请选择部门"  >
+				        <option value="">----请选择部门----</option>
+				        <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+				      </select>
+				       <select id="firstDept" class="selectpicker" data-live-search="true" title="请选择子部门"   multiple="multiple">
+				         
+				        </select>
+			        </div>
+			        <div class="form-group">
+				      <select id="assessment" class="form-control" title="基本定格"  >
+				        <option value="">----请选择基本定格----</option>
+				        <option th:each="a:${assessments}" th:value="${a}" th:text="${a}"></option>
+				      </select>
+			        </div>
+			         <div class="form-group">
+			           <input type="text" class="form-control" placeholder="输入标题" id="title"/>
 			         </div>
 			       </div>
-			       <button id="search_btn" class="btn btn-default">搜索</button>
+			       <button id="search_btn" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
 			
 			     </div>
 			         
@@ -94,38 +149,64 @@
 			 </nav>
 			
 			   <!-- 工具栏 -->
+			
 			  <div id="toolbar" class="btn-group pull-left" >
-			   <button id="btn_add" type="button" class="btn btn-primary">
+			      <button id="btn_add" type="button" class="btn btn-primary">
 			        <span class="glyphicon glyphicon-plus" aria-hidden="true">新增</span>
-			  </button>
+			      </button>
 			 
-			    <button id="btn_delete" type="button" class="btn btn-danger" >
+			      <button id="btn_delete" type="button" class="btn btn-danger" >
 			        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
-			    </button>
+			      </button>
+			    
 
 			  </div>
+			   			
+		
 			  <!-- /工具栏 -->
 			  <table id="mytab" class="table table-hover"></table>
 			</div>
 			
 		</div>
     
-    
+   
 
 </div>
-
+ 	
     <script th:inline="javascript">
+  //tab切换 
+    var taskType = [[${taskType}]];
+     $("#" + taskType).attr("class", "active");
+    $("li").each(function(){
+    	$(this).click(function(){
+    	     
+    		 $("li").attr("class","");
+    		 $(this).attr("class","active");
+    		 location.href="/responsibility/assessmentList/"+$(this).attr("id");
+    	});
+    });
+ //排序切换
+    
+    
+//生成用户数据
+//bootstrapTable保存pageIndex
+
     //根据窗口调整表格高度
     $(window).resize(function() {
         $('#mytab').bootstrapTable('resetView', {
             height: tableHeight()
         })
     })
-//生成用户数据
-//bootstrapTable保存pageIndex
+    
     var state={};
     if(window.history.state){
     	state=window.history.state;
+
+        if($('#second').val()!=""){
+	  
+		    getfirstDept($("#second").val(),state);
+
+	    }
     }else{
     	state={
     		'pageIndex':1,
@@ -176,6 +257,13 @@
             {
                 title:'申请用户ID',
                 field:'user.id',
+                visible:false
+               
+            }
+            ,
+            {
+                title:'用户电话',
+                field:'user.phone',
                 visible:false
                
             }
@@ -247,57 +335,73 @@
         var params=row.processInstanceId+","+row.executionId;
       
         var businessType="";
-	    if(row.businessType=='一线干部-月度考核') businessType="month";
-	    if(row.businessType=='一线干部责任清单') businessType="res";
-	    if(row.businessType=='一线干部-年度考核') businessType="fullYear";
-        return [  
+
+	    if(row.businessType=='一线干部-月度考核') {
+	        businessType="month";
+	        return [  
            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" >'+row.title+'</a>',
 	       ].join('');
-        
-        
+	    }
+	    if(row.businessType=='一线干部责任清单') {
+	        businessType="res";
+	        return [  
+           '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" >'+row.title+'</a>',
+	       ].join('');
+	    }
 
-          
+	    if(row.businessType=='一线干部-半年考核'||row.businessType=='一线干部-年度考核') {
+	    	businessType="halfYear";
+	    	return [  
+           '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" >'+row.title+'</a>',
+	       ].join('');
+	    }
+	   return [  
+           '<a  href="/process/activiti/selectOthers/'+row.processInstanceId+'/'+row.businessType+'" >'+row.title+'</a>',
+	       ].join('');
+        
     }
 
     function operateFormatter(value, row, index) {
    
         var params=row.processInstanceId+","+row.executionId;
-        var taskType=[[${taskType}]];
         var committed=row.committed;
         var completed=row.completed;
         if(row.businessType=='一线干部-月度考核') taskType="month";
         if(row.businessType=='一线干部责任清单') taskType="res";
-        if(row.businessType=='一线干部-年度考核') taskType="fullYear";
+        if(row.businessType=='一线干部-年度考核') taskType="halfYear";
+         if(row.businessType=='一线干部-半年考核') taskType="halfYear";
         //如果流程已经结束
         if(completed==="1"){
         	return [  
         	'<span class="btn btn-default">已结束</span>',
-            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"/>查阅</a>',
+            
             
         ].join('');
         //如果流程已经提交
          }
         if(committed=="1"){
-            if([[${session.sysuser.id}]]==row.user.id){
+            if(row.user!=null){
+            	if([[${session.sysuser.id}]]==row.user.id){
             	
             	return [  
 		            '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>进度</a>',
-		            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>考察表</a>',
+		            
 		            '<a  href="/system/activiti/withdrawTask/'+row.processInstanceId+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>撤回</a>',
 		            
 		        ].join('');
             	
             }
+            }
 		    return [  
 		            '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>进度</a>',
-		            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>考察表</a>',
+		            
 		            
 		        ].join('');
 	     }
        
 	    return [  
 	            '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>进度</a>',
-	            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑</a>',
+	           
 	            
 	            ].join('');  	
           
@@ -308,6 +412,9 @@
       state = { 
         'pageIndex':params.pageNumber, 
         'pageSize':params.limit,
+    
+       'firstDept':$('#firstDept').val().join(','),
+        
         };
         window.history.replaceState(state,'assessmentList',[[${taskType}]]);
         return{
@@ -315,13 +422,23 @@
             pageSize: params.limit,
             //请求第几页
             pageIndex:params.pageNumber,
-            title:$('#title').val()
+            firstDept:$('#firstDept').val().join(','),
+            second:$('#second').val(),
+            title:$('#title').val(),
+            assessment:$('#assessment').val(),
         }
     }
      //查询按钮事件
     $('#search_btn').click(function(){
         $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listProcessInstance/'+[[${taskType}]]});
     })
+       //当搜索框中的值 改变时 自动刷新
+ 
+   	 $('#assessment').change(function(){
+   	 	 $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listProcessInstance/'+[[${taskType}]]});
+   	 });
+
+
     //tableHeight函数
     function tableHeight(){
         //可以根据自己页面情况进行调整
@@ -344,8 +461,8 @@
         if(dataArr[0].user) requestedUserId=dataArr[0].user.id;
 		var sysuserid=[[${session.sysuser.id}]];
 		var flag=false;
-	    if(phone=="18250315022"){
-       	   alert("这个号码可以随意删除");
+	    if(phone=="100"){
+       	  
        	   deleteProcess(result);
        	   return ;
         }
@@ -370,18 +487,61 @@
     	location.href="/system/activiti/preStart/EvaluationProcess/"+[[${taskType}]]+"Form";
     });
 
-    var taskType = [[${taskType}]];
-    $("#" + taskType).attr("class", "active");
-    $("li").each(function(){
-    	$(this).click(function(){
-    		 $("li").attr("class","");
-    		 $(this).attr("class","active");
-    		 location.href="/responsibility/assessmentList/"+$(this).attr("id");
-    	});
-    });
+    
+
     
     var msg=[[${msg}]];
-    if(msg!=null) alert(msg);
+    if(msg!=null) {
+    	alert(msg);
+    	msg=null;
+    }
+    
+    //修改部门
+	$('#second').change(function(){
+	  
+		getfirstDept($('#second').val());   
+	});
+
+	 //一级子部门改变时查询
+   	 $('#firstDept').change(function(){
+   	    
+   	 	 $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listProcessInstance/'+[[${taskType}]]});
+   	 });
+   	 //查询一级部门
+     function getfirstDept(second,state){
+       $.ajax({
+		  type: 'POST',
+		  url: "/user/selectFirstLevelDept/"+second+"?param=name",
+		  dataType: "text",
+		  success: function(data){
+		        
+	
+		        $("#firstDept").html(data);
+
+		         
+
+		        if(second){
+		        //判断 history.state里面是否有值,有值就加载历史页面
+		          if(state){
+		          	if(state.firstDept) {
+                         $('#firstDept').selectpicker('val',state.firstDept.split(','));
+                          $("#firstDept").selectpicker('refresh');
+		                  $('#mytab').bootstrapTable('refreshOptions',{pageNumber:state.pageIndex});
+		                 
+                     }
+		          
+		          }
+                     
+                  $("#firstDept").selectpicker('refresh');    
+		        	
+		        }
+		        
+		  }
+		 
+		});
+     }
+     
+
     </script>
 
   </body>

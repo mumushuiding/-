@@ -48,7 +48,40 @@
 	.dl p a{ color:#1694FF;}
 	.dl .jzw input{ width:20px; height:20px; margin:0 10px 0 0; cursor: pointer;}
 	</style>
-	<link rel="stylesheet" href="//img.fznews.com.cn/www/javascript/animate.min.css"/>
+	<!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/AdminLTE.min.css" rel="stylesheet"/>
+    <link href="/css/font-awesome.min.css" rel="stylesheet"/>
+    <!-- 滚动 -->
+    <link href="/css/plugins/jquery.marquee.css" rel="stylesheet"/>
+    <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="//img.fznews.com.cn/www/javascript/animate.min.css"/>
+
+    <link href="/css/plugins/bootsnav.css" rel="stylesheet"/>
+    <script src="/js/jquery-3.2.1.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/adminlte.min.js"></script>
+    
+    <!-- scroll -->
+    <script src="/js/plugins/jquery.marquee.min.js"></script>
+    
+    <!-- 图表  -->
+    <script src="/js/chart/Chart.min.js" ></script>
+    <!-- table -->
+    <script src="/js/plugins/bootstrap-table.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    <!-- 日期 -->
+    <script src="/js/DateUtils.js"></script>
+	<!-- autosize -->
+    <script th:src="${urls.getForLookupPath('/js/plugins/autosize.js') }"></script>
+    <!-- 前端打印 -->
+    <script src="/js/plugins/jQuery.print.js"></script>
+    
+    <script th:src="${urls.getForLookupPath('/js/plugins/ajaxfileupload.js')}"></script>
+    <!-- nav -->
+    <script src="/js/plugins/bootsnav.js"></script>
+   
 	<!--[If Lt IE 9]><script src="//img.fznews.com.cn/www/js/html5shiv/dist/html5shiv.js"></script><![endif]-->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>
 <body>
@@ -57,16 +90,30 @@
 		<div class="right">
 		<form class="dl" action="#" method="post" th:action="@{/user/login}" th:object="${user}">
 		<div class="hd-tit"><span>登录</span></div>
-		<input type="text" name="tel" value="" class="tel" placeholder="手机号码" th:field="*{phone}"/><br/>
+		<input type="text" id="tel" name="tel" value="" class="tel" placeholder="手机号码" th:field="*{phone}"/><br/>
 		<input type="password" name="password" value="" class="pwd" placeholder="登录密码" th:field="*{password}" />
 		<input type="submit" value="登录" class="tj"/>
+		<br/>
+		
 		<span th:text="${msg}"></span>
-		<p><span class="jzw"><input type="checkbox" name="votes[]"/></span><span>记住我</span><span style=" float:right; margin:0 8% 0 0; cursor: pointer;">忘记密码？</span>
-		<span style=" float:right; margin:0 8% 0 0; cursor: pointer;"><a href="/user/registerForm">注册</a></span></p>
 		
 		</form>
-	
+		<div style="margin: 20px 0 0 40px;">
+	       <p><span class="jzw"><a class="btn btn-danger btn-lg" href="/user/forgotPasswordForm">忘记密码</a></span>
+		   <span style=" float:right; margin:0 8% 0 0; cursor: pointer;"><a class="btn btn-default btn-lg" href="/user/registerForm">注&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;册</a></span></p>
+		</div>
 		</div>
 	</div>
+	
+	<script th:inline="javascript">
+
+		var msg=[[${msg}]];
+    	if(msg) {
+    	
+    	   alert(msg);
+
+    	};
+	</script>
+	
 </body>
 </html>

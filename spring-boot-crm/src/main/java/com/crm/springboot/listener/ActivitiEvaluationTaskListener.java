@@ -32,7 +32,7 @@ public class ActivitiEvaluationTaskListener implements TaskListener{
 
 	ProcessBean processBean=processService.selectSingleProcessBean(params);
 	if(processBean==null) return;
-//	System.out.println("delegateTask.getName()="+delegateTask.getName());
+
 	if("提交申请".equals(delegateTask.getName())){
 		
 		processBean.setCommitted("0");

@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com</groupId>
+  <artifactId>springws-server</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>springws-server</name>
+  <url>http://maven.apache.org</url>
+
+ 
+<!-- 根据parent的版本，自动下载合适版本的依赖包  如果报classNotFound：如果依赖包没有缺漏的话，说明版本不对-->
+  <parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.4.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+   </parent>
+
+   <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+  <dependencies>
+
+
+  
+<!-- Starter for building web, including RESTful, applications using Spring MVC. Uses Tomcat as the default embedded container -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+   
+</dependency>
+<!--  Hot-Deployment dependency-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-context-support -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+   
+</dependency>
+<!-- =============================spring-ws relevant  dependencies============================== --> 
+<!-- Starter for using Spring Web Services -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web-services</artifactId>
+    
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.ws</groupId>
+    <artifactId>spring-ws-core</artifactId>    
+</dependency>
+
+<!--spring web service wsdl包-->
+ <dependency>
+   <groupId>wsdl4j</groupId>
+   <artifactId>wsdl4j</artifactId>
+  
+ </dependency>
+<!-- handle the XML -->
+<dependency>
+    <groupId>org.jdom</groupId>
+    <artifactId>jdom</artifactId>
+ 	<version>2.0.2</version>
+</dependency>
+<!-- Jaxen is a universal Java XPath engine -->
+<dependency>
+    <groupId>jaxen</groupId>
+    <artifactId>jaxen</artifactId>
+</dependency>
+
+
+<!-- =============================数据库相关============================== -->  
+<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    
+</dependency>
+<!-- 添加Mybatis框架jar包 -->
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis</artifactId>
+    <version>3.4.6</version>
+</dependency>
+<!-- An JDBC datasource implementation -->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>druid</artifactId>
+    <version>1.1.11</version>
+</dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+     
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+ <!-- 构建节点. -->
+    <build>
+        <plugins>
+            <!-- 这是spring boot devtool plugin 热部署3 常用-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+               
+                <configuration>
+                      <!--fork :  如果没有该项配置，这个devtools不会起作用，即应用不会restart -->
+                    <fork>true</fork>
+                    <executable>true</executable> 
+                    <addResources>true</addResources>
+                </configuration>
+    
+                
+            </plugin>
+			
+        </plugins>
+        
+    </build> 
+</project>

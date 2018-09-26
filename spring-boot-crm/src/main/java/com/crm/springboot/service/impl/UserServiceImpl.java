@@ -16,8 +16,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.crm.springboot.mapper.UserMapper;
+import com.crm.springboot.pojos.GroupManager;
+import com.crm.springboot.pojos.ProcessType;
+import com.crm.springboot.pojos.user.Department;
 import com.crm.springboot.pojos.user.Dept;
 import com.crm.springboot.pojos.user.DeptIdentityLink;
+import com.crm.springboot.pojos.user.DeptType;
 import com.crm.springboot.pojos.user.Post;
 import com.crm.springboot.pojos.user.User;
 import com.crm.springboot.pojos.user.UserLinkDept;
@@ -118,7 +122,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public List<UserLinkDept> selectUserLinkDeptWithUserId(Serializable userId) {
 		
-		return null;
+		return userMapper.selectUserLinkDeptWithUserId(userId);
 	}
 
 
@@ -294,7 +298,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void saveAndUpdateUserLinkDeptWithUser(User user) {
 		UserLinkDept userLinkDept=user.getUserLinkDept();
-		System.out.println(userLinkDept.toString());
+
 		if(userLinkDept==null||userLinkDept.getFirstLevelIds()==null||userLinkDept.getFirstLevelIds()=="") return;
 		HashMap<String, Object> params=new HashMap<String, Object>();
 		
@@ -331,7 +335,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public Dept selectSingleDept(HashMap<String, Object> params) {
 		List<Dept> depts=this.selectAllDepts(params);
-		if(depts==null && depts.size()==0) return null;
+		if(depts==null || depts.size()==0) return null;
 		return depts.get(0);
 	}
 
@@ -353,6 +357,291 @@ public class UserServiceImpl implements UserService{
 		
 		return userMapper.selectAllDeptsAsHashMap(params);
 	}
+
+	@Override
+	public User selectSingleUserWithHashMap(HashMap<String, Object> params) {
+		List<User> users=selectAllUserWithHashMap(params);
+		if(users==null||users.size()==0) return null;
+		return users.get(0);
+	}
+
+	@Override
+	public User selectUserByUserIdAsType(String id) {
+	
+		return userMapper.selectUserByUserIdAsType(id);
+	}
+
+	@Override
+	public List<DeptType> selectAllDeptType(HashMap<String, Object> params) {
+		
+		return userMapper.selectAllDeptType(params);
+	}
+
+	@Override
+	public List<DeptType> selectAllDeptType(int deptId, int dicId) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("deptId", deptId);
+		params.put("dicId", dicId);
+		List<DeptType> result=this.selectAllDeptType(params);
+		if(result==null||result.size()==0) return null;
+		return result;
+	}
+
+	@Override
+	public void saveDeptType(DeptType deptType) {
+		userMapper.saveDeptType(deptType);
+		
+	}
+
+	@Override
+	public Dept selectSingleDept(int deptId) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		
+		params.put("deptId", String.valueOf(deptId));
+		
+		return this.selectSingleDept(params);
+	}
+
+	@Override
+	public Dept selectSingleDept(String deptName) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("name", deptName);
+		return this.selectSingleDept(params);
+	}
+
+	@Override
+	public DeptType selectSingleDeptType(int deptId) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		
+		params.put("deptId", String.valueOf(deptId));
+		List<DeptType> deptTypes=this.selectAllDeptType(params);
+		if(deptTypes==null || deptTypes.size()==0) return null;
+		return deptTypes.get(0);
+	}
+
+	@Override
+	public DeptType selectSingleDeptType(String deptName) {
+		Dept dept=this.selectSingleDept(deptName);
+		if(dept==null)return null;
+		return this.selectSingleDeptType(dept.getDid());
+	}
+
+	@Override
+	public Integer selectCountUserNumber(HashMap<String, Object> params) {
+		
+		return userMapper.selectCountUserNumber(params);
+	}
+	@Override
+	public Integer selectCountUserNumber(Integer deptId, String deptLevel, String postIds) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("postIds", postIds.split(","));
+		params.put("deptLevel", deptLevel);
+		params.put("deptId", deptId);
+		return this.selectCountUserNumber(params);
+	}
+
+	@Override
+	public Integer selectCountUserNumberWithFirsDeptId(Integer firstDeptId, String postIds) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("firstLevelId", firstDeptId);
+		params.put("postIds", postIds.split(","));
+		
+		return this.selectCountUserNumber(params);
+	}
+
+	@Override
+	public Integer selectCountUserNumberWithSecondDeptId(Integer secondDeptId, String postIds) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("secondLevelId", secondDeptId);
+		params.put("postIds", postIds.split(","));
+		
+		return this.selectCountUserNumber(params);
+	}
+
+	@Override
+	public List<String> selectDistinctFirstDeptNames(HashMap<String, Object> params) {
+		
+		return userMapper.selectDistinctFirstDeptNames(params);
+	}
+
+	@Override
+	public List<String> selectDistinctFirstDeptNames(Integer secondDeptId) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("secondLevelId", secondDeptId);
+		return this.selectDistinctFirstDeptNames(params);
+	}
+
+	@Override
+	public List<User> selectUserWithDeptNameAndGroupName(String deptName, String groupName) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("deptName", deptName);
+		params.put("groupName", groupName);
+		
+		return userMapper.selectUserWithDeptNameAndGroupName(params);
+	}
+
+	@Override
+	public List<String> getDeptNames(String deptName, String deptLevel) {
+		Dept dept=this.selectSingleDept(deptName);
+		if(dept==null) throw new RuntimeException("该部门["+deptName+"]不存在");
+		    
+		List<String> dnames=new ArrayList<String>();//涉及到的部门
+		
+		if(ProcessType.DEPT_LEVEL_SECOND.equals(deptLevel)){
+			
+			dnames=this.selectDistinctFirstDeptNames(dept.getDid());
+		}
+        if (ProcessType.DEPT_LEVEL_FIRST.equals(deptLevel)) {
+        	dnames.add(deptName);
+		}
+		
+		return dnames;
+	}
+
+	@Override
+	public List<String> selectUserIdWithDeptNameAndGroupName(HashMap<String, Object> params) {
+		List<String> result=userMapper.selectUserIdWithDeptNameAndGroupName(params);
+		if(result==null||result.size()==0) return null;
+		return result;
+	}
+
+	@Override
+	public List<String> selectUserIdWithDeptNameAndGroupName(List<String> deptNames, String groupName) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("deptName", deptNames);
+		params.put("groupName", groupName.split(","));
+		return this.selectUserIdWithDeptNameAndGroupName(params);
+	}
+
+	@Override
+	public List<String> selectSingleColumnFromInfoDept(HashMap<String, Object> params) {
+		
+		return userMapper.selectSingleColumnFromInfoDept(params);
+	}
+
+	@Override
+	public List<String> selectSingleColumnFromInfoDept(String column, String level, String deptName) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("column", column);
+		if(!"".equals(level)) params.put("level", level);//部门级别
+		if(!"".equals(deptName)) params.put("deptName", deptName);
+		return this.selectSingleColumnFromInfoDept(params);
+	}
+
+	@Override
+	public List<User> selectUserAsResultType(HashMap<String, Object> params) {
+		
+		return userMapper.selectUserAsResultType(params);
+	}
+
+	@Override
+	public User selectSingleUserAsResultType(HashMap<String, Object> params) {
+		List<User> users=this.selectUserAsResultType(params);
+		if(users==null || users.size()==0) return null;
+		return users.get(0);
+	}
+
+	@Override
+	public User selectSingleUserAsResultType(String phone, String email) {
+		HashMap<String,Object> params=new HashMap<String,Object>();
+		params.put("phone", phone);
+		params.put("email", email);
+		return this.selectSingleUserAsResultType(params);
+	}
+
+	@Override
+	public boolean isContainsGroupLike(User user, String groupnameLike) {
+		for (GroupManager groupManager : user.getUserLinkGroup()) {
+			if (groupManager.getGroupTable().getGroupname().contains(groupnameLike)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public List<UserLinkDept> selectAllUserLinkDept(HashMap<String, Object> params) {
+		
+		return userMapper.selectAllUserLinkDept(params);
+	}
+
+	@Override
+	public UserLinkDept selectSingleUserLinkDept(HashMap<String, Object> params) {
+		List<UserLinkDept> userLinkDepts=this.selectAllUserLinkDept(params);
+		if(userLinkDepts==null||userLinkDepts.size()==0) return null;
+		return userLinkDepts.get(0);
+	}
+
+	@Override
+	public UserLinkDept selectSingleUserLinkDept(String firstDeptName) {
+		HashMap<String, Object> parHashMap=new HashMap<String, Object>();
+		parHashMap.put("firstDeptName", firstDeptName);
+		return this.selectSingleUserLinkDept(parHashMap);
+	}
+
+	@Override
+	public List<User> selectUser(HashMap<String, Object> params) {
+		
+		return userMapper.selectUser(params);
+	}
+
+	@Override
+	public User selectSingleUser(HashMap<String, Object> params) {
+		List<User> users=this.selectUser(params);
+		if(users==null||users.size()==0) return null;
+		return users.get(0);
+	}
+
+	@Override
+	public User selectSingleUserWithPhone(String phone) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		//params.put("columns", "id,username,phone,postId");
+		params.put("whereClause", "phone="+phone);
+		return this.selectSingleUser(params);
+	}
+
+	@Override
+	public boolean isDeptExists(Department dept) {
+		List<Dept> depts=this.selectDeptWithDepartment(dept);
+		if(depts==null||depts.size()==0) return false;
+		return true;
+	}
+
+	@Override
+	public List<Dept> selectDeptWithDepartment(Department dept) {
+		
+		return userMapper.selectDeptWithDepartment(dept);
+	}
+
+	@Override
+	public void saveDepartment(Department department) {
+		userMapper.saveDepartment(department);
+		
+	}
+
+	@Override
+	public void saveDeptIdentityLinkWithHashMap(HashMap<String, Object> params) {
+		userMapper.saveDeptIdentityLinkWithHashMap(params);
+		
+	}
+
+	@Override
+	public void saveDeptIdentityLink(String firstId, String secondId, String thirdId) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("firstId", firstId);
+		params.put("secondId", secondId);
+		params.put("thirdId", thirdId);
+		this.saveDeptIdentityLinkWithHashMap(params);
+		
+	}
+
+
+
+
+
+
+
+
 
 
 

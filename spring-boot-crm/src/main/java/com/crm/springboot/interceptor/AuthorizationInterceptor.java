@@ -19,6 +19,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor{
 			result.add("/user/loginForm");
 			result.add("/user/login");
 			result.add("/index");
+			result.add("/user/findPassword");
+			result.add("/user/forgotPasswordForm");
 			return result;
 		}
 		@Override
@@ -47,7 +49,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor{
 					flag=true;
 				}
 			}
-
+            System.out.println("flag="+flag);
 			
 			return flag;
 		}

@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.crm.springboot.pojos.FormField;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.user.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Evaluation implements Serializable{
 	private Integer eId;
@@ -31,11 +32,54 @@ public class Evaluation implements Serializable{
 	private String sparation;
 	private String leadershipRemark;
 	private String shortComesAndPlan;
+	private String overseerRemark;
+	private String publicRemark;
 	private List<Project> projects;
 	//判断流程是否已经提交 
 	private String committed;
-	
+	//纪录考核量化总分
+	private String marks;
 
+	private String result;
+
+	public String getResult() {
+		return result;
+	}
+
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+
+	public String getPublicRemark() {
+		return publicRemark;
+	}
+
+
+	public void setPublicRemark(String publicRemark) {
+		this.publicRemark = publicRemark;
+	}
+
+
+	public String getMarks() {
+		return marks;
+	}
+
+
+	public void setMarks(String marks) {
+		this.marks = marks;
+	}
+
+
+	public String getOverseerRemark() {
+		return overseerRemark;
+	}
+
+
+	public void setOverseerRemark(String overseerRemark) {
+		this.overseerRemark = overseerRemark;
+	}
 
 
 	public String getCommitted() {
@@ -81,12 +125,14 @@ public class Evaluation implements Serializable{
 		this.eId = eId;
 	}
 
+	@JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
 	public Date getStartDate() {
 		return startDate;
 	}
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
+	@JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
 	public Date getEndDate() {
 		return endDate;
 	}

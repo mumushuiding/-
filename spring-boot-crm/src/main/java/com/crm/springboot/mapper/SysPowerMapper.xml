@@ -3,6 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <!-- 指向UserMapper.xml文件 -->
 <mapper namespace="com.crm.springboot.mapper.SysPowerMapper">
+<cache flushInterval="60000" readOnly="true" size="512"></cache>
   <!-- ****************************Action***************************** -->
 	<resultMap type="action" id="actionResultMap">
 		<id property="actionid" column="actionid"></id>
@@ -121,9 +122,16 @@
      <delete id="deleteGroupById" parameterType="string">
      	delete from power_grouptable where groupid=#{id}
      </delete>
-     <select id="selectAllGroupIds" parameterType="string" resultType="string">
-        <bind name="pattern" value="'%' + _parameter + '%'" />
-     	select groupid from power_grouptable where groupname like #{pattern}
+     <select id="selectAllGroupIds" parameterType="hashmap" resultType="string">
+        select groupid from power_grouptable
+        <where>
+          <if test="groupname!=null and groupname!=''">
+          	<bind name="pattern" value="'%' + _parameter.groupname + '%'" />
+          	groupname like #{pattern}
+          </if>
+         
+        </where>
+
      </select>
      <!-- ****************************GroupManager***************************** -->
      <resultMap type="groupManager" id="groupManagerResultMap">
@@ -154,12 +162,32 @@
      		(#{groupManager.userid},#{groupManager.username},#{id},#{groupManager.creatorid},#{groupManager.creatorname},#{groupManager.createdate})	
      	</foreach>
      </insert>
+     <select id="selectAllGroupIdsFromGroupManager" parameterType="hashmap" resultType="string">
+     	select groupid from power_groupmanager
+     	<where>
+     		<if test="userid!=null and userid!=''">userid=#{userid}</if>
+     		<if test="groupid!=null and groupid!=''">and groupid=#{groupid}</if>
+     	</where>
+     </select>
+     <select id="selectGroupManager" parameterType="hashmap" resultType="groupManager">
+     	select * from power_groupmanager
+     	<where>
+     		<if test="userid!=null and userid!=''">userid=#{userid}</if>
+     		<if test="groupid!=null and groupid!=''">and groupid=#{groupid}</if>
+     	</where>
+     </select>
      <select id="selectGroupManagerByUserId" parameterType="string" resultMap="groupManagerResultMap">
      	select *  from power_groupmanager   where userid=#{id}
      </select>
      <select id="selectGroupManagerByUserId2" parameterType="string" resultMap="groupManagerResultMap2">
      	select *  from power_groupmanager   where userid=#{id}
      </select>
+     <delete id="deleteGroupManager" parameterType="hashmap">
+     	delete from power_groupmanager 
+     	<where>
+     		<if test="condition!=null and condition!=''">${condition}</if>
+     	</where>
+     </delete>
      <delete id="deleteGroupManagerById" parameterType="string">
      	delete from power_groupmanager where groupmanagerid=#{id}
      </delete>

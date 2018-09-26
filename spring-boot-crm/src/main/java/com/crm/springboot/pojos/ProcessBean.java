@@ -1,10 +1,10 @@
 package com.crm.springboot.pojos;
 
 import java.io.Serializable;
-import java.util.List;
+
 
 import com.crm.springboot.pojos.user.User;
-import com.crm.springboot.pojos.user.UserLinkDept;
+
 
 
 public class ProcessBean implements Serializable{
@@ -40,8 +40,6 @@ public class ProcessBean implements Serializable{
         private String committed;
 		private String currentCandidateGroup;
 
-		
-		
 		@Override
 		public String toString() {
 			return "ProcessBean [processInstanceId=" + processInstanceId + ", requestedDate=" + requestedDate
@@ -51,6 +49,7 @@ public class ProcessBean implements Serializable{
 					+ completed + ", committed=" + committed + ", currentCandidateGroup=" + currentCandidateGroup + "]";
 		}
 		
+
 		public String getCurrentCandidateGroup() {
 			return currentCandidateGroup;
 		}

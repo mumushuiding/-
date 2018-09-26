@@ -46,7 +46,7 @@ public class UserPowerController {
 		
 		params.put("username", username);
 		List<User> uList=userService.selectAllUserWithHashMap(params);
-		System.out.println(JsonUtils.formatListForPagination(uList, pageIndex, pageSize));
+
 		return JsonUtils.formatListForPagination(uList, pageIndex, pageSize);
 	}
 	

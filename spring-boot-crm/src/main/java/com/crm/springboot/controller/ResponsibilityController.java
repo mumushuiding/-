@@ -1,5 +1,5 @@
 package com.crm.springboot.controller;
-import static org.assertj.core.api.Assertions.useRepresentation;
+
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -7,18 +7,15 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+
 import java.util.List;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.websocket.server.PathParam;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
-import org.hibernate.loader.custom.ScalarResultColumnProcessor;
-import org.slf4j.Logger;
+import javax.xml.bind.JAXBException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,17 +27,23 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
-import com.crm.springboot.config.SchedulingConfig;
+import com.crm.springboot.factory.FactoryForIProcessPoJoFactory;
+import com.crm.springboot.factory.IFactoryForIProcessPojoFactory;
 import com.crm.springboot.pojos.Dictionary;
-import com.crm.springboot.pojos.ProcessBean;
+import com.crm.springboot.pojos.GroupManager;
+import com.crm.springboot.pojos.ProcessEntity;
+import com.crm.springboot.pojos.ProcessType;
 import com.crm.springboot.pojos.assess.Evaluation;
 import com.crm.springboot.pojos.assess.Mark;
+import com.crm.springboot.pojos.assess.MonthAssessCfgPojo;
 import com.crm.springboot.pojos.assess.Project;
 import com.crm.springboot.pojos.assess.Responsibility;
+import com.crm.springboot.pojos.process.AbstractProcessPojo;
+import com.crm.springboot.pojos.process.GroupManagerForProcess;
 import com.crm.springboot.pojos.user.Dept;
 import com.crm.springboot.pojos.user.Post;
 import com.crm.springboot.pojos.user.User;
-import com.crm.springboot.pojos.user.UserLinkDept;
+
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.DictionaryService;
 import com.crm.springboot.service.ProcessService;
@@ -73,6 +76,7 @@ public class ResponsibilityController {
 	private ActivitiService activitiService;
 	@Autowired
 	private UserService userService;
+
 	@RequestMapping("/{location}")
 	public String location(@PathVariable String location,Model model,
 			@RequestParam(required=false) String startDate,
@@ -80,8 +84,6 @@ public class ResponsibilityController {
 			@RequestParam(required=false) String userId,
 			HttpServletRequest request){
 		if("projectList".equals(location)){
-			
-			
 			
 			model.addAttribute("startDate", startDate);
 			model.addAttribute("endDate", endDate);
@@ -104,11 +106,15 @@ public class ResponsibilityController {
     				"halfYear".equals(location1)||//半年度考核
     				"fullYear".equals(location1)||//全年考核
     				"all".equals(location1)||//全部考核
-    				"res".equals(location1)){//日常工作一线干部考核情况督查登记表
+    				"res".equals(location1)||
+    				"others".equals(location1)){//日常工作一线干部考核情况督查登记表
     			
-    			
+    			List<Dept> depts=userService.selectDistinctSecondLevelDept();
+    			model.addAttribute("depts", depts);
     			model.addAttribute("taskType", location1);
     			
+    			List<String> assessments=dictionaryService.selectAllDictionaryWithName("基本定格");
+    			model.addAttribute("assessments", assessments);
     			return "/user/responsibility/"+location;
     		}
         }
@@ -147,7 +153,17 @@ public class ResponsibilityController {
 			return "/user/responsibility/"+location;
 			
 		}
-		
+        //显示历史排名数据
+		if ("unsubmittedList".equals(location)) {
+			
+			model.addAttribute("taskType", location1);
+			List<Dept> depts=userService.selectDistinctSecondLevelDept();
+			model.addAttribute("depts", depts);
+
+			
+			return "/user/responsibility/"+location;
+			
+		}
 		 
 		return "/user/responsibility/"+location+"/"+location1;
 	}
@@ -163,10 +179,11 @@ public class ResponsibilityController {
 		return "/user/responsibility/"+location+"/"+location1;
 	}
 	@RequestMapping("/{location}/{location1}/{location2}/{location3}")
-	public String locate2(@RequestParam(required=false) String processInstanceId,@PathVariable String location,@PathVariable String location1,@PathVariable String location2,@PathVariable String location3,Model model,HttpServletRequest request,HttpSession session) throws UnsupportedEncodingException{
+	public String locate2(@RequestParam(required=false) String processInstanceId,@PathVariable String location,@PathVariable String location1,@PathVariable String location2,@PathVariable String location3,Model model,HttpServletRequest request,HttpSession session,
+			@RequestParam(required=false) String userId) throws UnsupportedEncodingException{
 		String referer=request.getHeader("referer");
 		session.setAttribute("referer", referer);
-		
+		if(referer.indexOf("?msg=")!=-1) referer=referer.substring(0, referer.indexOf("?msg="));
 		User user=(User) session.getAttribute("sysuser");
 		//如果申请已经提交的话，就跳转
 //		String redirect=processService.isUserHasTheCandidateGroup(String.valueOf(user.getId()), processInstanceId, referer);
@@ -179,10 +196,12 @@ public class ResponsibilityController {
 			Project project=null;
 			String action="";
 			if ("update".equals(location2)) {
+				if(!responsibilityService.canIDeleteProject(location3)) return "redirect:"+referer+"?msg="+URLEncoder.encode("项目为系统导入或项目已经被删除，无法执行该操作","utf-8");
 				project=responsibilityService.selectProjectWithProjectId(location3);
 				action="/responsibility/updateProject";
 			}else {
 				project=new Project();
+				project.setUserId(userId);
 				project.setStartDate(DateUtil.parseWesternDate2(location2));
 				project.setEndDate(DateUtil.parseWesternDate2(location3));
 				action="/responsibility/saveProject";
@@ -229,9 +248,9 @@ public class ResponsibilityController {
 	//***************************************************用户项目 project*****************************************
 	@RequestMapping("/saveProject")
 	public String saveProject(Project project,HttpSession session){
-		User user=(User) session.getAttribute("sysuser");
-		if(user==null) return "redirect:/user/loginForm";
-		project.setUserId(String.valueOf(user.getId()));
+//		User user=(User) session.getAttribute("sysuser");
+//		if(user==null) return "redirect:/user/loginForm";
+//		project.setUserId(String.valueOf(user.getId()));
 		responsibilityService.saveProject(project);
 		return "redirect:"+session.getAttribute("referer");
 	}
@@ -247,29 +266,40 @@ public class ResponsibilityController {
 			
 			return redirect;
 		}
-		
+	   if(!responsibilityService.canIDeleteProject(projectId)) return "redirect:"+referer+"?msg="+URLEncoder.encode("项目为系统导入或项目已经被删除，无法执行该操作","utf-8");
 	   responsibilityService.deleteProject(projectId);
 	   return "redirect:"+referer;
    }
    @RequestMapping("/updateProject")
    public String updateProject(Project project,HttpSession session){
+	   
 	   responsibilityService.updateProject(project);
 	   return "redirect:"+session.getAttribute("referer");
+   }
+   @RequestMapping("/selectProjectWithProjectId/{projectId}")
+   @ResponseBody
+   public String selectProjectWithProjectId(@PathVariable String projectId){
+	   Project project=responsibilityService.selectProjectWithProjectId(projectId);
+	   return JsonUtils.getGson().toJson(project);
    }
    @RequestMapping("/selectAllProject")
    @ResponseBody
    public String selectAllProject(Integer pageIndex,Integer pageSize,HttpSession session
 		    ,@RequestParam(required=false) String startDate
 			,@RequestParam(required=false) String endDate
-			,@RequestParam(required=false) String userId){
+			,@RequestParam(required=false) String userId
+			,@RequestParam(required=false) Boolean markNeZero){
 	   
 		HashMap<String, Object> params = new HashMap<String,Object>();
 		params.put("userId", userId);
         params.put("startDate",startDate);
         params.put("endDate",endDate);
-        
+        markNeZero=true;
+        if (markNeZero!=null&&markNeZero==true) {
+        	params.put("markNeZero",markNeZero);
+		}
         params.put("orderByClause","createTime desc");
-        log.info("userId="+userId+",startDate="+startDate+",endDate="+endDate);
+        
         
 		JsonUtils.startPageHelper(pageIndex, pageSize);
 
@@ -281,6 +311,64 @@ public class ResponsibilityController {
 	    
 	   
    }
+   
+   /**
+    * //根据前N个月项目内容纪录，自动生成重复出现的项目
+    * @param request
+    * @param historicalNumbers
+    * @return
+ * @throws UnsupportedEncodingException 
+    */
+   @RequestMapping("/autoGenerateProject/{businessType}/{repeatTimes}")
+   public String autoGenerateProject(HttpServletRequest request,
+		   HttpSession session,
+		   @PathVariable Integer repeatTimes,
+		   @PathVariable String businessType) throws UnsupportedEncodingException{
+	   User user=(User) session.getAttribute("sysuser");
+
+	   String referer=request.getHeader("referer");
+
+        if(referer.indexOf("?msg")!=-1) referer=referer.substring(0, referer.indexOf("?msg"));
+	   //查询前N个月重复出现的项目
+       int month=DateUtil.getMonth();
+
+       int year=DateUtil.getYear();
+     
+	   if (RegexUtils.isMatch(businessType, ProcessType.EVALUCATION_MONTH_PATTER)) {
+		   year=Integer.valueOf(RegexUtils.getIndexGroup(1, businessType, ProcessType.EVALUCATION_MONTH_PATTER));
+		   month=Integer.valueOf(RegexUtils.getIndexGroup(2, businessType, ProcessType.EVALUCATION_MONTH_PATTER));
+		   
+	   }
+
+       Date startDate=DateUtil.getFirstDayOfMonth(year, month-repeatTimes);
+       Date endDate=DateUtil.getLastDayOfMonth(year, month-1);
+	   
+	   String table="select distinct projectContent,progress,count(projectContent) as repeatTimes from res_project where projectContent!='系统导入' and startDate>='"+DateUtil.formatDefaultDate(startDate)+"' and endDate<='"+DateUtil.formatDefaultDate(endDate)+"' and userId='"+user.getId()+"' group by projectContent";
+	   HashMap<String, Object> params=new HashMap<String, Object>();
+	   params.put("columns","projectContent,progress");
+	   params.put("table", table);
+	   params.put("repeatTimes", repeatTimes);
+	   
+	   List<Project> projects=responsibilityService.selectProject(params);
+       if (projects==null||projects.size()==0) {
+    	
+    	   return "redirect:"+referer+"?msg="+URLEncoder.encode("无常用项目，添加失败", "utf-8");
+	   }
+	   //生成项目
+	   Date start=DateUtil.getFirstDayOfMonth(year, month);
+	   Date end=DateUtil.parseDefaultDate(DateUtil.formatDefaultDate(DateUtil.getLastDayOfMonth(year, month)));
+	   String userId=String.valueOf(user.getId());
+	   for (Project project : projects) {
+		   project.setEndDate(end);
+		   project.setStartDate(start);
+		   project.setUserId(userId);
+		   project.setCompleted("0");
+		   responsibilityService.saveProject(project);
+	   }
+	  return "redirect:"+referer;
+	  
+   }
+   
  //***************************************************用户自评 *****************************************	
   @RequestMapping("/saveMark")
   public String saveMark(HttpSession session,Mark mark){
@@ -321,13 +409,20 @@ public class ResponsibilityController {
 	  responsibilityService.updateMark(mark);
 	  return "redirect:"+session.getAttribute("referer");
   }
+  @RequestMapping("/selectMark/{markId}")
+  @ResponseBody
+  public String selectMarkWithMarkId(@PathVariable String markId){
+	  Mark mark=responsibilityService.selectMarkByMarkId(markId);
+	  return JsonUtils.getGson().toJson(mark);
+  }
   @RequestMapping("/selectProjectWithProjectId/{id}/{processInstanceId}")
   public String selectMarkWithProjectId(@RequestParam(required=false) String msg,@PathVariable String id,@PathVariable String processInstanceId,Model model,HttpServletRequest request,HttpSession session) throws UnsupportedEncodingException{
       String referer=request.getHeader("referer");
       if(referer.indexOf("?msg")!=-1) referer=referer.substring(0, referer.indexOf("?msg"));
-     
+      //判断是否是系统导入的
+      if(!responsibilityService.canIDeleteProject(id)) return "redirect:"+referer+"?msg="+URLEncoder.encode("项目为系统导入或项目已经被删除，无法执行该操作","utf-8");
       model.addAttribute("processInstanceId", processInstanceId);
-     // System.out.println("*(******************referer="+referer);
+
       //evaluationHistory保存当前考核表跳转到查看项目之前的路径
       if( referer.contains("selectEvaluation")||referer.contains("perform")||referer.contains("toStartEvaluation")) session.setAttribute("evaluationHistory", referer);
       
@@ -345,7 +440,58 @@ public class ResponsibilityController {
 	  return "/user/responsibility/project/projectContent";
   }
 
-//***************************************************Evaluation*****************************************	
+//***************************************************Evaluation*****************************************
+  @RequestMapping("/selectAllEvaluation/{taskType}")
+  @ResponseBody
+  
+  public String selectAllEvaluation(@PathVariable String taskType,
+		  Model model,
+		  Integer pageSize,
+		  Integer pageIndex,
+		  String secondDeptId,
+		  String times,
+		  String assessGroup,
+		  HttpSession session,
+		  String username){//指示时间，eg:2018年上半年,2018年
+	  String businessType=responsibilityService.getBusinessType(taskType);
+	  String titleLike=responsibilityService.getTitleLikeForYear(taskType, times);
+	//获取考核组下的所有二级部门和一级部门id,并将它们以字符串数组形式存入哈希表
+      HashMap<String, Object> params=sysPowerService.getDepartmentsWithGroupname(assessGroup, "考核组");
+	  if(params==null) params=new HashMap<String, Object>();
+	  params.put("businessType", businessType);
+	  params.put("titleLike", titleLike);
+
+	  User user=(User) session.getAttribute("sysuser");
+	  //查询就否有超过90%的流程已经结束并且用户不包含考核组，是就查询，否则就返回空
+	  //System.out.println("任务是否超过0.9："+responsibilityService.isOverRate(params, 0.9)+",是否包含考核组："+userService.isContainsGroupLike(user, "考核组"));
+	  boolean isAssessMember=userService.isContainsGroupLike(user, "考核");//是否考核组和考核办成员 
+	  if(!responsibilityService.isOverRate(params, 0.9)&&!isAssessMember) {
+		  
+          return  "{\"total\":0,\"page\":1,\"pageSize\":10,\"rows\":[]}";
+	  }
+	  if(!isAssessMember) params.put("result", "优秀");//非考核组成员只能看到优秀的
+	 
+	  //根据二级部门查询
+	  params.put("secondDeptId", secondDeptId);
+	  JsonUtils.startPageHelper(pageIndex, pageSize);
+	  //List<ProcessEntity> processEntities=processService.selectAllEvaluationFromProcess(params);
+	  List<ProcessEntity> processEntities=responsibilityService.selectEvaluationWithUser(params);
+	 
+	  
+	  return JsonUtils.formatListForPagination(processEntities, pageIndex, pageSize);
+	  
+  }
+ 
+  /**
+   * 根据流程类型和流程id,查询考核表
+   * @param msg
+   * @param processInstanceId
+   * @param model
+   * @param taskType
+   * @param session
+   * @return
+   * @throws UnsupportedEncodingException
+   */
   @RequestMapping("/selectEvaluation/{processInstanceId}/{taskType}")
   public String selectEvaluation(@RequestParam(required=false) String msg,@PathVariable String processInstanceId,Model model,@PathVariable String taskType,HttpSession session) throws UnsupportedEncodingException{
 	  User user=(User) session.getAttribute("sysuser");
@@ -356,28 +502,60 @@ public class ResponsibilityController {
 	  //月度考核
 	  if("month".equals(taskType)){
 		  Evaluation evaluation=responsibilityService.selectSingleEvaluation(params);
-		  
-		  //获取当月所有项目并计算总分
+
+		  //获取当月所有项目
 		  HashMap<String, Object> params2 = new HashMap<String,Object>();
 		  params2.put("userId",evaluation.getProcessBean().getUser().getId());
 		  params2.put("startDate",DateUtil.formatTimesTampDate(evaluation.getStartDate()));
 		  params2.put("endDate", DateUtil.formatTimesTampDate(evaluation.getEndDate()));
 		  List<Project> projects=responsibilityService.selectAllProject(params2);
-		  int totalMark =responsibilityService.getTotalMarkOfProjects(projects);
+		  model.addAttribute("projects", projects);
+		 
+		  //计算总分
+		  Double totalMark =responsibilityService.getTotalMarkOfProjects(projects);
 		  evaluation.setTotalMark(String.valueOf(totalMark));
+
+		  model.addAttribute("evaluation", evaluation);
+		  
 		  //获取当前候选组，传递给页面，使对应的内容可以编辑
 		  String identity=responsibilityService.getIdentity(evaluation, user);
 		  model.addAttribute("identity", identity);
+	  }
+	  //半年考核
+	  if("halfYear".equals(taskType)||"fullYear".equals(taskType)){
 		
+		  Evaluation evaluation=responsibilityService.selectSingleEvaluation(params);
+		 
+		//基本定格
+		 List<Dictionary> remarks=dictionaryService.selectAllDics("基本定格", "基本定格");
+		 model.addAttribute("remarks", remarks);
+		//基本定格对应得分
+		 List<Dictionary> markOfAssessments=dictionaryService.selectAllDics("基本定格对应得分");
+		 model.addAttribute("markOfAssessments", markOfAssessments);
+      
+		 //计算总分
+		 Double totalMark =responsibilityService.selectTotalMark(evaluation.getProcessBean().getUser().getId(), 
+				  "1", DateUtil.formatTimesTampDate(evaluation.getStartDate()),
+				  DateUtil.formatTimesTampDate(evaluation.getEndDate()));
+		 totalMark=totalMark==null?0.0:totalMark;
+          Double baseMark=responsibilityService.getBaseMarkOfAssessment();
+		  model.addAttribute("total", totalMark+baseMark);
 		  
-		  model.addAttribute("projects", projects);
+		//获取当前候选组，传递给页面，使对应的内容可以编辑
+		  String identity=responsibilityService.getIdentity(evaluation, user);
+		  model.addAttribute("identity", identity);
+		  
+		  
 		  model.addAttribute("evaluation", evaluation);
 	  }
+	  
       //责任清单
 	  if("res".equals(taskType)){
 		  Responsibility responsibility=responsibilityService.selectSingleResponsibility(params);
 		  model.addAttribute("evaluation", responsibility);
-		  
+		//获取当前候选组，传递给页面，使对应的内容可以编辑
+		  String identity=responsibilityService.getIdentity(responsibility.getProcessBean(), user);
+		  model.addAttribute("identity", identity);
 		 //查询所有不同的二级部门
 		 List<Dept> depts=userService.selectDistinctSecondLevelDept();
 		 model.addAttribute("depts", depts);
@@ -387,12 +565,53 @@ public class ResponsibilityController {
 	  if("all".equals(taskType)){
 		  return "/system/activiti/EvaluationProcess/startmonth";
 	  }
-	  if(msg!=null) model.addAttribute("msg", URLDecoder.decode(msg, "UTF-8"));
+		if(msg!=null && !"".equals(msg)) {
+			model.addAttribute("msg", URLDecoder.decode(msg, "UTF-8"));
+		};
 	  
 	  return "/system/activiti/EvaluationProcess/start"+taskType;
   }
 //***************************************************Mark***************************************** 
+  @RequestMapping("/selectAllMark")
+  @ResponseBody 
+  public String selectAllMark(
+		     @RequestParam(required=false) String startDate,
+			 @RequestParam(required=false) String endDate,
+			 @RequestParam(required=false) String userId,
+			 @RequestParam(required=false) String checked,
+			 @RequestParam(required=false) String limit){
+	  HashMap<String, Object> params=new HashMap<String, Object>();
+//	  params.put("startDate", DateUtil.formatDefaultDate(DateUtil.parseEnglishDate(startDate)));
+//	  params.put("endDate", DateUtil.formatDefaultDate(DateUtil.parseEnglishDate(endDate)));
+	  params.put("startDate", startDate);
+	  params.put("endDate",endDate);
+	  params.put("userId", userId);
+	  params.put("checked", checked);
+	  params.put("orderByClause", "createTime desc");
+	  if(limit!=null) params.put("limitClause", limit);
+	  List<Mark> marks=responsibilityService.selectAllMarkAsType(params);
+	
+	  return JsonUtils.getGson().toJson(marks);
+	  
+  }
+  
+  @RequestMapping("/selectTotalMark")
+  @ResponseBody
+  public String selectTotalMark(HttpSession session
+		    ,@RequestParam(required=false) String processInstanceId
+		    ,@RequestParam(required=false) String startDate
+			,@RequestParam(required=false) String endDate
+			,@RequestParam(required=false) String userId
+			,@RequestParam(required=false) String checked){
 
+	  HashMap<String,Object> params=new HashMap<String, Object>();
+	  params.put("userId", userId);
+	  params.put("processInstanceId", processInstanceId);
+	  Double totalMark=responsibilityService.selectTotalMark(params);
+	  return String.valueOf(totalMark);
+	  
+  }
+  
   
   @RequestMapping("/selectTotalMark/{taskType}")
   @ResponseBody
@@ -410,18 +629,33 @@ public class ResponsibilityController {
 	return taskType;
 	  
   }
+
   @RequestMapping("/selectTotalMarkForEachGroup/{group}/{postNameLike}/{total}")
   @ResponseBody
-  public String slectTotalMark1(@PathVariable String group,@PathVariable String postNameLike,@PathVariable String total){
+  public String slectTotalMark1(@PathVariable String group,@PathVariable String postNameLike,@PathVariable String total,Model model){
       //获取考核组下的所有二级部门和一级部门id,并将它们以字符串数组形式存入哈希表
       HashMap<String, Object> params=sysPowerService.getDepartmentsWithGroupname(group, "考核组");
-
-	  params.put("startDate", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(new Date())));
-	  params.put("endDate",DateUtil.formatDefaultDate(new Date()));
+      //
+      Date date=new Date();
+     
+	  params.put("startDate", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(date)));
+	  params.put("endDate",DateUtil.formatDefaultDate(date));
+	  
+	 
 	  params.put("postNameLike", postNameLike);
 	  params.put("limitClause", "0,"+total);
 	  params.put("checked", "1");
-	  List<Mark> marks=responsibilityService.selectTotalMarkAndUser(params);
+	  // List<Mark> marks=responsibilityService.selectTotalMarkAndUser(params);
+	  List<Mark> marks=responsibilityService.selectTotalMarkWithAllUser(params);
+	  if(marks.size()==0){
+		  date=DateUtil.addYears(date, -1);
+		
+		  params.put("startDate", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(date)));
+		  params.put("endDate",DateUtil.formatDefaultDate(DateUtil.getLastDayOfYear(date)));
+		  //marks=responsibilityService.selectTotalMarkAndUser(params);
+		  marks=responsibilityService.selectTotalMarkWithAllUser(params);
+	  }
+	 
 	  return JsonUtils.getGson().toJson(marks);
   }
   
@@ -433,42 +667,98 @@ public class ResponsibilityController {
 		  String posts,
 		  String groups,
 		  Integer pageSize,
-		  Integer pageIndex){
+		  Integer pageIndex,
+		  @RequestParam(required=false) String total){
 	  
 	  model.addAttribute("taskType", taskType);
 
 	  //时间段
-	  startDate=startDate==null?DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(new Date())):startDate;
-	  endDate=endDate==null?DateUtil.formatDefaultDate(new Date()):endDate;
-
+	  Date date=new Date();
+	
+	  startDate=startDate==null?DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(date)):startDate;
+	  endDate=endDate==null?DateUtil.formatDefaultDate(DateUtil.getLastDayOfYear(date)):endDate;
+      
 	  //获取考核组下的所有二级部门和一级部门id,并将它们以字符串数组形式存入哈希表
-      HashMap<String, Object> params=sysPowerService.getDepartmentsWithGroupname(groups, "考核组");
+	  HashMap<String, Object> params=null;
+	 
+	  if (groups!=null&&!"".equals(groups)) {
+		  params=sysPowerService.getDepartmentsWithGroupname(groups, "考核组");
+	  }else {
+		  params=new HashMap<String, Object>();
+	 }
+      
       params.put("startDate", startDate);
 	  params.put("endDate",endDate);
 	  if(posts!=null && posts!="")params.put("postNames", posts.split(","));
 	  params.put("checked", "1");
-	 
-	  //分页查询
-	  JsonUtils.startPageHelper(pageIndex, pageSize);
-      
-	  List<Mark> marks=responsibilityService.selectTotalMarkAndUser(params);
+	  List<Mark> marks=null;
 	  
-	  return JsonUtils.formatListForPagination(marks, pageIndex, pageSize);
+	  
+	  if(total!=null&&!"".equals(total)){
+		  params.put("limitClause", "0,"+total);
+		  marks=responsibilityService.selectTotalMarkAndUser(params);
+		  
+		  
+		  return JsonUtils.getGson().toJson(marks);
+	  }else {
+		//分页查询
+		  JsonUtils.startPageHelper(pageIndex, pageSize);
+	      
+		  //marks=responsibilityService.selectTotalMarkAndUser(params);
+		  marks=responsibilityService.selectTotalMarkWithAllUser(params);
+		  
+		  return JsonUtils.formatListForPagination(marks, pageIndex, pageSize);
+	  }
+	  
+	  
+	 
   }
   
   @RequestMapping("/selectAllUsersWhoUnsubmittedProcess/{taskType}")
   @ResponseBody
-  public String selectAllUsersWhoUnsubmittedProcess(@PathVariable String taskType){
-	  if("month".equals(taskType)){
-		  List<User> users=new ArrayList<User>();
-		  for (int i = 0; i < 20; i++) {
-			 User user=new User();
-			 user.setUsername("王丽红");
-			 users.add(user);
-			 
-		  }
-		  
-		  return JsonUtils.getGson().toJson(users);
+  public String selectAllUsersWhoUnsubmittedProcess(@PathVariable String taskType,Model model,
+		  @RequestParam(required=false) String total,
+		  Integer pageIndex,
+		  Integer pageSize,
+		  String first,
+		  @RequestParam(required=false) String second) throws JAXBException{
+	       if("month".equals(taskType)){
+		   
+	        String titleLike=DateUtil.formatDateByFormat(DateUtil.addMonths(new Date(),-1), "yyyy年M月份")+"-月度考核";
+	        String postNames=dictionaryService.selectSingleValueOfDic("考核对象", "月度考核");
+	       
+	        HashMap<String, Object> params=new HashMap<String, Object>();
+	        params.put("titleLike", titleLike);
+	        params.put("postNames",postNames.split(","));
+	        List<User> users=null;
+	        //total不为空，为首页查询前30条
+	        if(total!=null){
+	        	params.put("limitClause","0,"+total);
+	        	users=processService.selectAllUsersWhoUnsubmittedProcess(params);
+	            String degreeOfUrgency=responsibilityService.getDegreeOfUrgencyWithUnsubmittedAssessForm();
+	            if(users==null) return null;
+	   		    StringBuffer stringBuffer=new StringBuffer("{}");
+	   		    String titleLike1="";
+
+	   		    if("month".equals(taskType)) titleLike1="月度考核未交清单";
+	   		 
+	   		    stringBuffer.insert(1,"\"titleLike\":\""+titleLike1+"\",\"degreeOfUrgency\":\""+degreeOfUrgency+"\",\"users\":"+JsonUtils.getGson().toJson(users));
+	   	      
+	   		   return JsonUtils.getGson().toJson(stringBuffer);
+	        }
+	        
+	        JsonUtils.startPageHelper(pageIndex, pageSize);
+	        //一级部门
+	        if(first!=null && first!="")params.put("firstLevelDeptIds", first.split(","));
+	       
+	        params.put("secondLevelId", second);
+	        users=processService.selectAllUsersWhoUnsubmittedProcess(params);
+	        
+	        if(users==null) return null;
+	      
+	        return JsonUtils.formatListForPagination(users, pageIndex, pageSize);
+
+		 
 	  }
 	return null;
   }

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: spring-security
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: Administrator
+Implementation-Vendor-Id: com.lxg.spring
+Build-Jdk: 1.8.0_112
+Implementation-URL: http://projects.spring.io/spring-boot/spring-secur
+ ity/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

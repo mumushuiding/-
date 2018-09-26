@@ -16,6 +16,7 @@ import org.activiti.engine.task.Task;
 
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
+import com.crm.springboot.pojos.ProcessBean;
 
 
 public interface BaseActivitiService {
@@ -46,6 +47,8 @@ public interface BaseActivitiService {
 	void bindUserAndGroup(String userId,String groupId);
 	void bindUserAndGroups(String userId,String[] groupIds);
 	void unBindUserAndGroup(String userId,String groupId);
+	void unBindUserWithGroupids(String userid,String groupids);
+	void unBindUserWithGroupids(String userid,List<String> groupids);
 	
 	/**
 	 * ********************************流程定义存储与查询*************************************
@@ -68,10 +71,14 @@ public interface BaseActivitiService {
 	void deleteProcessInstance(String processInstanceId,String deleteReason);
 	ProcessInstance selectProcessInstance(String processInstanceId);
 	Object getVariableFromProcessInstance(String processInstanceId,String variableName);
+	Object getVariableFromHistoryWithProcessInstanceId(String processInstanceId,String variableName);
     /**
      * *********************************设置变量****************************************
      */
  	void setVariable(Task task,HashMap<String , Object> variable);
+ 	void setVariable(ProcessBean processBean,Object param,String paramname);
+ 	void setVariable(Task task,Object param,String paramname);
+ 	
 	/**
 	 * ********************************任务存储与查询*************************************
 	 */
@@ -107,9 +114,10 @@ public interface BaseActivitiService {
 	 * @param userId 审批人的id
 	 * @param audit  审批意见：通过（pass）or驳回（reject）
 	 */
-	void completeWithCommentAndAudit(String taskId,String userId,Boolean audit,String comment);
+	void completeWithCommentAndAudit(String taskId,String userId,String audit,String comment);
 	void complete(String taskId,Map<String,Object> variables);
 	void complete(String taskId);
+	void complete(ProcessBean processBean);
 	void addComment(String taskId,String comment,String userId);
 	void claim(String taskId,String userId);
 	

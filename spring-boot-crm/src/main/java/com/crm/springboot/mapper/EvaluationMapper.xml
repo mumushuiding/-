@@ -2,7 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.crm.springboot.mapper.EvaluationMapper">
-  <!--*****************************processBean*************************************** -->  
+ <cache flushInterval="60000" readOnly="true" size="512"></cache>
+  
+ <!--*****************************processBean*************************************** -->
   <resultMap type="processBean" id="processBeanResultMap">
   	<id property="processInstanceId" column="processInstanceId"/>
   	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.getById"></association>
@@ -15,15 +17,117 @@
     <association property="processBean" javaType="processBean" column="processInstanceId" select="selectProcessBeanWithProcessInstanceId"></association>
   	<collection property="projects" javaType="ArrayList" column="userId" ofType="project" select="selectProjectWithUserId"></collection>
   </resultMap>
+  <resultMap type="evaluation" id="evaluationResultMap1">
+    <association property="processBean" javaType="processBean" column="processInstanceId" select="selectProcessBeanWithProcessInstanceId"></association>
+  </resultMap>
+  <resultMap type="processEntity" id="processEntityResultMap">
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.getById1"></association>
+  	<association property="evaluation" column="processInstanceId" javaType="evaluation" select="com.crm.springboot.mapper.EvaluationMapper.selectEvaluationByProcessInstanceId"></association>
+  </resultMap>
+  <select id="selectEvaluationByProcessInstanceId" parameterType="string" resultType="evaluation">
+  	select * from res_evaluation where processInstanceId=#{processInstanceId}
+  </select>
+   <select id="selectAllEvaluationWithProcess" resultMap="evaluationResultMap1" parameterType="hashmap">
+  	select * from res_evaluation
+  	<where>
+  		<if test="processInstanceId!=null">
+  			processInstanceId=#{processInstanceId}
+  		</if>
+  		<if test="completed!=null and completed!=''">
+  			and processInstanceId in (select processInstanceId from process where completed=#{completed})
+  		</if>
+  		<if test="phone!=null and phone!=''">
+  			and  processInstanceId in (select processInstanceId from process where userId in (select id from info_user where phone=#{phone}))
+  		</if>
+  		<if test="sparation!=null and sparation!=''">and sparation=#{sparation}</if>
+  		<if test="processInstanceIds">
+  			and processInstanceId in 
+  			<foreach collection="processInstanceIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}       
+       </foreach>  
+  		</if>
+  	</where>
+  </select>
+  <select id="selectEvaluationWithUser" parameterType="hashmap" resultMap="processEntityResultMap">
+  	select res_evaluation.processInstanceId,process.userId from res_evaluation join process on 
+  		process.businessType like '%${businessType}%'
+  		and process.title like '%${titleLike}%'   		
+  		and res_evaluation.processInstanceId=process.processInstanceId
+  		<if test="completed!=null and completed!=''">
+  		and process.completed=#{completed}
+  		</if>
+  		<if test="secondDeptId!=null and secondDeptId!=''">
+  		and process.userId in (select distinct userId from info_user_dept where secondLevelId=#{secondDeptId})
+  		</if>
+  		<if test="leadershipEvaluation!=null and leadershipEvaluation!=''">
+  			and res_evaluation.leadershipEvaluation=#{leadershipEvaluation}
+  		</if>
+  		<if test="result!=null and result!=''">
+  			and res_evaluation.result=#{result}
+  		</if>
+  		<!-- 查询在二级部门的用户和一级部门的用户并集-->
+	 	<choose>
+	 		<when test="secondLevelIds!=null and firstLevelIds!=null">
+	 			and process.userId in (select userId from info_user_dept where secondLevelId in
+	 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	 		  OR firstLevelId in
+	 		  <foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	 		)
+	 		</when>
+	 		<when test="secondLevelIds!=null and firstLevelIds==null">
+		 		and process.userId in (select userId from info_user_dept where secondLevelId in
+		 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		) 
+	 		</when>
+	 		<when test="secondLevelIds==null and firstLevelIds!=null">
+		 		and process.userId in (select userId from info_user_dept where firstLevelId in
+		 		<foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		)
+	 		</when>
+	 	</choose>
+  		order by res_evaluation.totalMark+0 desc,res_evaluation.marks+0 desc
+  </select>
 
-
+  <select id="selectAllEvaluationWithResultType" resultType="evaluation" parameterType="hashmap">
+  	select * from res_evaluation
+  	<where>
+  		<if test="processInstanceId!=null">
+  			processInstanceId=#{processInstanceId}
+  		</if>
+  		<if test="completed!=null and completed!=''">
+  			and processInstanceId in (select processInstanceId from process where completed=#{completed})
+  		</if>
+  		<if test="phone!=null and phone!=''">
+  			and  processInstanceId in (select processInstanceId from process where userId in (select id from info_user where phone=#{phone}))
+  		</if>
+  		<if test="sparation!=null and sparation!=''">and sparation=#{sparation}</if>
+  		<if test="processInstanceIds">
+  			and processInstanceId in 
+  			<foreach collection="processInstanceIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}       
+       </foreach>  
+  		</if>
+  	</where>
+  </select>
   <select id="selectAllEvaluation" resultMap="evaluationResultMap" parameterType="hashmap">
   	select * from res_evaluation
   	<where>
   		<if test="processInstanceId!=null">
   			processInstanceId=#{processInstanceId}
   		</if>
-  		
+  		<if test="completed!=null and completed!=''">
+  			and processInstanceId in (select processInstanceId from process where completed=#{completed})
+  		</if>
+  		<if test="phone!=null and phone!=''">
+  			 and processInstanceId in (select processInstanceId from process where userId in (select id from info_user where phone=#{phone}))
+  		</if>
+  		<if test="sparation!=null and sparation!=''">and sparation=#{sparation}</if>
+  		<if test="processInstanceIds">
+  			and processInstanceId in 
+  			<foreach collection="processInstanceIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}       
+       </foreach>  
+  		</if>
   	</where>
   </select>
   <insert id="saveEvaluation" parameterType="evaluation" keyProperty="eId" useGeneratedKeys="true">
@@ -31,11 +135,11 @@
   	startDate,endDate,processInstanceId,
   	selfEvaluation,attendance,overseerEvaluation,leadershipEvaluation,
   	publicEvaluation,organizationEvaluation,totalMark,evaluationType,
-  	createTime,sparation,leadershipRemark,shortComesAndPlan,committed) values (
+  	createTime,sparation,leadershipRemark,shortComesAndPlan,committed,overseerRemark,marks,publicRemark,result) values (
   	#{startDate},#{endDate},#{processBean.processInstanceId},
   	#{selfEvaluation},#{attendance},#{overseerEvaluation},#{leadershipEvaluation},
   	#{publicEvaluation},#{organizationEvaluation},#{totalMark},#{evaluationType},
-  	#{createTime},#{sparation},#{leadershipRemark},#{shortComesAndPlan},#{committed})
+  	#{createTime},#{sparation},#{leadershipRemark},#{shortComesAndPlan},#{committed},#{overseerRemark},#{marks},#{publicRemark},#{result})
   </insert>
   <update id="updateEvaluation" parameterType="evaluation">
   	update res_evaluation
@@ -43,7 +147,6 @@
   	  
   	  <if test="startDate!=null">startDate=#{startDate},</if>
   	  <if test="endDate!=null">endDate=#{endDate},</if>
-  	  <if test="processBean.processInstanceId!=null">processInstanceId=#{processBean.processInstanceId},</if>
   	  <if test="selfEvaluation!=null">selfEvaluation=#{selfEvaluation},</if>
   	  <if test="attendance!=null">attendance=#{attendance},</if>
   	  <if test="overseerEvaluation!=null">overseerEvaluation=#{overseerEvaluation},</if>
@@ -56,7 +159,11 @@
   	  <if test="sparation!=null">sparation=#{sparation},</if>
   	  <if test="leadershipRemark!=null">leadershipRemark=#{leadershipRemark},</if>
   	  <if test="shortComesAndPlan!=null">shortComesAndPlan=#{shortComesAndPlan},</if>
-  	  <if test="committed!=null">committed=#{committed}</if>
+  	  <if test="committed!=null">committed=#{committed},</if>
+  	  <if test="overseerRemark!=null">overseerRemark=#{overseerRemark},</if>
+  	  <if test="marks!=null">marks=#{marks},</if>
+  	  <if test="publicRemark!=null">publicRemark=#{publicRemark},</if>
+  	  <if test="result!=null">result=#{result}</if>
   	</set>
   	where eId=#{eId}
   </update>
@@ -109,9 +216,43 @@
   <resultMap type="project" id="projectResultMap">
     <id property="projectId" column="projectId"/>
     <collection property="marks" javaType="ArrayList" ofType="mark" column="projectId" select="selectMarkWithProjectId"></collection>
-    
-    
   </resultMap>
+  <select id="selectProject" parameterType="hashmap" resultType="project">
+
+    select
+    <choose>
+    	<when test="columns!=null and columns!=''"> ${columns} </when>
+    	<otherwise> * </otherwise>
+    </choose>
+    from  
+    <choose>
+    	<when test="table!=null and table!=''">(${table}) tableA</when>
+    	<otherwise>res_project</otherwise>
+    </choose>
+    <where>
+    	<if test="repeatTimes!=null and repeatTimes!=''">repeatTimes>=#{repeatTimes}</if>
+    </where>
+  </select>
+  <delete id="deleteFromProject" parameterType="hashmap">
+  	delete from res_project
+  	<where>
+  		<if test="whereClause!=null and whereClause">${whereClause}</if>
+  		
+  	</where>
+  </delete>
+  <select id="selectProjectWithProjectEntity" parameterType="project" resultType="project">
+  	select * from res_project 
+  	<where>
+  		<if test="projectId!=null">projectId=#{projectId}</if>
+  		<if test="projectName!=null">and projectName=#{projectName}</if>
+  		<if test="projectContent!=null">and projectContent=#{projectContent}</if>
+  		<if test="userId!=null">and userId=#{userId}</if>
+  		<if test="startDate!=null">and startDate=#{startDate}</if>
+  		<if test="endDate!=null">and endDate=#{endDate}</if>
+  		<if test="completed!=null">and completed=#{completed}</if>
+  		
+  	</where>
+  </select>
   <select id="selectProjectWithUserId" parameterType="string" resultMap="projectResultMap">
   	select * from res_project where userId=#{id}
   </select>
@@ -134,6 +275,9 @@
   	</if>
     <if test="selfEvaluated!=null and selfEvaluated!=''">
     	and selfEvaluated=#{selfEvaluated}
+    </if>
+    <if test="markNeZero!=null">
+    	and projectId in (select distinct projectId from res_mark where markNumber !=0 )
     </if>
     <if test="orderByClause!=null and orderByClause!=''">
     	order by #{orderByClause}
@@ -170,10 +314,125 @@
   </resultMap>
   <resultMap type="mark" id="markResultMap2">
   	<id property="markId" column="markId"/>
-  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.selectUserByUserIdAsType"></association>
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.selectUserByUserIdWithDept"></association>
   </resultMap>
+  <select id="selectSingleColumnFromMark" parameterType="hashmap" resultType="string">
+  	select ${column} from res_mark
+  	<where>
+  		<if test="whereClause!=null and whereClause">${whereClause}</if>
+  		<if test="userId!=null and userId!=''">and userId=#{userId}</if>
+  		<if test="orderClause!=null and orderClause!=''">${orderClause}</if>
+  		<if test="limitClause!=null and limitClause!=''">${limitClause}</if>
+  	</where>
+  </select>
+  <select id="selectMarkWithMarkEntity" parameterType="mark" resultType="mark">
+  	select * from res_mark 
+  	<where>
+  		<if test="markId!=null">markId=#{markId}</if>
+  		<if test="projectId!=null">and projectId=#{projectId}</if>
+  		<if test="markNumber!=null">and markNumber=#{markNumber}</if>
+  		<if test="markReason!=null">and markReason=#{markReason}</if>
+  		<if test="accordingly!=null">and accordingly=#{accordingly}</if>
+  		<if test="startDate!=null">and startDate=#{startDate}</if>
+  		<if test="endDate!=null">and endDate=#{endDate}</if>
+  		<if test="userId!=null">and userId=#{userId}</if>
+  	</where>
+  </select>
+  <select id="countTotalMarkAndUser" parameterType="hashmap" resultType="int">
+  	select count(userId) from res_mark
+  	<where>
+  		<if test="checked!=null and checked!=''">
+	 		and checked=#{checked}
+	 	</if>
+	 	<if test="startDate!=null and startDate!=''">
+	 	   and startDate &gt;=#{startDate}
+	 	</if>
+	 	<if test="endDate!=null and endtDate!=''">
+	 	   and endDate &lt;=#{endDate}
+	 	</if>
+  	</where>
+  </select>
+
+  <select id="selectTotalMark" parameterType="hashmap" resultType="double">
+  	select round(sum(markNumber),2) totalMark from res_mark 
+  	<where>
+	  	<if test="userId!=null">
+	 		userId=#{userId}
+	 	</if>
+	 	<if test="checked!=null and checked!=''">
+	 		and checked=#{checked}
+	 	</if>
+	 	<if test="startDate!=null and startDate!=''">
+	 	   and startDate &gt;=#{startDate}
+	 	</if>
+	 	<if test="endDate!=null and endtDate!=''">
+	 	   and endDate &lt;=#{endDate}
+	 	</if>
+	 	<if test="processInstanceId!=null">
+	 	   and startDate &gt;=(select startDate from res_evaluation where processInstanceId=#{processInstanceId}) 
+	 	    and endDate &lt;=(select endDate from res_evaluation where processInstanceId=#{processInstanceId})
+	 	</if>
+	 
+   	</where>
+    group by userId 
+
+  </select>
+  <select id="selectTotalMarkWithAllUser" resultMap="markResultMap2" parameterType="hashmap">
+  	select info_user.id as userId,ifnull(round(sum(markNumber),2),0) as totalMark 
+  		from info_user
+  		
+  		left outer join res_mark on(
+  			info_user.id=res_mark.userId
+  			<if test="checked!=null and checked!=''">
+	 			and checked=#{checked}
+	 	    </if>
+	 	    <if test="startDate!=null and startDate!=''">
+	 	 	   and startDate &gt;=#{startDate}
+	 	    </if>
+	 	    <if test="endDate!=null and endtDate!=''">
+	 	 	   and endDate &lt;=#{endDate}
+	 	    </if>
+
+  		)
+  		<where>
+  			  <!-- 查询在二级部门的用户和一级部门的用户并集-->
+		 	<choose>
+		 		<when test="secondLevelIds!=null and firstLevelIds!=null">
+		 			 info_user.id in (select info_user_dept.userId from info_user_dept where secondLevelId in
+		 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		  OR firstLevelId in
+		 		  <foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		)
+		 		</when>
+		 		<when test="secondLevelIds!=null and firstLevelIds==null">
+			 		and info_user.id in (select info_user_dept.userId from info_user_dept where secondLevelId in
+			 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+			 		) 
+		 		</when>
+		 		<when test="secondLevelIds==null and firstLevelIds!=null">
+			 		and info_user.id in (select info_user_dept.userId from info_user_dept where firstLevelId in
+			 		<foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+			 		)
+		 		</when>
+		 	</choose>
+	        <if test="postNames!=null">
+	        	and info_user.id in (select info_user.id from info_user where postId in(select pId from info_post where name  in 
+	        		<foreach collection="postNames" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	        	))
+	        </if>
+		 	<if test="postNameLike!=null and postNameLike!=''">
+		 	  <bind name="pattern" value="'%'+_parameter.postNameLike+'%'"/>
+		 		and info_user.id in (select id from info_user where postId in(select pId from info_post where name  like #{pattern}))
+		 	</if>
+  		</where>
+  		group by info_user.id order by totalMark desc
+       <if test="limitClause!=null and limitClause!=''">
+	 		limit ${limitClause}
+	   </if>
+  		
+  </select>
   <select id="selectTotalMarkAndUser" resultMap="markResultMap2" parameterType="hashmap">
-   	select userId,startDate,endDate,round(sum(markNumber),2) totalMark from res_mark
+   	select userId,startDate,endDate,ifnull(round(sum(markNumber),2),0) totalMark from res_mark
    	<where>
 	  	<if test="userId!=null">
 	 		userId=#{userId}
@@ -222,7 +481,8 @@
 	 		limit ${limitClause}
 	 </if>
   </select>
-    <select id="selectAllMarkAsType" resultType="mark" parameterType="hashmap">
+  <!-- 查询延迟未交被扣分的月分 -->
+  <select id="selectAllMarkAsType" resultType="mark" parameterType="hashmap">
    	select * from res_mark
    	<where>
 	  	<if test="userId!=null and userId!=''">
@@ -234,11 +494,23 @@
 	 	<if test="endDate!=null and endtDate!=''">
 	 	   and endDate &lt;=#{endDate}
 	 	</if>
-
+        <if test="markReason!=null and markReason!=''">
+           and markReason=#{markReason}
+        </if>
+        <if test="accordingly!=null and accordingly!=''">
+           and accordingly=#{accordingly}
+        </if>
+        <if test="checked!=null and checked!=''">
+	 		and checked=#{checked}
+	 	</if>
+	 	and markNumber!='0'
    	</where>
     <if test="orderByClause!=null and orderByClause!=''">
     	order by #{orderByClause}
     </if>
+    <if test="limitClause!=null and limitClause!=''">
+	 		limit ${limitClause}
+	</if>
   </select>
   <select id="selectMarkWithProjectId" parameterType="string" resultType="mark">
   	select * from res_mark where projectId=#{id}
@@ -251,8 +523,8 @@
   	 
   </select>
   <insert id="saveMark" parameterType="mark" keyProperty="markId">
-  	insert into res_mark (projectId,markNumber,markReason,accordingly,createTime,
-  	startDate,endDate,userId,checked) values (#{projectId},#{markNumber},#{markReason},#{accordingly},#{createTime},
+  	insert into res_mark (projectId,markNumber,markReason,accordingly,
+  	startDate,endDate,userId,checked) values (#{projectId},#{markNumber},#{markReason},#{accordingly},
   	#{startDate},#{endDate},#{userId},#{checked})
   </insert>
   <update id="updateMark" parameterType="mark">

@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import org.joda.time.field.DelegatedDateTimeField;
 public class DateUtil {
 public static String FILE_NAME = "MMddHHmmssSSS";
 public static String DEFAULT_PATTERN = "yyyy-MM-dd";
@@ -17,17 +19,41 @@ public static String NOCHAR_PATTERN = "yyyyMMddHHmmss";
 public static String NOCHAR_PATTERN2 = "yyyyMMdd";
 public static String WESTERN_PATTERN="MM/dd/yyyy";
 public static String WESTER_PATTER2="EEE MMM dd HH:mm:ss z yyyy";
-                                     
+public static String WESTER_PATTER3="MMM d, yyyy K:m:s a";                                   
 public static String DOT_PATTERN="yyyy.MM.dd";
 public static Calendar calendar;
 
 //public static void main(String[] args){
 //	
 //	
-//	System.out.println(DateUtil.getFirstDayOfYear(new Date()));
+//	System.out.println(getDay(new Date()));
 //	
 //}
-
+/**
+ * 当期日期
+ * @return
+ */
+public static int getToDay(){
+	
+	calendar=Calendar.getInstance();
+	return calendar.get(Calendar.DAY_OF_MONTH);
+}
+/**
+ * 当前年份
+ * @return
+ */
+public static int getYear(){
+	calendar=Calendar.getInstance();
+	return calendar.get(Calendar.YEAR);
+}
+/**
+ * 当前月份
+ * @return
+ */
+public static int getMonth(){
+	calendar=Calendar.getInstance();
+	return calendar.get(Calendar.MONTH);
+}
 public static Calendar getCalendar(){
 	if(calendar==null) calendar=new GregorianCalendar();
 	return calendar;
@@ -47,8 +73,7 @@ public static Date addDays(Date date,int n){
  * 日期加n个月,正数往后，负数往前
  */
 public static Date addMonths(Date date,int n){
-	if(date==null) return null;
-	if(n==0) return null;
+	if(date==null||n==0) return null;
 	calendar=getCalendar();
 	calendar.setTime(date); 
 	calendar.add(calendar.MONTH,n);
@@ -248,7 +273,22 @@ return parseDate(dateStr, WESTERN_PATTERN);
 public static Date parseDefaultDate(String date) {
 return parseDate(date, DEFAULT_PATTERN);
 }
+/**
+ * 字符串 MMM d, yyyy K:m:s a转换为日期对象
+ * @param date
+ * @return
+ */
+public static Date parseEnglishDate(String date){
+	SimpleDateFormat format = new SimpleDateFormat(WESTER_PATTER3,Locale.ENGLISH);
+	try {
+		return format.parse(date);
+	} catch (ParseException e) {
+		
+		e.printStackTrace();
+	}
+	return null;
 
+}
 /**
 * 字符串转换为完整格式(yyyy-MM-dd HH:mm:ss)日期对象
 *
@@ -324,6 +364,16 @@ String haomiao = String.valueOf(System.nanoTime());
 str = str + haomiao.substring(haomiao.length() - 6, haomiao.length());
 return str.substring(str.length() - t, str.length());
 }
+public static int getYear(Date date){
+	Calendar cal=Calendar.getInstance();
+	cal.setTime(date);
+	return cal.get(Calendar.YEAR);
+}
+public static int getMonth(Date date){
+	Calendar cal=Calendar.getInstance();
+	cal.setTime(date);
+	return cal.get(Calendar.MONTH);
+}
 public static Date getFirstDayOfYear(Date date){
 	Calendar cal=Calendar.getInstance();
 	cal.setTime(date);
@@ -336,6 +386,12 @@ public static Date getFirstDayOfYear(int year){
 	int firstDay=cal.getActualMinimum(Calendar.DAY_OF_YEAR);
 	cal.set(Calendar.DAY_OF_YEAR, firstDay);
 	return cal.getTime();
+}
+public static Date getLastDayOfYear(Date date){
+	Calendar cal=Calendar.getInstance();
+	cal.setTime(date);
+	int year=cal.get(Calendar.YEAR);
+	return getLastDayOfYear(year);
 }
 public static Date getLastDayOfYear(int year){
 	Calendar cal=Calendar.getInstance();
@@ -364,16 +420,9 @@ public static Date getFirstDayOfMonth(int year,int month){
     return cal.getTime();  
 } 
 public static Date getLastDayOfMonth(int year,int month){  
-    Calendar cal = Calendar.getInstance();  
-    //设置年份  
-    cal.set(Calendar.YEAR,year);  
-    //设置月份  
-    cal.set(Calendar.MONTH, month-1);  
-    //获取某月最大天数  
-    int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);  
-    //设置日历中月份的最大天数  
-    cal.set(Calendar.DAY_OF_MONTH, lastDay);  
- 
+    Calendar cal = Calendar.getInstance(); 
+    cal.setTime(getFirstDayOfMonth(year,month));
+    cal.roll(Calendar.DATE, -1);
     return cal.getTime();  
 }  
 /**

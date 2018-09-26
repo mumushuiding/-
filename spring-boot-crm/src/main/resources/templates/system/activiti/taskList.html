@@ -56,77 +56,139 @@
     
     <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
     
+    <script th:src="${urls.getForLookupPath('/js/plugins/ajaxfileupload.js')}"></script>
+    
     <div class="container">  
         <ul  class="nav nav-tabs">
-			<li id="candidate"><a href="/system/activiti/taskList/candidate" data-toggle="tab">待办</a>
-				
-			</li>
-			<li id="historyAssignee"><a href="/system/activiti/taskList/historyAssignee" data-toggle="tab">历史审批纪录</a>
-				 
-			</li>
-			
+			<!-- <li id="candidate"><a href="/system/activiti/taskList/candidate" data-toggle="tab">待办</a></li> -->
+			<li id="leader"><a href="/system/activiti/taskList/leader" data-toggle="tab">领导组待办</a></li>
+			<li id="assessGroups"><a href="/system/activiti/taskList/assessGroups" data-toggle="tab">考核组待办</a></li>
+			<li id="historyAssignee"><a href="/system/activiti/taskList/historyAssignee" data-toggle="tab">历史审批纪录</a></li>
+			<li id="historyPass"><a href="/system/activiti/taskList/historyPass" data-toggle="tab">通过纪录</a></li>
+			<li id="historyReject"><a href="historyReject" data-toggle="tab">驳回纪录</a></li>
 		</ul>
+		
 		<div  class="tab-content">
 			 <div class="tab-pane fade in active" id="home">
 			  <nav class="navbar navbar-default" role="navigation">
 			   <div class="container-fluid">
 			     <div class="navbar-header">
-			       <a class="navbar-brand" href="#">搜索任务名</a>
+			       <a class="navbar-brand" href="#">搜索</a>
 			     </div>
 			
 			     <div class="navbar-form navbar-left" role="search">
 
 			
 			       <div class="input-group">
-			         <input type="text" class="form-control" placeholder="Search" id="taskName"/>
-			
-			         <div class="input-group-btn">
-			           <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+			         <div class="form-group"  >
+					      <select id="second" class="form-control" title="请选择部门"  th:value="${second}">
+					        
+					        <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+					      </select>
+					       <select id="firstDept" class="selectpicker" data-live-search="true" title="(未选择就查询全部)" th:value="${firstDept}"  multiple="multiple">
+					         
+					        </select>
 			         </div>
+			         
+			          <div class="form-group">
+				          	 <select id="posts" class="selectpicker"  title="请选择职级"  multiple="multiple">
+				          	   
+			         			<option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}" th:if="${p.name} ne '高层正职' and ${p.name} ne '高层副职'"></option>
+			                </select>
+				     </div>
+			         <div class="form-group">
+			         	 <input type="text" class="form-control" placeholder="按人名探索" id="taskName"/>
+			         </div>
+			        
+	                 
+				        <button id="search_btn" class="btn btn-default">搜索</button>
+				     </div>
 			       </div>
-			       <button type="search_btn" class="btn btn-default">搜索</button>
-			
-			     </div>
+
 			         
 			   </div>
 			   <!-- .container-fluid -->
 			 </nav>
 			
 			   <!-- 工具栏 -->
-			  <div id="toolbar" class="btn-group pull-right" style="margin-right: 20px;">
-			    <button id="btn_power" type="button" class="btn btn-default">
-			        <span class="glyphicon glyphicon-pencil" aria-hidden="true" ></span>权限
-			    </button>
-			    <button id="btn_users" type="button" class="btn btn-default">
-			        <span class="glyphicon glyphicon-pencil" aria-hidden="true" ></span>用户
-			    </button>
-			    <button id="btn_update" type="button" class="btn btn-default">
-			        <span class="glyphicon glyphicon-pencil" aria-hidden="true" ></span>修改
-			    </button>
-			    <button id="btn_delete" type="button" class="btn btn-default" >
-			        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
-			    </button>
-			    <button id="btn_add" type="button" class="btn btn-default">
-			        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
-			    </button>
+			  <div id="toolbar" class="btn-group pull-right" >
+                 <div class="form-inline"  >
+		          	 <select id="totalMarkNeZero" class="selectpicker"  title="按加减分筛选" >
+		          	    <option value=''>---查询所有员工---</option>
+	         			<option value='false'>---只查询无加减分---</option>
+	         			<option value='true'>---只查询有加减分---</option>
+	                </select>
+				 
+					 <button id="btn_importHalfYear" type="button" class="btn btn-primary" >
+				        <span class="glyphicon glyphicon-plus" aria-hidden="true">导入群众评议结果</span>
+				    </button>
+				    <button id="btn_updateYear" type="button" class="btn btn-danger">
+				        <span class="glyphicon glyphicon-plus" aria-hidden="true">批量修改半年、全年考核结果</span>
+				    </button>
+				    <button id="btn_importMarks" type="button" class="btn btn-success" >
+				        <span class="glyphicon glyphicon-plus" aria-hidden="true">导入加减分</span>
+				    </button>
+			    </div>
 			  </div>
 			  <!-- /工具栏 -->
 			  <table id="mytab" class="table table-hover"></table>
+			   <input type="file" name="file" id="file"  style="display:none"/> 
 			</div>
 			
 		</div>
-    
-    
 
 </div>
     <script th:inline="javascript">
+    //<![CDATA[
     //根据窗口调整表格高度
     $(window).resize(function() {
         $('#mytab').bootstrapTable('resetView', {
             height: tableHeight()
         })
-    })
+    });
+
+
 //生成用户数据
+//bootstrapTable保存pageIndex
+    var state={};
+    
+    //读取session值 
+   var second_session=[[${session.second}]];
+   var firstDept_session=[[${session.firstDept}]];
+   var posts_session=[[${session.posts}]];
+   var totalMarkNeZero_session=[[${session.totalMarkNeZero}]];
+   if(firstDept_session) state.firstDept=firstDept_session;
+  
+   if(totalMarkNeZero_session){
+      state.totalMarkNeZero=totalMarkNeZero_session;
+
+   }
+   if(posts_session){
+    	state.posts=posts_session;
+ 
+   }
+   if(second_session){
+   		$('#second').val(second_session);
+   		getfirstDept($("#second").val(),state);
+   }
+
+ 
+    if(window.history.state){
+    	state=window.history.state;
+
+    	if($('#second').val()!=""){
+	        getfirstDept($("#second").val(),state);
+	    }else{
+	    	//$('#totalMarkNeZero').selectpicker('val',state.totalMarkNeZero);
+            //$('#totalMarkNeZero').selectpicker('refresh');
+	    }
+    }else{
+    	state={
+    		'pageIndex':1,
+    		'pageSize':10,
+    	};
+    	window.history.pushState(state,'taskList',[[${taskType}]]);
+    }
     $('#mytab').bootstrapTable({
         method: 'post',
         contentType: "application/x-www-form-urlencoded",//必须要有！！！！
@@ -134,18 +196,18 @@
         //height:tableHeight(),//高度调整
         toolbar: '#toolbar',//指定工具栏
         striped: true, //是否显示行间隔色
-        pageNumber: 1, //初始化加载第一页，默认第一页
+        pageNumber: window.history.state.pageIndex, //初始化加载第一页，默认第一页
         pagination:true,//是否分页
         queryParamsType:'limit',//查询参数组织方式
         queryParams:queryParams,//请求服务器时所传的参数
         sidePagination:'server',//指定服务器端分页
-        pageSize:10,//单页记录数
+        pageSize:window.history.state.pageSize,//单页记录数
         pageList:[5,10,20,30],//分页步进值
         showRefresh:true,//刷新按钮
         showColumns:true,
         clickToSelect: true,//是否启用点击选中行
-        toolbarAlign:'right',//工具栏对齐方式
-        buttonsAlign:'right',//按钮对齐方式
+        toolbarAlign:'left',//工具栏对齐方式
+        buttonsAlign:'left',//按钮对齐方式
         toolbar:'#toolbar',//指定工作栏
         columns:[
             {
@@ -200,6 +262,7 @@
             	title:'申请日期',
             	field:'requestedDate',
             },
+
             {
                 title:'流程定义',
                 field:'businessKey',
@@ -234,6 +297,7 @@
 	    if(row.businessType=='一线干部-月度考核') businessType="month";
 	    if(row.businessType=='一线干部责任清单') businessType="res";
 	    if(row.businessType=='一线干部-年度考核') businessType="fullYear";
+	    if(row.businessType=='一线干部-半年考核') businessType="halfYear";
         var committed=row.committed;
         var completed=row.completed;
         
@@ -243,19 +307,19 @@
         if(completed==="1"){
 	        return [  
 	        	'<span class="btn btn-default">已结束</span>',
-	            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"/>查阅</a>',
+	            
 	            
 	        ].join('');
         }
-        if(taskType=="candidate"){
+        if(taskType=="candidate"||taskType=="assessGroups"||taskType=="leader"){
         	return [  
-            '<a id="claim" href="/system/activiti/claim/'+row.taskId+'/'+row.businessType+'" class="btn btn-default"><span class="glyphicon glyphicon-hand-right"/>查阅</a>',
+            
             '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"/>查看进度</a>',
             ].join('');
         }
-        if(taskType=="historyAssignee"){
+        if(taskType=="historyAssignee"||taskType=="historyPass"||taskType=="historyReject"){
         	return [  
-           '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"/>查阅</a>',
+           
 	        '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"/>查看进度</a>',
             '<a  href="/system/activiti/withdrawTask/'+row.processInstanceId+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>撤回</a>',
             ].join('');
@@ -265,15 +329,25 @@
         
         var params=row.processInstanceId+","+row.executionId;
         var taskType=[[${taskType}]];
-	    var businessType="";
-	    if(row.businessType=='一线干部-月度考核') businessType="month";
-	    if(row.businessType=='一线干部责任清单') businessType="res";
-	    if(row.businessType=='一线干部-年度考核') businessType="fullYear";
-        if(taskType=="candidate"){
-        	return ['<a id="claim" href="/system/activiti/claim/'+row.taskId+'/'+row.businessType+'" >'+row.title+'</a>',
+	   
+	    var businessTypes=["一线干部-月度考核","一线干部责任清单","一线干部-年度考核","一线干部-半年考核"];
+	    var types=["month","res","fullYear","halfYear"];
+	    
+	    var businessType=row.businessType;
+	    var des="/process/activiti";
+        for(x in businessTypes){
+        	if(row.businessType==businessTypes[x]){
+        		businessType=types[x];
+        		des="/system/activiti";
+        		break;
+        	}
+        }
+        
+        if(taskType=="candidate"||taskType=="assessGroups"||taskType=="leader"){
+        	return ['<a id="claim" href="'+des+'/perform/'+row.taskId+'?buisinessType='+row.businessType+'&processInstanceId='+row.processInstanceId+'">'+row.title+'</a>',
             ].join('');
         }
-        if(taskType=="historyAssignee"){
+        if(taskType=="historyAssignee"||taskType=="historyPass"||taskType=="historyReject"){
         	return [  
            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" >'+row.title+'</a>',
 	       ].join('');
@@ -284,16 +358,31 @@
     }
     //请求服务数据时所传参数
     function queryParams(params){
+    state = { 
+        'pageIndex':params.pageNumber, 
+        'pageSize':params.limit,
+        'firstDept':$('#firstDept').val().join(','),
+        
+        };
+        window.history.replaceState(state,'taskList',[[${taskType}]]);
         return{
             //每页多少条数据
             pageSize: params.limit,
             //请求第几页
             pageIndex:params.pageNumber,
-            taskName:$('#taskName').val()
+            taskName:$('#taskName').val(),
+            posts:$('#posts').val().join(','),
+            firstDept:$('#firstDept').val().join(','),
+            second:$('#second').val(),
+            totalMarkNeZero:$('#totalMarkNeZero').val(),
         }
     }
+       //当搜索框中的值 改变时 自动刷新
+
+
      //查询按钮事件
     $('#search_btn').click(function(){
+      
         $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listTask/'+[[${taskType}]]});
     })
     //tableHeight函数
@@ -303,39 +392,7 @@
     }
     
 
-    
-    //查看权限
-    $('#btn_power').click(function(){
-    	var dataArr=$('#mytab').bootstrapTable('getSelections');
-    	
-    	location.href="/system/power/syspower/userPower/"+dataArr[0].id;
-    	//window.open("/system/power/syspower/userPower/"+dataArr[0].id,"_blank");
-    });
-        //对应用户组下的用户
-    $('#btn_users').click(function(){
-    	var dataArr=$('#mytab').bootstrapTable('getSelections');
-    	if(!dataArr) alert("请先勾选一行");
-    	location.href="/system/power/syspower/userInGroup/"+dataArr[0].groupid;
-    	
-    });
-    //更新用户信息
-    $('#btn_update').click(function(){
-    	var dataArr=$('#mytab').bootstrapTable('getSelections');
-    	if(!dataArr) alert("请先勾选一行");
-    	location.href="/system/power/syspower/updateGroupForm/updateGroup/"+dataArr[0].groupid;
-    });
-    //删除用户
-    $('#btn_delete').click(function(){
-    	var dataArr=$('#mytab').bootstrapTable('getSelections');
-    	if(!dataArr) alert("请先勾选一行");
-    	location.href="/system/power/syspower/deleteGroup/"+dataArr[0].groupid;
-    });
-    //添加新用户
-    $('#btn_add').click(function(){
-    	
-    	location.href="/system/power/syspower/addGroupForm";
-    });
-    
+   
     var taskType = [[${taskType}]];
     $("#" + taskType).attr("class", "active");
     $("li").each(function(){
@@ -346,7 +403,164 @@
     	});
     });
     
-    if([[${msg}]]) alert([[${msg}]]);
+    var msg=[[${msg}]];
+    	if(msg) {
+    	
+    	   alert(msg);
+    	   msg==null;
+    	
+    	};
+    
+    
+     //修改部门
+	$('#second').change(function(){
+	  
+		getfirstDept($('#second').val());   
+	});
+
+	 //一级子部门改变时查询
+   	 $('#firstDept').change(function(){
+   	    
+   	 	 $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listTask/'+[[${taskType}]]});
+   	 });
+   	 $('#posts').change(function(){
+   	    
+   	 	 $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listTask/'+[[${taskType}]]});
+   	 });
+     $('#totalMarkNeZero').change(function(){
+   	    
+   	 	 $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listTask/'+[[${taskType}]]});
+   	 });
+   	 //查询一级部门
+     function getfirstDept(second,state){
+       $.ajax({
+		  type: 'POST',
+		  url: "/user/selectFirstLevelDept/"+second+"?param=name",
+		  dataType: "text",
+		  success: function(data){
+
+		        $("#firstDept").html(data);
+
+		        if(second){
+		        //判断 history.state里面是否有值,有值就加载历史页面
+		          if(state){
+		          	if(state.posts){
+		            	$('#posts').selectpicker('val',state.posts.split(','));
+		            }
+                    if(state.totalMarkNeZero){
+                         $('#totalMarkNeZero').selectpicker('val',state.totalMarkNeZero);
+                    }
+		          	if(state.firstDept) {
+                         $('#firstDept').selectpicker('val',state.firstDept.split(','));
+                     }
+		          }
+		          $(".selectpicker").selectpicker('refresh'); 
+                  $('#mytab').bootstrapTable('refreshOptions',{pageNumber:state.pageIndex});  
+                     
+
+		        }
+		        
+		  }
+		 
+		});
+     }
+   //查询总分
+     function getTotalMark(userId,processInstanceId){
+        
+     	$.ajax({
+     		type:'post',
+     		url:'/responsibility/selectTotalMark?userId='+userId+'&processInstanceId='+processInstanceId,
+     		dataType:'text',
+     		success:function(data){
+     			return data;
+     		}
+     	});
+     }
+   //导入文件
+    var groups=[[${session.sysuser.userLinkGroup}]];
+
+    //判断是否属于考核组和考核办
+    function check1(groups){
+    	for(x in groups){
+           
+       		if(groups[x].groupTable.groupname.indexOf('考核')!=-1){
+       			
+       			return true;
+       		}
+        }
+        return false;
+    }
+    //判断是否属于考核办
+    function check2(groups){
+    	for(x in groups){
+           
+       		if(groups[x].groupTable.groupname.indexOf('考核办')!=-1){
+       			
+       			return true;
+       		}
+        }
+        return false;
+    }
+    $('#btn_updateYear').click(function(){
+        if(!check2(groups)){
+        	alert('只有考核办成员，才有此权限');
+        	return;
+        }
+        if(confirm("是否下载模板,【确定】下载模板，【取消】导入文件")){
+            location.href="/file/download?filename=/www/spring-boot-crm/upload/public/半年、全年考评批量修改模板.xls";
+        	
+        }else{
+        	$("#file").val("");//先清空原有内容，这样可以重复提交可以触发onchange事件
+    	    $("#file").attr("onchange","upload1('/file/upload/assessment/updateYear');");
+    	    $("#file").click();
+        }
+        
+    });
+    $('#btn_importHalfYear').click(function(){
+       if(!check1(groups)){
+        	alert('只有考核办和考核组成员，才有此权限');
+        	return;
+        }
+        if(confirm("是否下载模板,【确定】下载模板，【取消】导入文件")){
+            location.href="/file/download?filename=/www/spring-boot-crm/upload/public/群众评议导入表.xls";
+        	
+        }else{
+        	$("#file").val("");//先清空原有内容，这样可以重复提交可以触发onchange事件
+    	    $("#file").attr("onchange","upload1('/file/upload/assessment/data/halfYear');");
+    	    $("#file").click();
+        }
+        
+    });
+     $('#btn_importMarks').click(function(){
+       if(!check1(groups)){
+        	alert('只有考核办和考核组成员，才有此权限');
+        	return;
+        }
+        if(confirm("加减分需要在月度考核审批之前导入,否则不会生效！！\n是否下载模板,【确定】下载模板，【取消】导入文件")){
+            location.href="/file/download?filename=/www/spring-boot-crm/upload/public/加减分后台导入模板.xls";
+        	
+        }else{
+        	$("#file").val("");//先清空原有内容，这样可以重复提交可以触发onchange事件
+    	    $("#file").attr("onchange","upload1('/file/uploadProjectAndMark?completed=0');");
+    	    $("#file").click();
+        }
+     	
+        
+    });
+    function upload1(url){
+        
+    	$.ajaxFileUpload({
+    		url:url,
+    		secureuri: false, //是否需要安全协议，一般设置为false
+    		fileElementId:'file',//id
+    		dataType:'text',//返回值
+    		success:function(data,status){
+    			
+    			alert(data);
+    		}
+    	});
+    }
+     //]]>
     </script>
 
   </body>

@@ -13,12 +13,13 @@ public class UserLinkDept implements Serializable{
 	
     
     
+	
+
 	@Override
 	public String toString() {
 		return "UserLinkDept [id=" + id + ", userId=" + userId + ", firstLevel=" + firstLevel + ", secondLevel="
 				+ secondLevel + ", thirdLevel=" + thirdLevel + ", firstLevelIds=" + firstLevelIds + "]";
 	}
-
 	public String getFirstLevelIds() {
 		return firstLevelIds;
 	}

@@ -63,9 +63,9 @@
               </div>
                <div class="form-group">
 			      <select  class="form-control" th:field="*{processBean.deptName}" th:value="*{processBean.deptName}">
-			        
+			        <option th:each="d,dStat:${session.sysuser.userLinkDepts}" th:value="${d.secondLevel.name}" th:text="${d.secondLevel.name}" th:if="${dStat.index} eq 1"></option>
 			        <option th:each="d,dStat:${session.sysuser.userLinkDepts}" th:value="${d.firstLevel.name}" th:text="${d.firstLevel.name}" th:if="${d.firstLevel.name!='0'}"></option>
-			        <option th:each="d,dStat:${session.sysuser.userLinkDepts}" th:value="${d.secondLevel.name}" th:text="${d.secondLevel.name}"></option>
+			        
 			        
 			      </select>
                </div>

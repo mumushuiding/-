@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>一线考核系统</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+     
+    <link href="/css/grid.css" rel="stylesheet"/>
+
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+
+    
+    
+       <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    <!-- autosize -->
+      <script th:src="${urls.getForLookupPath('/js/plugins/autosize.js') }"></script>
+    <!-- 前端打印 -->
+    <script src="/js/plugins/jQuery.print.js"></script>
+
+  </head>
+  
+<body>
+<style>
+	textarea{
+        display: table-cell; vertical-align: middle;
+		resize : none;
+
+
+	}
+</style>
+
+
+  <div id="content" class="container" >
+     <form id="f1" method="post"  th:object="${pojo}">
+     	<input type="hidden" name="token" th:value="${session.token}" />
+		 <input type="text" th:value="*{processBean.deploymentId}" th:field="*{processBean.deploymentId}" style="display:none;"/>
+         <input type="text" th:value="*{processBean.businessKey}" th:field="*{processBean.businessKey}" style="display:none;"/>
+         <input type="text" th:value="*{processBean.processInstanceId}" th:field="*{processBean.processInstanceId}" style="display:none;"/>
+         <input type="text" th:value="*{processBean.businessType}" th:field="*{processBean.businessType}" style="display:none;"/>
+         <input type="text" th:value="*{processBean.user.username}" th:field="*{processBean.user.username}" style="display:none;"/>
+         <input type="text" th:value="*{processBean.user.id}" th:field="*{processBean.user.id}" style="display:none;"/>
+         <input type="text" th:value="*{processBean.title}" th:field="*{processBean.title}" style="display:none;"/>
+    	<div class="row">
+	    	<div class="page-header">
+	          <h1 style="text-align:center;">添加部门申请</h1>
+	        </div>
+    	</div>
+    	<div class="row">
+    		<div class="FlexRow">
+    			<div class="FlexItem FlexItem-md-5">
+    		                  <p>申请人部门</p>
+    			</div>
+    			<div class="FlexItem FlexItem-md-8 ">
+    			 
+    			
+				      <select   th:field="*{processBean.deptName}" th:value="*{processBean.deptName}" th:if="*{processBean.deptName==null}">
+				        <option th:each="d,dStat:${session.sysuser.userLinkDepts}" th:value="${d.secondLevel.name}" th:text="${d.secondLevel.name}" th:if="${dStat.index} eq 1"></option>
+				        <option th:each="d,dStat:${session.sysuser.userLinkDepts}" th:value="${d.firstLevel.name}" th:text="${d.firstLevel.name}" th:if="${d.firstLevel.name!='0'}"></option>
+				        
+				        
+				      </select>
+                     <input type="text" class="form-control" th:field="*{processBean.deptName}" th:value="*{processBean.deptName}" th:if="*{processBean.deptName!=null}" readOnly="true" style="height:100%;"/>
+    		    
+    			</div>
+    			<div class="FlexItem FlexItem-md-5">
+    		            <p> 填表日期:</p>
+    			</div>
+    			<div class="FlexItem FlexItem-md-7">
+    		        <input type="text" class="form-control" th:value="*{processBean.requestedDate}" th:field="*{processBean.requestedDate}" readOnly="true" style="height:100%;"/>	
+    			</div>
+    		</div>
+    		
+    	</div>
+   
+    	<div class="row">
+    		<div class="FlexColumn">
+  		           <div class="FlexRow">
+				    	<div class="FlexItem FlexItem-md-3"><p>部门层级</p></div>
+				    	<div class="FlexItem FlexItem-md-8"><p>顶级部门</p></div>
+				    	<div class="FlexItem FlexItem-md-7"><p>二级部门</p></div>
+				    	<div class="FlexItem FlexItem-md-7"><p>子部门</p></div>
+				 </div>
+    		
+    		</div>
+    	</div>
+    	<div class="row">
+    		<div class="FlexColumn">
+  		           <div class="FlexRow">
+				    	<div class="FlexItem FlexItem-md-3">
+				    		<select  id="level" th:value="*{department.level}" th:field="*{department.level}" style="background-color:azure;border: black;">
+				    			<option value="">请先选择层级</option>
+				    			<option value="first">子部门</option>
+				    			<option value="second">二级部门</option>
+				    			<option value="third">顶级部门</option>
+				    		</select>
+				    	</div>
+				    	<div class="FlexItem FlexItem-md-8" id="3">
+				    		<select id="third" th:value="*{department.thirdId}" th:field="*{department.thirdId}" >
+				    			<option value=""></option>
+				    			<option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+				    		</select>
+				    	</div>
+				    	<div class="FlexItem FlexItem-md-7" id="2">
+				    		<select id="second" th:value="*{department.secondId}" th:field="*{department.secondId}" >
+				    			<option value=""></option>
+				    			<option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+				    		</select>
+				    	</div>
+				    	<div class="FlexItem FlexItem-md-7" id="1">
+				    		<select id="first" th:value="*{department.firstId}" th:field="*{department.firstId}" disabled="disabled">
+				    			<option value=""></option>
+				    			<option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+				    		</select>
+				    	</div>
+				    	
+				    	
+				 </div>
+    		
+    		</div>
+    	</div>
+    	 <div class="row" th:each="c:${comments}">
+    	 	<div class="FlexRow">
+    			<div class="FlexItem FlexItem-md-3">
+    				<p th:text="${c.userId}"></p>
+    			</div>
+    			
+    			<div class="FlexItem FlexItem-md-22">
+    				<textarea  class="form-control input-lg" placeholder="" rows="" cols="" th:text="${c.fullMessage}" readOnly="true"   style="vertical-align:middle;"></textarea>
+    			</div>
+    		</div>
+
+      
+          </div>
+    	<div class="row">
+    		  <div class="FlexRow">
+    			<div class="FlexItem FlexItem-md-3">
+    				<p>备注</p>
+    			</div>
+    			
+    			<div class="FlexItem FlexItem-md-22">
+    				<textarea  class="form-control input-lg" placeholder="" rows="" cols="" th:value="*{comment}" th:field="*{comment}" required="true"  style="vertical-align:middle;"></textarea>
+    			</div>
+    		</div>
+    	</div>
+    	
+
+    	<div class="row text-center">
+           <button  id="submit" type="submit" class="btn btn-lg btn-success">提交</button>
+           <button  id="save" type="submit" class="btn btn-lg btn-default">保存</button>
+        </div>
+	  </form>
+</div>
+    <script th:inline="javascript">
+    //<![CDATA[
+       //设置textarea高度
+        //autosize(document.querySelectorAll('textarea'));
+  var identity=[[${identity}]]; 
+
+console.log(identity);
+  if(identity){
+      
+  }else{
+       	 $("#submit").hide();
+       	 $("#save").hide();
+       	 
+  }
+
+ $("#submit").click(function(){
+          
+     $("#f1").attr("action","/process/activiti/start/others/complete?businessType="+[[${pojo.processBean.businessType}]]);
+     $("#f1").submit();
+
+ }); 
+  $("#save").click(function(){
+          
+     $("#f1").attr("action","/process/activiti/start/others/save?businessType="+[[${pojo.processBean.businessType}]]);
+     $("#f1").submit();
+
+ }); 
+var actionType=[[${actionType}]];
+
+var taskId=[[${taskId}]];
+if(actionType=="perform"){
+        $('#alert').hide();
+        $('#f1').show();
+        
+  	    $("#submit").html('通过');
+  	    $("#save").html('驳回');
+  	    $("#submit").click(function(){
+         
+          $("#f1").attr("action","/process/activiti/complete/"+[[${pojo.processBean.businessType}]]+"/"+taskId+"/true");
+  		    $("#f1").submit();
+   	
+
+  	  });
+   	$("#save").click(function(){
+   		$("#f1").attr("action","/process/activiti/complete/"+[[${pojo.processBean.businessType}]]+"/"+taskId+"/false");
+   		$("#f1").submit();
+   	});
+}
+//刷新select值 
+
+console.log([[${pojo.department.thirdId}]]);
+if([[${pojo.department.level}]]){
+	
+	//$('#'+[[${pojo.department.level}]]).val([[${pojo.department.name}]]);
+	$('#'+[[${pojo.department.level}]]).parent('div').html('<input type="text" id="department.name" name="department.name" value="'+[[${pojo.department.name}]]+'" class="" placeholder="请输入部门名字" required="true"></input>');
+}
+//选择部门
+$('#level').change(function(){
+   
+    var level=$(this).val();
+    //如果添加的是顶级部门
+    if(level=="third"){
+    	$('#3').html('<input type="text"  name="department.name" placeholder="请输入部门名字" required="true"></input>');
+    	$('#2').html('');
+    	$('#1').html('');
+    	return;
+    }
+	//如果添加的是二级部门
+	if(level=="second"){
+		getDept("third","3");
+    	
+    	$('#2').html('<input type="text" name="department.name" class="" placeholder="请输入部门名字" required="true"></input>');
+    	$('#1').html('');
+    	return;
+    }
+    //如果添加的是子部门
+	if(level=="first"){
+		getDept("third","3");
+    	getSecondDept("2");
+    	
+    	$('#1').html('<input type="text" name="department.name" class="" placeholder="请输入部门名字" required="true"></input>');
+    	return;
+    }
+	
+}); 
+function getSecondDept(destinationId){
+	$.ajax({
+		type:'post',
+		url:'/user/selectDistinctSecondLevelDept',
+		dataType:'json',
+		success:function(data){
+			var opts='';
+			for(x in data){
+				
+				opts+='<option value="'+data[x].did+'">'+data[x].name+'</option>';
+			}
+			$('#'+destinationId).html('<select name="department.secondId" required="true">'+opts+'</select>');
+		}
+	});
+}
+function getDept(level,destinationId){
+	$.ajax({
+		type:'post',
+		url:'/user/selectAllDepts?level='+level,
+		dataType:'json',
+		success:function(data){
+		    var opts='';
+			for(x in data){
+				
+				opts+='<option value="'+data[x].did+'">'+data[x].name+'</option>';
+			}
+			
+			$('#'+destinationId).html('<select name="department.thirdId" required="true">'+opts+'</select>');
+		}
+	});
+}
+function getUser(phone,id){
+	   $.ajax({
+    	type:'post',
+    	url:'/user/findUser/'+phone,
+    	dataType:'json',
+    	success:function(data){
+    		if(data==null) {alert('电话不存在，是否输入有误？');return;}
+    		var pre=id.split('.')[0];
+    		document.getElementById(pre+'.username').value=data.username;
+    		
+    		document.getElementById(pre+'.id').value=data.id;
+    		
+    		if(data.userLinkDepts.length>1){
+    			document.getElementById(pre+'.position').value=data.userLinkDepts[0].secondLevel.name;
+    		}else{
+    			document.getElementById(pre+'.position').value=data.userLinkDepts[0].firstLevel.name;
+    		}
+    		
+    		
+    		
+    		
+    	}
+    });
+}     
+ 
+
+//]]>
+       
+    </script>
+</body>
+</html>

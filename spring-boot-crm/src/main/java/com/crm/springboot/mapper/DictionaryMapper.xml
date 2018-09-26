@@ -5,6 +5,20 @@
   <!-- 指向UserMapper.xml文件 -->
   
 <mapper namespace="com.crm.springboot.mapper.DictionaryMapper">
+   <cache flushInterval="60000" readOnly="true" size="512"></cache>
+    <update id="updateDic" parameterType="dictionary">
+    	update  info_dic
+    	<set>
+    		<if test="type!=null and type!=''">type=#{type},</if>
+    		<if test="value!=null and value!=''">value=#{value},</if>
+    		<if test="name!=null and name!=''">name=#{name}</if>
+    	</set>
+    	where id=#{id}
+    
+    </update>
+    <select id="selectDictionaryWithId" parameterType="string" resultType="dictionary">
+    	select * from info_dic where id=#{id}
+    </select>
     <select id="selectDistinctNameWithType" parameterType="string" resultType="string">
     	select distinct name from info_dic where type=#{type}
     </select>

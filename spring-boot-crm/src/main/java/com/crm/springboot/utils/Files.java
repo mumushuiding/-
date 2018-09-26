@@ -11,7 +11,8 @@ import com.google.gson.Gson;
 
 
 public class Files {
-	private  ArrayList<String> fileList=new ArrayList<String>();
+	private  List<String> fileList=new ArrayList<String>();
+	
 	public  void getFiles(String pathname){
 		File root=new File(pathname);
 		String rootPath=root.getAbsolutePath();
@@ -26,7 +27,7 @@ public class Files {
 			}
 		}
 	}
-
+  
 	public  List<String> getFileList() {
 	
 		return fileList;

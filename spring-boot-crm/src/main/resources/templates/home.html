@@ -1,386 +1,799 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8"/>
-<title>一线考察系统</title>
-<style type="text/css">
-body, ul, li, p, span, h1, h2, img, div, footer, header, section, aside, dl, dt, dd, a, form, input, textarea, i { margin:0; padding:0; border:0; }
-body { font-size:14px; color:#333; font-family:"Microsoft YaHei", "微软雅黑", "SimSun", "宋体", "Arial Narrow"; background:#fff; }
-ul, ol, li { list-style-type:none; }
-select, input, img { vertical-align:middle; }
-a { text-decoration:none; color:#333; }
-a:hover, a:active, a:focus { text-decoration:underline; }
-.clean:after { display: block; clear: both; content: ""; visibility: hidden; height: 0; }
-.clean { zoom: 1; }
-.mainbox { width: 1205px; margin: 0px auto; padding-bottom: 100px; box-shadow: 0px 0px 30px 5px darkgrey; }
-.main { width: 1000px; margin: 0px auto; }
-.parta { margin-bottom: 50px; }
-.parta .nav{ width:1205px; height:40px; line-height:40px; font-size: 18px; background:#C8000B; color:#FFFFFF; }
-.parta .nav a{line-height:40px; font-size: 18px; color:#FFFFFF; text-align:center;}
 
-.partb { margin-bottom: 20px; }
-.partb .left { width: 640px; float: left; }
-.partb .left .tit { font-size: 18px; background: url(/images/home/bkmore.jpg) no-repeat 0px center; padding-right: 40px; padding-left: 16px; margin-bottom: 10px; }
-.partb .left .tit a { text-decoration: none; color: #c6010b; display: block; }
-.partb .left ul { margin-bottom: 30px; }
-.partb .left ul li { line-height: 30px; width: 126px; float: left; }
-.partb .left ul li span { margin-right: 14px; }
-.partb .right { width: 358px; float: right; padding-bottom: 10px; border: 1px solid #e0e0e0; }
-.partb .right .tit { background: #f4f3ef url(/images/home/ggl.png) no-repeat center center; height: 50px; margin-bottom: 10px; }
-.partb .right ul li { line-height: 40px; background: url(/images/home/dian.png) no-repeat 0px center; padding-left: 20px; margin-left: 26px; }
-.partc { margin-bottom: 50px; }
-.partc .left, .partc .right { width: 486px; height: 342px; float: left; }
-.partc .left { background: url(/images/home/bj2.jpg) no-repeat left top; margin-right: 22px; }
-.partc .left .tit { background: url(/images/home/bt1.png) no-repeat center 24px; height: 76px; }
-.partc .left table { color: #FFF; background-color: #fdd494; }
-.partc .left tr { line-height: 30px; background-color: #cf1a29; }
-.partc .left td { text-align: center; }
-.partc .left .more { display: block; width: 90px; height: 20px; margin: 14px auto 0px; }
-.partc .right { line-height: 30px; color: #FFF; background: url(/images/home/bj3.jpg) no-repeat left top; }
-.partc .right .tit { height: 70px; }
-.partc .right p { padding-left: 61px; }
-.partc .right .p2 { text-indent: 56px; }
-.partd .tit { line-height: 30px; color: #c8000d; background: #f0f0f0 url(/images/home/bk2.jpg) no-repeat left center; height: 30px; padding-left: 26px; margin-bottom: 20px; }
-.partd .tit a { text-decoration: none; color: #c8000d; background-color: #FFF; float: left; cursor: pointer; }
-.partd .tit .default1, .partd .tit .default2 { font-size: 18px; }
-.partd .tit .active1, .partd .tit .active2 { font-size: 24px; }
-.partd .tit span { font-size: 24px; background-color: #FFF; float: left; }
-.partd .set { height: 30px; padding-left: 30px; margin-bottom: 20px; position: relative; }
-.partd .set select { background: url(/images/home/xiala.jpg) no-repeat 55px center; width: 98px; height: 30px; float: left; border: 1px solid #949494; }
-.partd .set span { background-color: #FFF; width: 20px; height: 30px; position: absolute; top: 0px; z-index: 66; }
-.partd .set .sp1 { left: 108px; }
-.partd .set .sp2 { left: 206px; }
-.partd .set .chaxun { background: url(/images/home/chaxun.jpg) no-repeat left top; width: 87px; height: 30px; float: left; cursor: pointer; }
-.partd tr { height: 40px; }
-.partd th { font-size: 18px; }
-.partd td { text-align: center; }
-
-	.examples pre {
-		margin-top: 0;
-	}
-	
-	.marquee .author {
-		display: none;
-	}
-	
-	.marquee-author {
-		float: left; 
-		width: 90px; 
-		text-align: right; 
-		padding: 4px 5px 1px 0;
-	}
-table,td,tr,th{
-	border:solid 1px black;
-	
-	
-}
-tr{
-	height:38px;
-}
-table{
-	height:300px;
+<title>一线考核系统</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=yes"/>
+<link href="/css/common.css" rel="stylesheet" type="text/css" />
+<style  type="text/css">
+.top { background: url(/images/top.jpg) no-repeat center top; width: 1200px; height: 50px; padding-top: 146px; margin: 0px auto; box-shadow: 0px -10px 30px 5px #999999; }
+.top p { line-height: 50px; float: left; }
+.tb { font-size: 20px; background-color: #367fa9; text-align: center; width: 130px; }
+.tb a { color: #FFF; text-decoration: none; }
+.gg { font-size: 16px; color: #FFF; background-color: #3c8dbc; width: 1070px; height: 50px; line-height: 50px; float: left; }
+@media screen and (max-width:721px) {
+.top { background: url(/images/top2.jpg) no-repeat center top; width: 100%; }
+.tb { font-size: 16px; width: 30%; }
+.gg { font-size: 14px; width: 65%; padding-left: 5%;}
 }
 
+.main { width: 1200px; padding-top: 50px; padding-bottom: 100px; margin: 0px auto; box-shadow: 0px 0px 30px 5px #999999; }
+.zuo { width: 764px; float: left; margin-left: 88px; }
+.zuo .tit { font-size: 22px; color: #337ab7; background: url(images/zuotit.jpg) no-repeat left center; width: 744px; float: left; margin-bottom:20px;}
+.zuo .tit p { line-height: 37px; margin-left: 20px; border-bottom: 3px solid #eeeeee;margin-bottom:0px; }
+.khzu { line-height: 40px; text-align: center; width: 170px; float: left; margin: 0px 20px 40px 0px; border-top: 1px solid #999999; border-left: 1px solid #999999; }
+.khzu p { float: left; border-right: 1px solid #999999; border-bottom: 1px solid #999999;margin-bottom:0px; }
+.khzu .p1 { width: 168px; }
+.khzu .p2 { width: 84px; }
+.you { width: 300px; float: right; margin-right: 10px; }
+.you .tit { font-size: 20px; line-height: 50px; color: #FFF; background-color: #3c8dbc; height: 50px;  padding:0 10px;}
+.you .tit a{float: right; color:#fff;}
+.wt { width: 100px; margin: 0px auto; }
+.you ul { font-size: 14px; background-color: #f7f7f7; }
+.wtul { line-height: 50px; background: url(images/wtul.png) repeat-x center top; padding-bottom: 20px; }
+.wtul li { text-align: center; width: 42px; float: left; margin-left: 26px; }
+.wj { width: 180px; margin: 0px auto; display: box;display: -webkit-box;display: -moz-box;-webkit-box-pack:center;-moz-box-pack:center;-webkit-box-align:center;-moz-box-align:center;}
+.wjul { line-height: 28px; padding-bottom: 20px; }
+.wjul li { padding-top: 10px; padding-bottom: 10px; margin-right: 20px; margin-left: 20px; border-bottom: 1px dashed #cecece; }
+.phb { width: 764px; float: left; }
+.phb .tit { line-height: 40px; width: 738px; height: 40px; padding-left: 26px; }
+.phb .tit a { text-decoration: none; color: #337ab7; background-color: #FFF; float: left; cursor: pointer; }
+.phb .tit .default1, .phb .tit .default2 { font-size: 18px; }
+.phb .tit .active1, .phb .tit .active2 { font-size: 22px; }
+.phb .tit span { font-size: 24px; background-color: #FFF; float: left; }
+.phzu { line-height: 40px; text-align: center; width: 1017px; margin: 0px auto; border-top: 1px solid #999999; border-left: 1px solid #999999; }
+.phzu p { width: 112px; float: left; border-right: 1px solid #999999; border-bottom: 1px solid #999999; }
+.phzu .pa { font-size: 18px; }
+.phzu .pb { font-size: 14px; }
+@media screen and (max-width:721px) {
+ .main {width: 100%;padding-top: 0;padding-bottom: 0;}
+.zuo {width: auto;margin: 0px 5%;}
+.zuo .tit {font-size: 16px;color: #337ab7;background: url(images/zuotit.jpg) no-repeat left center;width: auto;float: left;margin-top: 5%;}
+.khzu {font-size: 14px;width: 164px;margin-top: 5%;margin-right: 5%;margin-bottom: 0;}
+.khzu .p1 {width: 163px;}
+.khzu .p2 {width: 81px;}
+.you {width: auto;margin: 0px 5%;}
+.you .tit {font-size: 16px;line-height: 50px;margin-top: 5%; padding:0 10px;}
+.you .tit a{float: right; color:#fff;}
+.wtul {background-image: none;padding-bottom: 0;}
+.wjul {padding-bottom: 0;}
+.wjul li {border-bottom: none;}
+.phb {width: auto;margin: 5% 5%;}
+.phb .tit .default1, .phb .tit .default2 { font-size: 14px; }
+.phb .tit .active1, .phb .tit .active2 { font-size: 16px; font-weight: bold; }
+.phb .tit span {font-size: 16px;}
+}
+.normal{background-color: #3c8dbc !important;}
+.normalB{background-color: #f7f7f7 !important;}
+.warn{background-color: #f39c12 !important;}
+.warnB{background-color:#f39c125e !important;}
+.danger{background-color: #d24c37 !important;}
+
+.dead{background-color: #5d5a5a !important;}
+.deadB{background-color:#605a5b6e !important;}
 </style>
 
-<!-- Bootstrap core CSS -->
+
+    <!-- Bootstrap core CSS -->
+   
     <link href="/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
-    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
-    
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
-    <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-   
-   
+    <link href="/css/AdminLTE.min.css" rel="stylesheet"/>
+    <link href="/css/font-awesome.min.css" rel="stylesheet"/>
     <!-- 滚动 -->
     <link href="/css/plugins/jquery.marquee.css" rel="stylesheet"/>
-     
-    <script src="/css/ie-emulation-modes-warning.js"></script>
+    <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    
-       <!-- Bootstrap core JavaScript ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
     <script src="/js/jquery-3.2.1.js"></script>
-
     <script src="/js/bootstrap.min.js"></script>
-
-    <script src="/js/holder.min.js"></script>
-
-    <script src="/js/bootstrap-select.min.js"></script>
-    
-    <script src="/js/moment-with-locales.min.js"></script>
-    
-    <script src="/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="/js/plugins/bootstrap-table.min.js"></script>
-    
-    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    <script src="/js/adminlte.min.js"></script>
     
     <!-- scroll -->
     <script src="/js/plugins/jquery.marquee.min.js"></script>
     
+    <!-- 图表  -->
+    <script src="/js/chart/Chart.min.js" ></script>
+    <!-- table -->
+    <script src="/js/plugins/bootstrap-table.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    <!-- 日期 -->
+    <script src="/js/DateUtils.js"></script>
 </head>
 
 <body>
-<div class="mainbox">
-     <!-- head -->
-  <div class="parta">
-        <img src="/images/home/bj1.jpg" />
-      <div class="nav">
-        <a href="/user/loginForm" target="_blank" style=" width:105px; float:right;background:#FFD908; font-weight:900; color:#C8000B;" th:if="${session.sysuser==null}">登入</a>
-        <a href="/index" target="_blank" style=" width:100px; float:left;background:#FFD908; font-weight:900; color:#C8000B;"  th:if="${session.sysuser!=null}">
-              
-                进入填表
-          </a>
-       <!-- 显示本月前10名 -->
+<div class="top">
+  <p class="tb">
+  	 <a href="/user/loginForm" target="_blank"  th:if="${session.sysuser==null}">登入</a>
+     <a href="/index" target="_blank" th:if="${session.sysuser!=null}">进入填表</a>
+  </p>
+  <div class="gg" >       
+        <!-- 显示本月前10名 -->
+        
 		<ul id="marquee5" class="marquee">
-			<li>4月份加分前10名：王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 王丽红 </li>
+			<li>每月10日前提交考核表，超期未交的每天扣0.5分；超过5天未交的，月度考核定格为不合格</li>
 		</ul>
-          
-      </div>
-    </div>
-    
-     <!-- /head -->
-   <div class="main">
-       <!-- container -->
-      <div class="container">
-        <!-- 月度累计和未填写 -->
-      	<div class="row">
-             <div class="col-md-8">
-                <div class="alert alert-success" role="alert"><h3>中层干部2018年一线考核加减分排行榜（累计）</h3></div>
-                 <div class="row">
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-1_post1">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第一考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-
-                              </tbody>
-                          </table>
-                      </div>
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-2_post1">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第二考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              	
-
-                              </tbody>
-                          </table>
-                      </div>
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-3_post1">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第三考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-
-                              </tbody>
-                          </table>
-                      </div>
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-4_post1">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第四考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-        
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-                  <a th:href="@{/responsibility/rankList/month?group=第一考核组&amp;postNameLike=中层}" style="color:red;" class="pull-right"><span class="glyphicon glyphicon-hand-right"></span>&nbsp;&nbsp;更多</a>
-                  <div style="height:26px;"></div>
-                  <div class="alert alert-success" role="alert"><h3>工作人员2018年一线考核加减分排行榜（累计）</h3></div>
-                  <div class="row">
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-1_post2">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第一考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
+		
+  </div>
  
-                              </tbody>
-                          </table>
-                          
-                      </div>
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-2_post2">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第二考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                    
-                              </tbody>
-                          </table>
-                          
-                      </div>
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-3_post2">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第三考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-         
-                              </tbody>
-                          </table>
-                          
-                      </div>
-                      <div class="col-md-3">
-                          <table class="table table-hover" id="group-4_post2">
-                              <thead>
-                              <tr>
-                                  <th colspan="2">第四考核组</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-       
-                              </tbody>
-                          </table>
-                          
-                      </div>
-                  </div> 
-               <a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike=普通员工" style="color:red;" class="pull-right"><span class="glyphicon glyphicon-hand-right"></span>&nbsp;&nbsp;更多</a>
-             </div>
-             <div class="col-md-3">
-                <!-- row -->
-             	<div class="row">
-             	   <!-- col -->
-	        	   <div class="col-md-10">
-	        	      <div class="alert alert-danger" role="alert"><h3>未填表名单</h3>
-	        	      </div>
-	        	      <div class="panel-body" id="month"> 
-		                  
-		                  
-	                  </div>
-	                  <div class="alert alert-info" role="alert"><h4>一线考核相关文件</h4></div>
-	                  <div id="fileLinks">
-	                  	
-	                  </div>
-	             </div>
-	              <!-- /col -->
-              </div>
-              <!-- /row -->
-             </div>
-        </div>
-        
-        <!-- /月度累计和未填写 -->
-      </div>
-      <!-- /container -->
-
-       <!-- container -->
-        <div class="container">
-           <div class="col-md-8">
-				 <div id="myTab" class="nav nav-tabs">
-					<div class="partd">
-                          <div class="tit">
-	                         <a href="#halfYear" class="active1" data-toggle="tab">半年考评排行</a><span>丨</span>
-	                          <a href="#fullYear" class="default2" data-toggle="tab">年度考评排行</a>
-                          </div>
-					</div>	
-				</div>
-				<div id="myTabContent" class="tab-content">
-					<div class="tab-pane fade in active" id="halfYear">
-						<p>暂无数据</p>
-					</div>
-					<div class="tab-pane fade" id="fullYear">
-						<p>暂无数据</p>
-					</div>
-				</div>
-	       </div> 
-        </div> 
-       <!-- /container -->
-
-
-      
-     
-   </div> 
 </div>
+<div class="main clean">
+  <!-- BAR CHART -->
+  <div class="container" style="width:100%;">
+	  <div class="box box-success">
 
+	    <div class="box-body">
+	      <div class="chart">
+	        <canvas id="barChart" style="height:230px"></canvas>
+	      
+	        
+	      </div>
+	    </div>
+	    <!-- /.box-body -->
+	  </div>
+	 
+	  <div style="display:flex;flex-direction:row;margin-bottom:20px;">
+		 <div>
+		  	  <canvas id="chart-area1" style="height:300px;width:450px;"></canvas>
+		  </div>
+		  <div>
+		  	<canvas id="chart-area2" style="height:300px;width:700px;"></canvas>
+		  </div>
+	 </div>
+  </div>
+
+  
+  
+  <div class="zuo">
+     <div id="month">
+     	
+     </div>
+   
+  
+    <div class="phb">
+      <div class="tit"><a class="active1"  id="halfYear">半年考评排行</a><span>丨</span><a class="default2"  id="fullYear">年度考评排行</a></div>
+          <!-- 考核组 -->
+          <div class="form-inline" id="assessGroups">
+            
+          </div>
+     	  <!-- 工具栏 -->
+		  <div id="toolbar" class="btn-group pull-left" >
+		    <div class="form-inline"  >
+		        <select id="times" class="form-control" title="请选择日期"  >
+			        <option value="">----请选择日期----</option>
+			        
+			    </select>
+	          	<select id="second" class="form-control" title="请选择部门"  >
+			        <option value="">----请选择部门----</option>
+			        <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
+			    </select>
+			    <input  id="name" class="form-control" style="display:none;"/>
+			    <button id="btn_export" type="button" class="btn btn-primary" style="display:none;">
+			        <span class="glyphicon glyphicon-plus" aria-hidden="true">导出Excel</span>
+			   </button>
+
+			</div>
+			
+		  </div>
+		  <!-- /工具栏 -->
+		  <table id="mytab" class="table table-hover"></table>
+		 
+   
+    </div>
+  </div>
+  <div class="you">
+  <!-- 未交清单 -->
+    <div id="unSubmitted">
+	    
+	    
+    </div>
+    <div class="tit">
+      <p class="wj">一线考核相关文件</p>
+    </div>
+    <ul class="wjul">
+
+    </ul>
+  </div>
+</div>
+<!-- Button trigger modal -->
+        <button  id="modalButton" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalTable" style="display:none;">点击查看</button>
+        <div class="modal fade" id="modalTable" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+            <div class="modal-dialog" style="width:900px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">加减分明细</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="table"
+                               data-toggle="table"
+                               data-height="499"
+                              >
+                            <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>开始日期</th>
+                                <th>结束日期</th>
+                                <th>生成日期</th>
+                                <th>评分</th>
+                                <th>评分原因</th>
+                                <th>评分依据</th>
+                                
+                                
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 </body>
 <script th:inline="javascript">
-//<![CDATA[      
-	     
-            
-     //multiple table
-     var group="group";
-     $("[id^="+group+"]").each(function(){
-          var id=$(this).attr("id");
-         
-		  getData(id);
-     });
-     function getData(id){
-         var ids=id.split("_");
-         var group=ids[0];
-         var post=ids[1];
-         var total;
-         if("post1"==ids[1]) {
-         	post="中层";
-         	total=5;
-         }
-         if("post2"==ids[1]){
-         	post="普通";
-         	total=10;
-         }
-         //考核组
-         var groups=["第一考核组","第二考核组","第三考核组","第四考核组"];
-         var index=ids[0].split("-")[1];
+//<![CDATA[ 
+
+
+//显示考核组内容
+var groups=[[${session.sysuser.userLinkGroup}]];
+var assessGroupFlag=false;//是否包含考核组
+for(x in groups){
+          
+    if(groups[x].groupTable.groupname.indexOf('考核')!=-1){
+      	$("#btn_export").show();
+      	assessGroupFlag=true;
+      	break;
+    }
+}
+      //-------------
+    //- BAR CHART -
+    //-------------
+    
+    //以下为上月交表情况
+    var ctx= $('#barChart').get(0).getContext('2d');
+    var barChartData={};
+    var barChartOptions={};
+    var chart=new Chart(ctx,{
+    	type: 'bar',
+		data: barChartData,
+		options:barChartOptions,
+		
+    });
+    
+    //以下为PolarChart
+    window.chartColors = {
+		red: 'rgb(255, 99, 132)',
+		orange: 'rgb(255, 159, 64)',
+		yellow: 'rgb(255, 205, 86)',
+		green: 'rgb(75, 192, 192)',
+		blue: 'rgb(54, 162, 235)',
+		purple: 'rgb(153, 102, 255)',
+		grey: 'rgb(201, 203, 207)'
+    };
+    var chartColors = window.chartColors;
+	var color = Chart.helpers.color;
+
+    var backgroundColor =[color(chartColors.red).alpha(0.5).rgbString(),
+						color(chartColors.orange).alpha(0.5).rgbString(),
+						color(chartColors.yellow).alpha(0.5).rgbString(),
+						color(chartColors.green).alpha(0.5).rgbString(),
+						color(chartColors.blue).alpha(0.5).rgbString(),
+					];
+    var polarOption={
+				responsive: true,
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: 'Chart.js Polar Area Chart'
+				},
+				scale: {
+					ticks: {
+						beginAtZero: true
+					},
+					reverse: false
+				},
+				animation: {
+					animateRotate: false,
+					animateScale: true
+				}
+			};
+
+    
+    var domChartArea1=document.getElementById("chart-area1");
+    window.ctx1=document.getElementById("chart-area1").getContext("2d");
+    var polarData={
+		datasets: [{
+			data:  [0,0,0,0],
+			backgroundColor: backgroundColor,
+			label: 'My dataset' // for legend
+		}],
+		labels: [0,0,0,0]
+	}
+    var config1 = {
+			data: {
+				datasets: [{
+					data:  [0,0,0,0],
+					backgroundColor: backgroundColor,
+					label: 'My dataset' // for legend
+				}],
+				labels: [0,0,0,0]
+			},
+			options:polarOption 
+		};
+    
+    window.chartArea1 = Chart.PolarArea(ctx1,{
+    	
+		data: polarData,
+		options:polarOption,
+		
+    });
+    getLastMonthEfficiency("second","福州新闻网(社新媒体中心)","部门主任组");
+
+   function loadLastMonthEfficiency(data,labels,deptLevel,deptName,groupName){
+
+         polarOption.title.text="上个月月度考核完成情况："+deptName+"-"+groupName;
+	     polarData={
+			datasets: [{
+				data:  data,
+				backgroundColor: backgroundColor,
+				label: 'My dataset' // for legend
+			}],
+			labels: labels
+		 }
+
+       
+     
+      
+        chartArea1.data=polarData;
+	    chartArea1.options=polarOption;
+        chartArea1.update();
         
-     	 $.ajax({
-		  type: 'POST',
-		  url: "/responsibility/selectTotalMarkForEachGroup/"+groups[index-1]+"/"+post+"/"+total,
-		  dataType: "json",
-		  success: function(data){
-		     var result="";
-		    
-		     for(x in data){
-		       
-		       var aLink='<a href="/responsibility/projectList?userId='+data[x].user.id+'&startDate='+[[${startDateOfYear}]]+'&endDate='+[[${endDateOfYear}]]+'">'+data[x].user.username+'</a>';
-		       
-		     	result+="<tr><td>"+aLink+"</td><td>"+data[x].totalMark+"</td></tr>";
-		     }
-		     var length=data.length;
-		     
-             if(length<total){
+   		
+   }       //获取上月完成情况
+    function getLastMonthEfficiency(deptLevel,deptName,groupName){
+    	$.ajax({
+    		type:'post',
+    		url:'/process/monthApprovalEfficiency/'+deptLevel+'/'+deptName,
+    		dataType:'json',
+    		success:function(data){
+    		    
+    			loadLastMonthEfficiency(data.data,data.labels,deptLevel,deptName,groupName)
+    		}
+    	});
+    } 
+    //以下为折线图
+    var ctx2= $('#chart-area2').get(0).getContext('2d');
+    var chartData2={};
+    var chartOptions2={};
+    var chart2=new Chart(ctx2,{
+    	type: 'line',
+		data: chartData2,
+		options:chartOptions2,
+		
+    });
+    //获取历史完成情况
+    getHistoryMonthEfficiency("third","福州日报社","部门主任组");
+    function getHistoryMonthEfficiency(deptLevel,deptName,groupName){
+        $.ajax({
+    		type:'post',
+    		url:'/process/getHistoryMonthEfficiency/'+deptLevel+'/'+deptName,
+    		dataType:'json',
+    		success:function(data){
+    		    
+    			loadHistoryMonthEfficiency(data.dataset,data.labels,data.names,deptLevel,deptName,groupName);
+    		}
+    	});
+    }
+    function loadHistoryMonthEfficiency(dataset,labels,names,deptLevel,deptName,groupName){
+    var datasets=[];
+        var color=["#3c8dbc","#dd4b39","#00a65a","#00c0ef","#f39c12","#00FFFF","#333"]
+        for(x in dataset){
+        	datasets.push(
+        	{
+        		label:names[x],
+        		type: 'line',
+        		fill: false,
+				backgroundColor: color[x%7],
+				borderColor: color[x],
+        		data:dataset[x]
+        	}
+        	);
+        }
+    	chartData2={
+    		labels:labels,
+    		datasets:datasets
+    	};
+	    chartOptions2                  = {
+	            responsive: true,
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: '审批同比效率:'+deptName+'-'+groupName
+				},
+				//给柱子添加点击事件"click"
+		        events : ["mousemove", "mouseout", "click"],
+		        onClick : function (event, bars){
+		           var activeElement = bars[0];   //当前被选中的元素
+		           if(activeElement==null){
+		           		
+		           		
+		           		
+		           }else{
+		           		var product = activeElement._model.label;
+		           		
+		           }
+		           
+		           
+		        },
+	    }
+	  
+
+	   chart2.data=chartData2;
+	   chart2.options=chartOptions2;
+	   chart2.update();
+    }
+
+   getMonthCompletionRate();
+    function getMonthCompletionRate(){
+    
+    	//ajax
+    	$.ajax({
+    		type:'post',
+    		url:'/process/completionRate',
+    		dataTyp:'json',
+    		success:function(data){
+    		
+    			var result=eval('(' + data + ')');
+    			result=JSON.parse(result);
+    			var deptNames=[];
+
+
+    			getMonthCompletionRateAsChart(result.deptNames,result.userRateSubmitted,result.processRateCompletted);
+    		}
+    	});
+
+    }
+    function loadUnCompletionRateForEachDept(groupName,deptLevel,deptName){
+    	$.ajax({
+    		type:'post',
+    		url:'/process/unCompletionRateForEachDept/'+groupName+"/"+deptLevel+"/"+deptName,
+    		dataType:'json',
+    		success:function(data){
+    		   var length=9;
+    		   for(x in data.deptNames){
+    		       
+    		   		if(data.deptNames[x].length>length)data.deptNames[x]=data.deptNames[x].substring(0,length)+"..";
+    		   }
+               getUnCompletionRateForEachDept(data.deptNames,data.rates,groupName,deptName);
+    		}
+    	});
+    }
+    
+    function loadCompletionRateForGroup(deptName){
+    	//ajax
+    	
+    	$.ajax({
+    		type:'post',
+    		url:'/process/unCompletionRateForEachGroup/second/'+deptName,
+    		dataTyp:'json',
+    		success:function(data){
+    		   
+    			var result=eval('(' + data + ')');
+    			getUnCompletionRateForGroup(result.groups,result.rates,deptName);
+
+    		}
+    	});
+    }
+    function loadAVGDurationForEachTask(deptName,groupName,secondDeptName){
+    	$.ajax({
+    		type:'post',
+    		url:'/system/activiti/selectAVGDration/'+deptName+'/'+groupName,
+    		dataType:'json',
+    		success:function(data){
+    	
+    			getAVGDurationForEachTask(data.labels,data.dataset,data.names,deptName,groupName,secondDeptName)
+    		}
+    	});
+    }
+    function getAVGDurationForEachTask(labels,dataset,names,deptName,groupName,secondDeptName){
+        var datasets=[];
+        var color=["#3c8dbc","#dd4b39","#00a65a","#00c0ef","#f39c12","#00FFFF","#FFFF00"]
+        for(x in dataset){
+        	datasets.push(
+        	{
+        		label:names[x],
+        		type: 'line',
+        		fill: false,
+				backgroundColor: color[x%7],
+				borderColor: color[x],
+        		data:dataset[x]
+        	}
+        	);
+        }
+    	barChartData={
+    		labels:labels,
+    		datasets:datasets
+    	};
+	    barChartOptions                  = {
+	            responsive: true,
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: '月度考核:'+deptName+'-'+groupName+'-每个流程平均耗时（小时）'
+				},
+				//给柱子添加点击事件"click"
+		        events : ["mousemove", "mouseout", "click"],
+		        onClick : function (event, bars){
+		           var activeElement = bars[0];   //当前被选中的元素
+		           if(activeElement==null){
+		           		
+		           		
+		           		loadUnCompletionRateForEachDept(groupName,"second",secondDeptName);
+		           		getLastMonthEfficiency("second",secondDeptName,"部门主任组");
+		           }else{
+		           		var product = activeElement._model.label;
+		           		loadUnCompletionRateForEachDept(groupName,"second",secondDeptName);
+		           		
+		           }
+		           
+		           
+		        },
+	    }
+	  
+
+	   chart.data=barChartData;
+	   chart.options=barChartOptions;
+	   chart.update();
+    }
+    function getUnCompletionRateForEachDept(labels,data1,groupName,deptName){
+    	barChartData={
+    		labels:labels,
+    		datasets:[
+    			{
+    				label:'未审占比',
+    				backgroundColor: 'rgba(60,141,188,0.9)',
+    				data:data1,
+    			}
+    		]
+    	};
+	    barChartOptions                  = {
+	            responsive: true,
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: '月度考核:'+deptName+'-'+groupName
+				},
+				//给柱子添加点击事件"click"
+		        events : ["mousemove", "mouseout", "click"],
+		        onClick : function (event, bars){
+		           var activeElement = bars[0];   //当前被选中的元素
+		           if(activeElement==null){
+		           		loadCompletionRateForGroup(deptName);
+		           }else{
+		           		var product = activeElement._model.label;
+		           		loadAVGDurationForEachTask(product,groupName,deptName)
+		           		
+		           		getLastMonthEfficiency("first",product,"部门主任组");
+		           }
+		           
+		           
+		        },
+	    }
+
+	   chart.data=barChartData;
+	   chart.options=barChartOptions;
+	   chart.update();
+    }
+    function getUnCompletionRateForGroup(labels,data1,deptName){
+    	barChartData={
+    		labels:labels,
+    		datasets:[
+    			{
+    				label:'流程数占比',
+    				backgroundColor: 'rgba(60,141,188,0.9)',
+    				data:data1,
+    			}
+    		]
+    	};
+	    barChartOptions                  = {
+	            responsive: true,
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: '月度考核:'+deptName
+				},
+				//给柱子添加点击事件"click"
+		        events : ["mousemove", "mouseout", "click"],
+		        onClick : function (event, bars){
+		           var activeElement = bars[0];   //当前被选中的元素
+		           if(activeElement==null){
+		           		getMonthCompletionRate();
+		           		getHistoryMonthEfficiency("third","福州日报社","部门主任组");
+		           }else{
+		           		var product = activeElement._model.label;
+		           		if(product=="未提交") {
+		           			//getUnsubmittedUser("second",deptName);
+		           			return;
+		           		}
+		           		loadUnCompletionRateForEachDept(product,"second",deptName);
+		           }
+		           
+		           
+		        },
+	    }
+	 
+	   chart.data=barChartData;
+	   chart.options=barChartOptions;
+	   chart.update();
+    }
+ //   function getUnsubmittedUser(deptLevel,deptName){
+   //    alert(deptName);
+  //  }
+    function getMonthCompletionRateAsChart(labels,data1,data2){
+    
+       barChartData = {
+	      labels  : labels,
+	      datasets: [
+	        {
+	          label               : '提交率',
+	          backgroundColor     : 'rgba(210, 214, 222, 1)',
+	          data                : data1
+	        },
+	        {
+	          label               : '审结率',
+	          backgroundColor     : 'rgba(60,141,188,0.9)',
+	          data                : data2
+	        }
+	      ]
+       }
+	   barChartOptions                  = {
+	            responsive: true,
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: '月度考核'
+				},
+				//给柱子添加点击事件"click"
+		        events : ["mousemove", "mouseout", "click"],
+		        onClick : function (event, bars){
+		           var activeElement = bars[0];   //当前被选中的元素
+		           if(activeElement==null){
+		           	  
+		           	
+		           }else{
+		           	  var product = activeElement._model.label;
+		              getHistoryMonthEfficiency("second",product,"部门主任组");
+		              getLastMonthEfficiency("second",product,"部门主任组");
+		              
+		              loadCompletionRateForGroup(product);
+		           }
+		           
+		        },
+	    }
+	 
+	   chart.data=barChartData;
+	   chart.options=barChartOptions;
+	   chart.update();
+     
+    }
+    
+         
+	 //获取上月排名前10名，并添加到滚动栏
+	 getTenTotalMark();
+	 function getTenTotalMark(){
+	    var startDate=[[${startDateOfLastMonth}]];
+	    var endDate=[[${endDateOfLastMonth}]];
+	    var total=10;
+	 	 //ajax
+		       $.ajax({
+				  type: 'POST',
+				  url: "/responsibility/selectHistoryTotalMark/month?startDate="+startDate+"&endDate="+endDate+"&total="+total,
+				  dataType: "json",
+				  success: function(data){
+				  
+				  	var result=" ";
+                    var date=new Date(Date.parse(data[0].startDate));
+                    var month=date.getMonth()+1;
+				  	result+=month+"月份 月度考核排名前10: ";
+				  	for(x in data){
+				  		
+				  		result+='<a style="color:white;" href="/responsibility/projectList?userId='+data[x].user.id+'&startDate='+startDate+'&endDate='+endDate+'">'+data[x].user.username+'</a>&nbsp;&nbsp;';
+				  		
+				  	}
+				  	addMessage('.marquee',result);
+				  }
+				 
+				});
+				//ajax
+	 }      
+     //multiple table
+    
+    // var groups=["第一考核组","第二考核组","第三考核组","第四考核组"];
+     var groups=[[${assessGroups}]];
+     var posts=["中层","普通员工"];
+     var total=[5,10];
+     
+     //加减分排行
+     getData();
+
+     function getData(){
+       
+        $('#month').html('');
+        for(x in posts){
+            if(posts[x]=='普通员工'){
+            
+            	$('#month').append('<div class="tit"><p>工作人员'+[[${year}]]+'年一线考核加减分排行（累计）<a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike='+posts[x]+'" style="color:red;float:right;" >》》更多&nbsp;&nbsp;&nbsp;</a></p></div>')
+            }
+        	if(posts[x]=='中层'){
+            	$('#month').append('<div class="tit"><p>中层干部'+[[${year}]]+'年一线考核加减分排行（累计）<a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike='+posts[x]+'" style="color:red;float:right;" >》》更多&nbsp;&nbsp;&nbsp;</a></p></div>')
+            }
+        	for(y in groups){
+        		$('#month').append('<div class="khzu" id="'+x+'-'+y+'"><p class="p1">'+groups[y]+'</p></div>');
+        		
+                getDataForEachGroup(x,y);
                
-             	for(var i=0;i<total-length;i++){
-             	   
-             		 result+="<tr><td><td></tr>";
-             		 
-             	}
-             }
-		      $("#"+id+" tbody").html(result);
-		  }
-		 
-		});
+        	}
+        	
+        }
+        
+
+     }
+     
+     function getDataForEachGroup(a,b){
+     
+     	       //ajax
+		       $.ajax({
+				  type: 'POST',
+				  url: "/responsibility/selectTotalMarkForEachGroup/"+groups[b]+"/"+posts[a]+"/"+total[a],
+				  dataType: "json",
+				  success: function(data){
+				     var result="";
+				    
+				     for(x in data){
+				       
+				      // var aLink='<a href="/responsibility/projectList?userId='+data[x].user.id+'&startDate='+[[${startDateOfYear}]]+'&endDate='+[[${endDateOfYear}]]+'">'+data[x].user.username+'</a>';
+				       var aLink='<a href="javascript:void(0);" onclick="javascript:getDetailsOfMarks(\''+data[x].user.id+'\',\''+[[${startDateOfYear}]]+'\',\''+[[${endDateOfYear}]]+'\',\'1\')">'+data[x].user.username+'</a>';
+				     	result+='<p class="p2">'+aLink+'</p><p class="p2">'+data[x].totalMark+'</p>';
+				     }
+				     var length=data.length;
+				     
+		             if(length<total[a]){
+		               
+		             	for(var i=0;i<total[a]-length;i++){
+		             	   
+		             		 result+='<p class="p2">&nbsp;</p><p class="p2">&nbsp;</p>';
+		             		 
+		             	}
+		             }
+		              $('.wt').html()
+				      $("#"+a+"-"+b+"").append(result);
+				  }
+				 
+				});
+				//ajax
      }
     //获取存储在/upload/public文件中的公共文件
     getFileLinks("public");
     function getFileLinks(pathname){
-        
+       
     	 $.ajax({
 		  type: 'POST',
 		  url: "/file/getFileLinks/"+pathname,
@@ -388,6 +801,7 @@ table{
 		  success: function(data){
 		     var result="";
 		     for(x in data){
+		      
 		        var y;
 		        //获取文件名
 		          //linux
@@ -398,10 +812,11 @@ table{
 		  
 		     	var z=y[y.length-1].substring(0,y[y.length-1].lastIndexOf("."));
 		     	
-		     	result+='<a href="/file/download?filename='+data[x]+'">'+z+'</a><br/><br/>';
+		     	result+='<li><a href="/file/download?filename='+data[x]+'">'+z+'</a></li>';
 		     
 		     }
-		      $("#fileLinks").html(result);   
+		     
+		      $(".wjul").html(result);   
 
 		  }
 		 
@@ -411,40 +826,44 @@ table{
     //未提交名单
     getUnsubmitted('month');    
     function getUnsubmitted(taskType){
+       
     	$.ajax({
 		  type: 'POST',
-		  url: "/responsibility/selectAllUsersWhoUnsubmittedProcess/"+taskType,
+		  url: "/responsibility/selectAllUsersWhoUnsubmittedProcess/"+taskType+"?total=30",
 		  dataType: "json",
 		  success: function(data){
-		     var result="";
-		     for(x in data){
-                
-		     	result+='<a href="/file/download?filename=">'+data[x].username+'</a>';
+		     var html="";
 		     
+		     result=JSON.parse(data);
+            
+             if(result){
+                
+             	$('#unSubmitted').html('<div class="tit '+result.degreeOfUrgency+'">'+result.titleLike+'<a href="/responsibility/unsubmittedList/month">更多</a></div> <ul class="wtul clean '+result.degreeOfUrgency+'B"></ul>');
+             }
+		     for(x in result.users){
+		      
+		       html+='<li>'+result.users[x].username+'</li>';
+		     	
 		     }
-		      if(result) $("#"+taskType).html(result);   
+               
+		      if(html){
+		      	 $(".wtul").html(html); 
+		      }  
 
 		  } 
 		 
 		});
     }
- //]]>      
-</script>
- <script th:inline="javascript">
-    
-    //半年和全年数据
-    $(".tit a").each(function(){
-    	$(this).click(function(){
-    		 $(".tit a").attr("class","default2");
-    		 $(this).attr("class","active1");
-    		
-    	});
-    });
+
+
     
 
     
     var msg=[[${msg}]];
-    if(msg!=null) alert(msg);
+    if(msg!=null) {
+    	alert(msg);
+    	msg=null;
+    }
     
     
 	var use_debug = false;
@@ -455,7 +874,7 @@ table{
 
 	// on DOM ready
 	$(document).ready(function (){
-		$("#marquee5").marquee({
+		$(".marquee").marquee({
 			loop: -1
 			// this callback runs when the marquee is initialized
 			, init: function ($marquee, options){
@@ -490,12 +909,12 @@ table{
 	
 	var iNewMessageCount = 0;
 	
-	function addMessage(selector){
+	function addMessage(selector,msg){
 		// increase counter
 		iNewMessageCount++;
-
+       // console.log(selector+",msg="+msg);
 		// append a new message to the marquee scrolling list
-		var $ul = $(selector).append("<li>New message #" + iNewMessageCount + "</li>");
+		var $ul = $(selector).prepend("<li>" + msg + "</li>");
 		// update the marquee
 		$ul.marquee("update");
 	}
@@ -507,8 +926,318 @@ table{
 	function resume(selector){
 		$(selector).marquee('resume');
 	}
-    
+
+    //半年和全年数据
+    var taskType_year='halfYear';
+    setTimes();
+    $(".tit a").each(function(){
+    	$(this).click(function(){
+    		 $(".tit a").attr("class","default2");
+    		 $(this).attr("class","active1");
+    		 taskType_year=$(this).attr("id");
+    		 $('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectAllEvaluation/'+taskType_year});
+    		 
+    		 setTimes();
+    	});
+    });
+   //考核组
+    var assessGroups=[[${assessGroups}]];
+    $("#assessGroups").html('<input id="assessGroup" type="text" style="display:none;"/>');
+    for(x in assessGroups){
+    	$("#assessGroups").append('<button class="btn btn-primary">'+assessGroups[x]+'</button>');
+    }
+    $("#assessGroups button").click(function(){
+        $("#assessGroup").val($(this).html());
+        $("#assessGroups button").removeClass("btn-lg");
+        $(this).addClass("btn-lg");
+    	$('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectAllEvaluation/'+taskType_year});
+    });
+    function setTimes(){
+        $('#times').html('<option value="">----请选择日期-----</option>');
+    	var date=new Date();
+    	var year=date.getFullYear();
+    	var pre=[];
+    	if(taskType_year=='halfYear') pre=["年上半年","年下半年"];
+    	if(taskType_year=='fullYear') pre=["年"];
+    	for(var i=0;i<5;i++){
+    	    
+    		for(x in pre){
+    			$('#times').append('<option value="'+(year-i)+pre[x]+'">'+(year-i)+pre[x]+'</option>');
+    		}
+    	}
+    }
+  //bootstrapTable保存pageIndex
+    var state={};
+    if(window.history.state){
+    	state=window.history.state;
+    }else{
+       state = { 
+        'pageIndex':1, 
+        'pageSize':10,
+        };
+        window.history.pushState(state,'home',null);
+    }
+    var column=[
+            {
+                title:'全选',
+                field:'select',
+                //复选框
+                checkbox:true,
+                align:'center',
+                valign:'middle'
+            },
+            {
+            	title:'排名',
+            	formatter:function(value,row,index){
+            		var pageSize=$('#mytab').bootstrapTable('getOptions').pageSize;
+            		var pageNumber=$('#mytab').bootstrapTable('getOptions').pageNumber;
+            		return pageSize*(pageNumber-1)+index+1;
+            	},
+            },
+            {
+                title:'用户Id',
+                field:'user.id',
+                visible:false
+                
+            },
+            {
+            	title:'用户姓名',
+            	field:'user.username',
+            },
+            {
+            	title:'电话',
+            	field:'user.phone',
+            	visible:false
+            },
+            {
+            	title:'部门',
+            	formatter:function(value,row,index){ 
+           				if(row.user.userLinkDepts.length==1){
+					        
+					     	 return row.user.userLinkDepts[0].firstLevel.name;
+					     }else{
+					        if(row.user.userLinkDepts[0]){
+					        return row.user.userLinkDepts[0].secondLevel.name;
+					        } else{
+					        	return"无部门，请至《个人中心》添加";
+					        }
+					     	 
+					     }
+            	}
+            },
+            
+            {
+            	title:'总分',
+            	field:'evaluation.totalMark'
+            },
+            {	
+            	title:'考核结果',
+            	field:'evaluation.result'
+            }
+          
+        ];
+    if(assessGroupFlag) column=[{
+                title:'全选',
+                field:'select',
+                //复选框
+                checkbox:true,
+                align:'center',
+                valign:'middle'
+            },
+            {
+            	title:'排名',
+            	formatter:function(value,row,index){
+            		var pageSize=$('#mytab').bootstrapTable('getOptions').pageSize;
+            		var pageNumber=$('#mytab').bootstrapTable('getOptions').pageNumber;
+            		return pageSize*(pageNumber-1)+index+1;
+            	},
+            },
+            {
+                title:'用户Id',
+                field:'user.id',
+                visible:false
+                
+            },
+            {
+            	title:'用户姓名',
+            	field:'user.username',
+            },
+            {
+            	title:'电话',
+            	field:'user.phone',
+            	visible:false
+            },
+            {
+            	title:'部门',
+            	formatter:function(value,row,index){ 
+           				if(row.user.userLinkDepts.length==1){
+					        
+					     	 return row.user.userLinkDepts[0].firstLevel.name;
+					     }else{
+					        if(row.user.userLinkDepts[0]){
+					        return row.user.userLinkDepts[0].secondLevel.name;
+					        } else{
+					        	return"无部门，请至《个人中心》添加";
+					        }
+					     	 
+					     }
+            	}
+            },
+            {
+            	title:'考效总分',
+            	field:'evaluation.marks',
+           
+             	formatter:function(value,row,index){
+             	    var startDate=row.evaluation.startDate;
+           	    var date=new Date(startDate);
+            	    startDate=date.format('yyyy-MM-dd');
+            	    
+             	    var endDate=row.evaluation.endDate;
+            	    
+             	    date=new Date(endDate);
+            	    
+             	    endDate=date.format('yyyy-MM-dd');
+                    
+             	    var userId=row.user.id;
+            	    var checked="1";
+            		var aLink='<a href="javascript:void(0);" onclick="javascript:getDetailsOfMarks(\''+userId+'\',\''+startDate+'\',\''+endDate+'\',\''+checked+'\')">'+row.evaluation.marks+'</a>';
+            		
+            		
+            		return aLink;
+             	}
+
+             },
+             {
+             	title:'群众评议',
+             	field:'evaluation.publicEvaluation',
+           	
+             },
+             {
+             	title:'领导点评',
+            	field:'evaluation.leadershipEvaluation',
+             	
+            },
+             {
+             	title:'组织考核',
+            	field:'evaluation.overseerEvaluation',
+            	
+            },
+            {
+            	title:'总分',
+            	field:'evaluation.totalMark'
+            },
+            {	
+            	title:'考核结果',
+            	field:'evaluation.result'
+            }
+          
+        ];
+    $('#mytab').bootstrapTable({
+        method: 'post',
+        contentType: "application/x-www-form-urlencoded",//必须要有！！！！
+        url:'/responsibility/selectAllEvaluation/'+taskType_year,//要请求数据的文件路径
+        //height:tableHeight(),//高度调整
+        toolbar: '#toolbar',//指定工具栏
+        striped: true, //是否显示行间隔色
+        pageNumber:window.history.state.pageIndex, //初始化加载第一页，默认第一页
+        pagination:true,//是否分页
+        queryParamsType:'limit',//查询参数组织方式
+        queryParams:queryParams,//请求服务器时所传的参数
+        sidePagination:'server',//指定服务器端分页
+        pageSize:10,//单页记录数
+        pageList:[5,10,20,30],//分页步进值
+        showRefresh:true,//刷新按钮
+        showColumns:true,
+        clickToSelect: true,//是否启用点击选中行
+        toolbarAlign:'left',//工具栏对齐方式
+        buttonsAlign:'left',//按钮对齐方式
+        toolbar:'#toolbar',//指定工作栏
+        columns:column,
+        locale:'zh-CN',//中文支持,
+        responseHandler:function(result){
 	
+		    return result;
+        }
+    })
+
+
+
+    //请求服务数据时所传参数
+    function queryParams(params){
+        state = { 
+        'pageIndex':params.pageNumber, 
+        'pageSize': params.limit,
+        };
+        window.history.replaceState(state,'home',null);
+        return{
+            //每页多少条数据
+            pageSize: params.limit,
+            //请求第几页
+            pageIndex:params.pageNumber,
+            //部门:
+            secondDeptId:$('#second').val(),
+            //时间：
+            times:$('#times').val(),
+            assessGroup:$('#assessGroup').val(),
+            username:$('#name').val(),
+
+        }
+    }
+     //查询按钮事件
+    $('#search_btn').click(function(){
+       
+        $('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectAllEvaluation/'+taskType_year});
+    });
+    $('#second').change(function(){
+    	 $('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectAllEvaluation/'+taskType_year});
+    });
+    $('#times').change(function(){
+    	 $('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectAllEvaluation/'+taskType_year});
+    });
+    $('#name').change(function(){
+    	 $('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectAllEvaluation/'+taskType_year});
+    });
+    
+    //按妞事件
+   
+    $("#btn_export").click(function(){
+        if(confirm("确定要导出吗？")){
+        	location.href="/file/export/assessment/"+taskType_year+"?secondDeptId="+$("#second").val()+"&times="+$('#times').val()+"&assessGroup="+$('#assessGroup').val();
+        }
+    	
+    });
+    //modal table
+   
+    function getDetailsOfMarks(userId,startDate,endDate,checked){
+        $('#table tbody').html('');
+         $.ajax({
+         	type:'post',
+         	url:'/responsibility/selectAllMark?userId='+userId+'&startDate='+startDate+'&endDate='+endDate+'&checked='+checked,
+         	dataType:'json',
+         	success:function(data){
+         		
+         		var marks=data;
+         		 
+         		 var result='';
+         		
+       		 	 for(x in marks){
+    	               var date=new Date(Date.parse(marks[x].createTime));
+         		       var startDate=new Date(Date.parse(marks[x].startDate));
+         		       var endDate=new Date(Date.parse(marks[x].endDate));
+         		       
+    	   		       result+='<tr><td>'+marks[x].markId+'</td><td style="width:80px;">'+startDate.format('yyyy-MM-dd')+'</td><td style="width:80px;">'+endDate.format('yyyy-MM-dd')+'</td><td style="width:140px;">'+date.format('yyyy-MM-dd hh:mm:ss')+'</td><td>'+marks[x].markNumber+'</td><td>'+marks[x].markReason+'</td><td>'+marks[x].accordingly+'</td></tr>';
+    	          }
+         		 
+      	          $('#table tbody').html(result);
+      	          $('#modalButton').click();
+         	}
+         });
+
+    
+    }
+    
+ //]]>	
+ 
     </script>
 
 </html>

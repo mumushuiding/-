@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.crm.springboot.mapper.ActivitiMapper">
+
+  <update id="updateTaskInst" parameterType="taskEntity">
+  	update ACT_HI_TASKINST set DESCRIPTION_=#{DESCRIPTION_} where ID_=#{ID_}
+  </update>
+  <!-- 计算任务平均耗时 -->
+ <select id="selectAVGDration" parameterType="hashmap" resultType="string">
+ 	select IFNULL(round(AVG(DURATION_),0),0)  from ACT_HI_TASKINST 
+ 	<where>
+ 	    <if test="assignee!=null and assignee!=''">ASSIGNEE_=#{assignee}</if>
+ 		<if test="assignees!=null and assignees!=''">
+ 		    and ASSIGNEE_ in
+ 			<foreach collection="assignees" item="id" index="no" open="(" close=")" separator=",">#{id}</foreach>
+ 		</if>
+ 		<if test="processInstanceIds!=null">
+ 			and PROC_INST_ID_ in
+ 			<foreach collection="processInstanceIds" index="index" item="id" open="(" separator="," close=")">#{id}</foreach>
+ 		</if>
+ 		and NAME_!='提交申请'
+ 	</where>
+ </select>
+ <!-- 计算总耗时 -->
+ <select id="selectSumDuration" parameterType="hashmap" resultType="string">
+ 	select IFNULL(SUM(DURATION_),0)  from ACT_HI_TASKINST 
+ 	<where>
+ 		 <if test="assignee!=null and assignee!=''">ASSIGNEE_=#{assignee}</if>
+ 		 <if test="assignee==null and assignees==null">and ASSIGNEE_ IS NOT NULL</if>
+ 		<if test="assignees!=null">
+ 		    and ASSIGNEE_ in
+ 			<foreach collection="assignees" item="id1" index="no" open="(" close=")" separator=",">#{id1}</foreach>
+ 		</if>
+ 		<if test="processInstanceIds!=null">
+ 			and PROC_INST_ID_ in
+ 			<foreach collection="processInstanceIds" index="index" item="id" open="(" separator="," close=")">#{id}</foreach>
+ 		</if>
+ 		<if test="name!=null and name!=''">
+ 			and NAME_=#{name}
+ 		</if>
+ 		and NAME_!='提交申请'
+ 	</where>
+ </select>
+</mapper>

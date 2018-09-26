@@ -1,64 +1,89 @@
 package com.crm.springboot.pojos.assess;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name="month-mapping")
 public class MonthAssessCfgPojo {
 	
 	private String cronSchedule;
 	
 	private String targetGroup;
 	
-	private String yellowLightDay;
+	private int warningBeginDayOfMonth;
 	
-	private String redLightDay;
+	private int dangerBeginDayOfMonth;
 	
-	private String deadLineDay;
+	private int deadLineDayOfMonth;
 	
-	private String deductPoints;
+	private String deductPointsForDelay;
+	
+	private String deductPointsForUnsubmitted;
+
+	
+	
 	@Override
 	public String toString() {
-		return "MonthAssessCfgPojo [cronSchedule=" + cronSchedule + ", targetGroup=" + targetGroup + ", yellowLightDay="
-				+ yellowLightDay + ", redLightDay=" + redLightDay + ", deadLineDay=" + deadLineDay + ", deductPoints="
-				+ deductPoints + "]";
+		return "MonthAssessCfgPojo [cronSchedule=" + cronSchedule + ", targetGroup=" + targetGroup
+				+ ", warningBeginDayOfMonth=" + warningBeginDayOfMonth + ", dangerBeginDayOfMonth="
+				+ dangerBeginDayOfMonth + ", deadLineDayOfMonth=" + deadLineDayOfMonth + ", deductPointsForDelay="
+				+ deductPointsForDelay + ", deductPointsForUnsubmitted=" + deductPointsForUnsubmitted + "]";
 	}
+
 	public String getCronSchedule() {
 		return cronSchedule;
 	}
+
 	public void setCronSchedule(String cronSchedule) {
 		this.cronSchedule = cronSchedule;
 	}
+
 	public String getTargetGroup() {
 		return targetGroup;
 	}
+
 	public void setTargetGroup(String targetGroup) {
 		this.targetGroup = targetGroup;
 	}
-	public String getYellowLightDay() {
-		return yellowLightDay;
-	}
-	public void setYellowLightDay(String yellowLightDay) {
-		this.yellowLightDay = yellowLightDay;
-	}
-	public String getRedLightDay() {
-		return redLightDay;
-	}
-	public void setRedLightDay(String redLightDay) {
-		this.redLightDay = redLightDay;
-	}
-	public String getDeadLineDay() {
-		return deadLineDay;
-	}
-	public void setDeadLineDay(String deadLineDay) {
-		this.deadLineDay = deadLineDay;
-	}
-	public String getDeductPoints() {
-		return deductPoints;
-	}
-	public void setDeductPoints(String deductPoints) {
-		this.deductPoints = deductPoints;
+
+	public int getWarningBeginDayOfMonth() {
+		return warningBeginDayOfMonth;
 	}
 
+	public void setWarningBeginDayOfMonth(int warningBeginDayOfMonth) {
+		this.warningBeginDayOfMonth = warningBeginDayOfMonth;
+	}
+
+	public int getDangerBeginDayOfMonth() {
+		return dangerBeginDayOfMonth;
+	}
+
+	public void setDangerBeginDayOfMonth(int dangerBeginDayOfMonth) {
+		this.dangerBeginDayOfMonth = dangerBeginDayOfMonth;
+	}
+
+	public int getDeadLineDayOfMonth() {
+		return deadLineDayOfMonth;
+	}
+
+	public void setDeadLineDayOfMonth(int deadLineDayOfMonth) {
+		this.deadLineDayOfMonth = deadLineDayOfMonth;
+	}
+
+	public String getDeductPointsForDelay() {
+		return deductPointsForDelay;
+	}
+
+	public void setDeductPointsForDelay(String deductPointsForDelay) {
+		this.deductPointsForDelay = deductPointsForDelay;
+	}
+
+	public String getDeductPointsForUnsubmitted() {
+		return deductPointsForUnsubmitted;
+	}
+
+	public void setDeductPointsForUnsubmitted(String deductPointsForUnsubmitted) {
+		this.deductPointsForUnsubmitted = deductPointsForUnsubmitted;
+	}
+
+
+	
+	
 
 }

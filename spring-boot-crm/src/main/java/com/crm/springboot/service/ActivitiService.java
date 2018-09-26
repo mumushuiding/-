@@ -14,10 +14,12 @@ import com.crm.springboot.pojos.FormField;
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
+import com.crm.springboot.pojos.activiti.TaskEntity;
 import com.crm.springboot.pojos.user.User;
 import com.github.pagehelper.PageInfo;
 
 public interface ActivitiService extends BaseActivitiService{
+
 	
 	/**
 	 * ********************将数据封装成分页的对象 pageinfo*******************
@@ -83,17 +85,31 @@ public interface ActivitiService extends BaseActivitiService{
  // 将Task集合转为TaskVO集合
  	List<ProcessBean> createTaskVOList(List<Task> tasks);
  	//查询一个任务所在流程的全部评论
- 	List<Comment> getComments(String taskId);
+ 	
+ 	List<Comment> getComments(String processInstanceId);
     //查询当前任务的审批用户组
  	List<String> selectCandidateGroup(String taskId);
  	/**
 	 * ********************************历史任务查询*************************************
 	 */
  	long countAllHistoricTaskInstancesByUserId(String userId);
- 	List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserId(String userId,Integer pageIndex, Integer pageSize);
- 	PageInfo listAllHistoricTaskInstancesPageInfoByUserId(String userId,Integer pageIndex, Integer pageSize);
+ 	long countAllHistoricTaskInstancesByUserId(String userId,List<String> processInstanceIds);
+ 	List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserId(String userId,List<String> processInstanceIds,Integer pageIndex, Integer pageSize);
+ 	PageInfo listAllHistoricTaskInstancesPageInfoByUserId(String userId,List<String> processInstanceIds,Integer pageIndex, Integer pageSize);
+ 	//分别查询通过和驳回的历史任务
+ 	long countAllHistoricTaskInstancesByUserIdWithPassValue(String userId,String isPass);
+ 	List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserIdWithPassValue(String userId,Integer pageIndex, Integer pageSize,String isPass);
+ 	PageInfo listAllHistoricTaskInstancesPageInfoByUserIdWithPassValue(String userId,Integer pageIndex, Integer pageSize,String isPass);
  	
  	List<ProcessBean> createAllHistoricProcess(List<HistoricTaskInstance> historicTaskInstances);
  	
  	HistoricTaskInstance selectSingleHistoricTaskInstance(String userId,String processInstanceId);
+ 	
+ 	void updateTaskInst(TaskEntity taskEntity);
+ 	//查询历史任务平均耗时
+ 	String selectAVGDration(HashMap<String, Object> params);
+ 	//查询总共耗时
+ 	String selectSumDuration(HashMap<String, Object> params);
+ 	List<String> generateMonthLabels(int number);
+
 }

@@ -2,6 +2,7 @@ package com.crm.springboot.service.impl;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,6 +32,7 @@ public class FileServiceImpl implements FileService{
 			        }
 			        // 将上传文件保存到一个目标文件当中
 			        File result=new File(path+File.separator+DateUtil.formatFileName(new Date())+filename);
+			        
 					file.transferTo(result);
 					
 					return result;
@@ -44,12 +46,12 @@ public class FileServiceImpl implements FileService{
 		if(!file.isEmpty()){
 			
 			// 上传文件路径
-			String path1 =AvailableSettings.TEMP_UPLOAD_LOCATION+File.separator+path;
-			System.out.println("path1="+path1);
+			String path1 =System.getProperty("user.dir")+File.separator+"upload"+File.separator+path;
+			
 			// 上传文件名
 			String filename = file.getOriginalFilename();
 		    File filepath = new File(path1,filename);
-		    System.out.println("filename="+filename);
+		    
 			// 判断路径是否存在，如果不存在就创建一个
 	        if (!filepath.getParentFile().exists()) { 
 	        	filepath.getParentFile().mkdirs();
@@ -61,5 +63,7 @@ public class FileServiceImpl implements FileService{
 		}
 		
 	}
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.crm.springboot.service.impl;
 
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class DictionaryServiceImpl implements DictionaryService{
    
 	@Autowired
 	private DictionaryMapper dictionaryMapper;
+
 	@Override
 	public List<String> selectAllDictionaryWithName(String name) {
 		
@@ -42,5 +44,51 @@ public class DictionaryServiceImpl implements DictionaryService{
 		
 		return dictionaryMapper.selectDistinctNameWithType(type);
 	}
+	@Override
+	public Dictionary selectSingleDic(String name, String type) {
+        HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("type", type);
+		params.put("name", name);
+		return this.selectSingleDic(params);
+	}
+	@Override
+	public String selectSingleValueOfDic(String name, String type) {
+		Dictionary dictionary=selectSingleDic(name, type);
+		if(dictionary==null) return null;
+		return dictionary.getValue();
+	}
+	@Override
+	public void updateDic(Dictionary dictionary) {
+		dictionaryMapper.updateDic(dictionary);
+		
+	}
+	@Override
+	public List<Dictionary> selectAllDics(String name, String type) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("type", type);
+		params.put("name", name);
+		return this.selectAllDics(params);
+	}
+	@Override
+	public List<Dictionary> selectAllDics(String type) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("type", type);
+		return this.selectAllDics(params);
+	}
+	@Override
+	public List<Dictionary> selectAllDics2(String value, String type) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("type", type);
+		params.put("value", value);
+		return this.selectAllDics(params);
+	}
+	@Override
+	public Dictionary selectSingleDict(String value, String type) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("type", type);
+		params.put("value", value);
+		return selectSingleDic(params);
+	}
+
 
 }

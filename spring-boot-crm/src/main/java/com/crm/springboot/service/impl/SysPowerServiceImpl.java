@@ -1,6 +1,7 @@
 package com.crm.springboot.service.impl;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -213,25 +214,7 @@ public class SysPowerServiceImpl implements SysPowerService{
 	public List<String> selectAllActionsWithUserId(Serializable userId) {
 		
 		List<String> result=new ArrayList<String>();
-//		HashMap<String, Object> params = new HashMap<String,Object>();
-//		params.put("userId", userId);
-//		List<GroupManager> groupManagers=this.selectAllGroupManagersWithHashMap(params);
-//		System.out.println(groupManagers.size());
-//		if(groupManagers==null||groupManagers.size()==0) return null;
-//		
-//		for (GroupManager groupManager : groupManagers) {
-//			System.out.println(groupManager.toString());
-//			if(groupManager.getGroupTable()!=null){
-//				if(groupManager.getGroupTable().getActionGroups()==null||groupManager.getGroupTable().getActionGroups().size()==0) return null;
-//				for(ActionGroup actionGroup:groupManager.getGroupTable().getActionGroups()){
-//					result.add(actionGroup.getAction().getAction());
-//				}
-//			}
-//
-//		}
-//		for (String string : result) {
-//			System.out.println(string);
-//		}
+
 		return result;
 	}
 
@@ -252,33 +235,20 @@ public class SysPowerServiceImpl implements SysPowerService{
 
 	@Override
 	public List<String> selectAllGroupIds(String groupname) {
-		
-		return sysPowerMapper.selectAllGroupIds(groupname);
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("groupname", groupname);
+		return this.selectAllGroupIds(params);
 	}
-
+    @Override
+    public List<String> selectAllGroupIds(HashMap<String, Object> params){
+    	return sysPowerMapper.selectAllGroupIds(params);
+    }
 	@Override
 	public String selectGroupIdWithGroupName(String groupname) {
 		
 		return sysPowerMapper.selectGroupIdWithGroupName(groupname);
 	}
 
-	@Override
-	public String getGroupIdWithDepartmentNameAndGroupType(String departmentName,String groupType){
-		String groupname=this.getGroupNameWithDepartmentNameAndGroupType(departmentName, groupType);
-		if(groupname==null) return null;
-		return this.selectGroupIdWithGroupName(groupname);
-	}
-
-	@Override
-	public String getGroupNameWithDepartmentNameAndGroupType(String departmentName, String groupType) {
-		if(departmentName==null||departmentName=="")return null;
-        HashMap<String, Object> params=new HashMap<String, Object>();
-		params.put("value",departmentName);
-		params.put("type", groupType);
-		Dictionary dictionary=dictionaryService.selectSingleDic(params);
-		if(dictionary==null) log.warn("["+departmentName+"] 这个部门，在info_dic字典表里找不到与之对应的 ["+groupType+"]",new RuntimeException(departmentName+" 这个部门，在字典表里找不到与之对应的 "+groupType));;
-		return dictionary.getName();
-	}
 
 	@Override
 	public String getGroupNameWithDepartmentNameAndGroupType(String[] departmentNames, String groupType) {
@@ -287,12 +257,13 @@ public class SysPowerServiceImpl implements SysPowerService{
 		params.put("values",departmentNames);
 		params.put("type", groupType);
 		Dictionary dictionary=dictionaryService.selectSingleDic(params);
-		if(dictionary==null) log.warn("["+departmentNames+"] 这个部门，在info_dic字典表里找不到与之对应的 ["+groupType+"]",new RuntimeException(departmentNames+" 这个部门，在字典表里找不到与之对应的 "+groupType));;
+		if(dictionary==null) return null;
 		return dictionary.getName();
 	}
 
 	@Override
 	public HashMap<String, Object> getDepartmentsWithGroupname(String groupname, String groupType) {
+		  if(groupname==null||"".equals(groupname))return null;
 		  List<String> firstLevelIds=new ArrayList<String>();
 		  List<String> secondLevelIds=new ArrayList<String>();
 		  HashMap<String, Object> params1=new HashMap<String, Object>();
@@ -327,8 +298,8 @@ public class SysPowerServiceImpl implements SysPowerService{
 
 	@Override
 	public List<String> getGroupsOfOvereerWithUserId(String userId) {
-		//查询用户包含哪些考核组
-    	List<String> candidateGroups=activitiService.candidateGroups(userId);
+		//查询用户包含哪些审批组
+    	List<String> candidateGroups=this.selectAllGroupIdsFromGroupManager(userId);
 		//查询考核组和考核办的用户组
 		List<String> list=this.selectAllGroupIds("考");
 		List<String> assessGroups=new ArrayList<String>();
@@ -340,6 +311,106 @@ public class SysPowerServiceImpl implements SysPowerService{
 		}
         if(assessGroups==null||assessGroups.size()==0)return null;
 		return assessGroups;
+	}
+
+	@Override
+	public List<String> getGroupsOfLeaderWithUserId(String userId) {
+		//查询用户包含哪些审批组
+    	List<String> candidateGroups=activitiService.candidateGroups(userId);
+    	List<String> deptManager=this.selectAllGroupIds("部门主任组");
+    	List<String> leader=this.selectAllGroupIds("分管领导组");
+    	List<String> assessGroups=new ArrayList<String>();
+    	
+    	//添加候选组
+	    for (String string : deptManager) {
+			if(candidateGroups.contains(string)){
+				assessGroups.add(string);
+			}
+		}
+	    for (String string : leader) {
+			if(candidateGroups.contains(string)){
+				assessGroups.add(string);
+			}
+		}
+        if(assessGroups==null||assessGroups.size()==0)return null;
+		return assessGroups;
+	}
+
+	@Override
+	public List<GroupManager> selectGroupManager(HashMap<String, Object> params) {
+		
+		return sysPowerMapper.selectGroupManager(params);
+	}
+
+	@Override
+	public GroupManager selectSingleGroupManager(HashMap<String, Object> params) {
+		List<GroupManager> groupManagers=this.selectGroupManager(params);
+		if(groupManagers==null||groupManagers.size()==0) return null;
+		return groupManagers.get(0);
+	}
+
+	@Override
+	public GroupManager selectSingleGroupManager(Integer userid, String groupid) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("userid", userid);
+		params.put("groupid", groupid);
+		return this.selectSingleGroupManager(params);
+	}
+
+	@Override
+	public List<String> getGroupIds(User user) {
+		List<String> result=new ArrayList<String>();
+		for (GroupManager groupManager : user.getUserLinkGroup()) {
+			result.add(groupManager.getGroupid());
+		}
+		return result;
+	}
+
+	@Override
+	public void deleteGroupManager(HashMap<String, Object> params) {
+		sysPowerMapper.deleteGroupManager(params);
+		
+	}
+
+	@Override
+	public void deleteGroupManager(Integer userid, String groupids) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		System.out.println(" userid="+userid+" and groupid in ("+groupids+")");
+		params.put("condition", " userid="+userid+" and groupid in ("+groupids+")");
+		sysPowerMapper.deleteGroupManager(params);
+		
+	}
+
+	@Override
+	public void deleteGroupManager(Integer userid, List<String> groupids) {
+		if(groupids.size()==0) return;
+		StringBuffer buffer=new StringBuffer();
+		for (String string : groupids) {
+			buffer.append(string+",");
+		}
+		this.deleteGroupManager(userid, buffer.toString());
+	}
+
+	@Override
+	public void saveGroupManagerWithGroupIds(GroupManager groupManager, String[] ids) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("groupManager", groupManager);
+		params.put("ids", ids);
+		this.saveGroupManagerWithGroupIds(params);
+		
+	}
+
+	@Override
+	public List<String> selectAllGroupIdsFromGroupManager(HashMap<String, Object> params) {
+		
+		return sysPowerMapper.selectAllGroupIdsFromGroupManager(params);
+	}
+
+	@Override
+	public List<String> selectAllGroupIdsFromGroupManager(String userId) {
+		HashMap<String, Object> params=new HashMap<String, Object>();
+		params.put("userid", userId);
+		return this.selectAllGroupIdsFromGroupManager(params);
 	}
 
 

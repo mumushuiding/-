@@ -230,10 +230,10 @@
             	title:"项目总分",
             	formatter:function(value,row,index){
             		var marks=row.marks;
-            		var totalMark="";
+            		var totalMark=0;
             		for(x in marks){
             			if(marks[x].checked=="1"){
-            				totalMark+=marks[x].markNumber;
+            				totalMark+=parseFloat(marks[x].markNumber);
             			}
             		}
             		return totalMark;
@@ -299,7 +299,10 @@
 
     var msg=[[${msg}]];
 
-    if(msg!=null) alert(msg);
+    if(msg!=null) {
+    	alert(msg);
+    	msg=null;
+    }
 
 /*]]>*/
     </script>

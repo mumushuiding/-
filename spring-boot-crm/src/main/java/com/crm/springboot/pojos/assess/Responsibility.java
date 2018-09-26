@@ -138,10 +138,9 @@ public class Responsibility implements Serializable{
 		return createTime;
 	}
 	public void setCreateTime(Date createTime) {
-		System.out.println("=======================由于今年填表时间较晚，故生成时间默认为1月至二月之间随机的日期");
 		
-		//this.createTime = createTime;
-		this.createTime=DateUtil.getRandomDateBetweenMinAndMax("2018-01-01", "2018-02-15");
+		this.createTime = createTime;
+//		this.createTime=DateUtil.getRandomDateBetweenMinAndMax("2018-01-01", "2018-02-15");
 	}
 	public String getCurrentJob() {
 		return currentJob;

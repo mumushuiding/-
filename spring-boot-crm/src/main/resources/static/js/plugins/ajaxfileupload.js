@@ -35,11 +35,17 @@ jQuery.extend({
         var formId = 'jUploadForm' + id;
         var fileId = 'jUploadFile' + id;
         var form = $('<form  action="" method="POST" name="' + formId + '" id="' + formId + '" enctype="multipart/form-data"></form>');
-        var oldElement = $('#' + fileElementId);
-        var newElement = $(oldElement).clone();
-        $(oldElement).attr('id', fileId);
-        $(oldElement).before(newElement);
-        $(oldElement).appendTo(form);
+        var oldElement = jQuery('#' + fileElementId);  
+
+        var newElement = oldElement.clone();  
+
+        
+
+        oldElement.attr('id', fileId);  
+
+        oldElement.before(newElement);  
+
+        oldElement.appendTo(form); 
         //set attributes
         $(form).css('position', 'absolute');
         $(form).css('top', '-1200px');
@@ -197,29 +203,33 @@ jQuery.extend({
     },
 
     uploadHttpData: function( r, type ) {
-        var data = !type;
-        data = type == "xml" || data ? r.responseXML : r.responseText;
-        // If the type is "script", eval it in global context
-        if ( type == "script" )
-            jQuery.globalEval( data );
-        // Get the JavaScript object, if JSON is used.
-        if ( type == "json" )
-        {
-            // If you add mimetype in your response,
-            // you have to delete the '<pre></pre>' tag.
-            // The pre tag in Chrome has attribute, so have to use regex to remove
-            var data = r.responseText;
-            var rx = new RegExp("<pre.*?>(.*?)</pre>","i");
-            var am = rx.exec(data);
-            //this is the desired data extracted
-            var data = (am) ? am[1] : "";    //the only submatch or empty
-            eval( "data = " + data );
+    	 var data = !type;
+         data = type == "xml" || data ? r.responseXML : r.responseText;
+         // If the type is "script", eval it in global context
+         if ( type == "script" )
+             jQuery.globalEval( data );
+         // Get the JavaScript object, if JSON is used.
+         if ( type == "json" )
+            // eval( "data = " + data );
+             //data会被加<pre>导致AJAX不走success方法,改为如下形式
+             //eval("data = \" "+data+" \" ");
+             data = jQuery.parseJSON(jQuery(data).text());
+         // evaluate scripts within html
+         if ( type == "html" )
+             jQuery("<div>").html(data).evalScripts();
+             //alert($('param', data).each(function(){alert($(this).attr('value'));}));
+         return data;
+    },
+    handleError: function (s, xhr, status, e) {
+        // If a local callback was specified, fire it
+        if (s.error) {
+            s.error.call(s.context || s, xhr, status, e);
         }
-        // evaluate scripts within html
-        if ( type == "html" )
-            jQuery("<div>").html(data).evalScripts();
-        //alert($('param', data).each(function(){alert($(this).attr('value'));}));
-        return data;
-    }
+
+        // Fire the global callback
+        if (s.global) {
+            (s.context ? jQuery(s.context) : jQuery.event).trigger("ajaxError", [xhr, s, e]);
+        }
+    },
 })
 

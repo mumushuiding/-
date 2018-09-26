@@ -2,12 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.crm.springboot.mapper.ProcessMapper">
+<!--  -->
+<cache flushInterval="60000" readOnly="true" size="512"></cache>
+
   <resultMap type="processBean" id="processBeanResultMap">
   	<id property="processInstanceId" column="processInstanceId"/>
   	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.getById"></association>
+   </resultMap>
+  
+   <!-- user  with phone,id and username -->
+   <resultMap type="processBean" id="processBeanResultMap1">
+  	<id property="processInstanceId" column="processInstanceId"/>
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.selectUserWithNameAndPhone"></association>
+   </resultMap>
+  <resultMap type="processEntity" id="processEntityResultMap">
+  	<association property="user" column="userId" javaType="user" select="com.crm.springboot.mapper.UserMapper.getById1"></association>
+  	<association property="evaluation" column="processInstanceId" javaType="evaluation" select="com.crm.springboot.mapper.EvaluationMapper.selectEvaluationByProcessInstanceId"></association>
   </resultMap>
+   <resultMap type="processEntity" id="processEntityResultMap1">
+   		<association property="processBean" column="processInstanceId" javaType="processBean" select="selectProcessBeanByProcessInstanceId"></association>
+   </resultMap>
   <select id="selectUserWithUserId" resultType="user">
   	 select * from info_user where id=#{id}
+  </select>
+  <select id="selectProcessBeanByProcessInstanceId" parameterType="string" resultType="processBean">
+  	select * from process where processInstanceId=#{processInstanceId}
   </select>
   <insert id="save" parameterType="processBean">
   	insert into process(
@@ -29,6 +48,21 @@
   		#{id}
   	</foreach>
   </delete>
+  
+  <select id="selectAllEvaluationFromProcess" parameterType="hashmap" resultMap="processEntityResultMap">
+  	select processInstanceId,userId from process  
+  		<where>
+  			<if test="businessType!=null and businessType!=''">
+	  			<bind name="pattern" value="'%'+_parameter.businessType+'%'"/>
+	  			 businessType like #{pattern}
+  		    </if>
+  		    <if test="titleLike!=null and titleLike!=''">
+	  			<bind name="pattern1" value="'%'+_parameter.titleLike+'%'"/>
+	  			and title like #{pattern1}
+	  		</if>
+  		</where>
+
+  </select>
   <select id="selectAllProcess" parameterType="hashmap" resultMap="processBeanResultMap">
   	select * from process
   	  <where>
@@ -55,41 +89,97 @@
 		                #{id}
 		    </foreach>
         </if>
+        <!-- 查询考核表 组织的定格 -->
+        <if test="assessment!=null and assessment!=''">
+        	and processInstanceId in (select processInstanceId from res_evaluation where overseerEvaluation=#{assessment})
+        </if>
+  	  </where>
+  	  order by requestedDate desc
+  </select>
+  
+  <select id="selectAllProcessWithUserNameAndPhone" parameterType="hashmap" resultMap="processBeanResultMap1">
+  	select * from process
+  	  <where>
+  	  	<if test="userId!=null">userId=#{userId}</if>
+  	  	<if test="processInstanceId!=null">
+  	  	  and processInstanceId=#{processInstanceId}
+  	  	 </if>
+  	  	 <!-- 近似查询 -->
+  	  	 <if test="title!=null and title!=''">
+  	  	 	<bind name="pattern" value="'%'+_parameter.get('title')+'%'"/>
+  	  	 	and title like #{pattern}
+  	  	 	
+  	  	 </if>
+  	  	 <!-- 精确查询 -->
+  	  	 <if test="titleExactly!=null and titleExactly!=''">
+  	  	 	and title=#{titleExactly}
+  	  	 </if>
+  	  	 <if test="businessType!=null and businessType!=''">
+  			<bind name="pattern" value="'%'+_parameter.businessType+'%'"/>
+  			and businessType like #{pattern}
+  		</if>
+  		<if test="deptNames != null and deptNames!=''">     
+		    <foreach collection="deptNames" item="id" open="and deptName IN(" close=")" separator=",">
+		                #{id}
+		    </foreach>
+        </if>
+        <!-- 查询考核表 组织的定格 -->
+        <if test="assessment!=null and assessment!=''">
+        	and processInstanceId in (select processInstanceId from res_evaluation where overseerEvaluation=#{assessment})
+        </if>
   	  </where>
   	  order by requestedDate desc
   </select>
   <select id="selectAllProcessInstanceIds" parameterType="hashmap" resultType="String">
   	select processInstanceId from process
   	  <where>
+  	  
   	  	<if test="completed!=null and completed!=''">
   	  		completed=#{completed}
   	  	</if>
-  	  	<choose>
-  	  		<when test="deptNames!=null and candidateGroups!=null">
-  	  			and (deptName IN
+  	  	<if test="userId!=null">and userId=#{userId}</if>
+  	  	<if test="title!=null and title!=''">
+  	  	 	<bind name="pattern" value="'%'+_parameter.get('title')+'%'"/>
+  	  	 	and title like #{pattern}
+  	  	 	
+  	  	 </if>
+  	  	 <!-- 精确查询 -->
+  	  	 <if test="titleExactly!=null and titleExactly!=''">
+  	  	 	and title=#{titleExactly}
+  	  	 </if>
+  	  	 <if test="businessType!=null and businessType!=''">
+  			<bind name="pattern" value="'%'+_parameter.businessType+'%'"/>
+  			and businessType like #{pattern}
+  		</if>
+  	  	 <if test="postNames!=null and postNames!=''">
+  	  	 	and userId in (select id from info_user where postId in
+  	  	 		<foreach collection="postNames" item="id" index="no" open="(" close=")" separator=",">
+  	  	 			#{id}
+  	  	 		</foreach>
+  	  	 	)
+  	  	 </if>
+  	  	 <if test="deptNames!=null">
+  	  	 	and deptName IN
 		       <foreach collection="deptNames" item="id" index="no" open="(" close=")" separator=",">
 		        #{id}
 		      </foreach>
-		      OR  currentCandidateGroup IN 
+  	  	 </if>
+  	  	 <if test="candidateGroups!=null">
+  	  	    and currentCandidateGroup IN 
         	  <foreach collection="candidateGroups" item="id" index="no" open="(" close=")" separator=",">
 		        #{id}
 		      </foreach>
-		      )
-  	  		</when>
-  	  		<when test="deptNames==null and candidateGroups!=null">
-	  	  		and  currentCandidateGroup IN 
-	        	<foreach collection="candidateGroups" item="id" index="no" open="(" close=")" separator=",">
-			        #{id}
-			    </foreach>
-  	  		</when>
-  	  		<when test="deptNames!=null and candidateGroups==null">
-	  	  		and  deptName IN 
-	        	<foreach collection="deptNames" item="id" index="no" open="(" close=")" separator=",">
-			        #{id}
-			    </foreach>
-  	  		</when>
-  	  	</choose>
-
+  	  	 
+  	  	 </if>
+  	  	 <!-- 月度考核加减分不为0 -->
+  	  	 <if test="totalMarkNeZero=='true'">
+  	  	    and processInstanceId in (select processInstanceId from res_evaluation where totalMark !=0)
+  	  	 	
+  	  	 </if>
+  	  	 <if test="totalMarkNeZero=='false'">
+  	  	    and processInstanceId in (select processInstanceId from res_evaluation where totalMark =0)
+  	  	 	
+  	  	 </if>
   	  </where>
   </select>
   <update id="updateProcess" parameterType="processBean">
@@ -101,18 +191,234 @@
   	</set>
   	where processInstanceId=#{processInstanceId}
   </update>
-  <!-- 查询未填写指定考核表的员工 -->
-  <select id="selectAllUsersWhoUnsubmittedProcess" parameterType="hashmap" resultType="user">
-  	select * from info_user
+  <select id="selectSingleFieldFromProcess" parameterType="hashmap" resultType="string">
+  	select 
+  		<if test="keywordBefore!=null and keywordBefore!=''">${keywordBefore}</if>
+  		${column} from process
+  		<where>
+	  		<if test="completed!=null and completed!=''">completed=#{completed}</if>
+	  		<if test="committed!=null and committed!=''">and committed=#{committed}</if>
+	  		<if test="titleLike!=null and titleLike!=''">
+	  			<bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
+	  			and title like #{pattern}
+	  		</if>
+	  		<if test="currentCandidateGroup!=null and currentCandidateGroup!=''">
+        	    and currentCandidateGroup=#{currentCandidateGroup}
+             </if>
+	  		<if test="deptName!=null and deptName!=''">
+	        	and deptName=#{deptName}
+	        </if>
+	        <if test="deptNames!=null and deptNames!=''">
+	        	and deptName in 
+	        	<foreach collection="deptNames" item="id" index="no" separator="," open="(" close=")">
+	        		#{id}
+	        	</foreach>
+	        </if>
+  		</where>
+  	
+  </select>
+  <select id="selectCountUserNumberWhichSubmittedProcess" parameterType="hashmap" resultType="integer">
+  	select count(userId) from process 
   	<where>
   		<if test="titleLike!=null and titleLike!=''">
-  		  <bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
-  			id not in (select userId from process where title like #{pattern})
+  			<bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
+  			title like #{pattern} and committed=1
   		</if>
+        <if test="deptName!=null and deptName!=''">
+        	and deptName=#{deptName}
+        </if>
+        <if test="deptNames!=null and deptNames!=''">
+        	and deptName in 
+        	<foreach collection="deptNames" item="id" index="no" separator="," open="(" close=")">
+        		#{id}
+        	</foreach>
+        </if>
+  	</where>
+  </select>
+  <select id="selectDistinctCurrentCandidateGroup" parameterType="hashmap" resultType="string">
+  	select distinct currentCandidateGroup from process
+  	<where>
+  		<if test="completed!=null and completed!=''">completed=#{completed}</if>
+  		<if test="committed!=null and committed!=''">and committed=#{committed}</if>
+  		<if test="titleLike!=null and titleLike!=''">
+  			<bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
+  			and title like #{pattern}
+  		</if>
+  		<if test="deptName!=null and deptName!=''">
+        	and deptName=#{deptName}
+        </if>
+        <if test="deptNames!=null and deptNames!=''">
+        	and deptName in 
+        	<foreach collection="deptNames" item="id" index="no" separator="," open="(" close=")">
+        		#{id}
+        	</foreach>
+        </if>
+  	</where>
+  </select>
+  <select id="selectCountProcess" parameterType="hashmap" resultType="integer">
+  	select count(userId) from process
+  	<where>
+  		<if test="completed!=null and completed!=''">completed=#{completed}</if>
+  		<if test="committed!=null and committed!=''">and committed=#{committed}</if>
+  		<if test="titleLike!=null and titleLike!=''">
+  			<bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
+  			and title like #{pattern}
+  		</if>
+  		<if test="businessType!=null and businessType!=''">and businessType=#{businessType}</if>
+        <if test="deptName!=null and deptName!=''">
+        	and deptName=#{deptName}
+        </if>
+        <if test="deptNames!=null">
+        	and deptName in 
+        	<foreach collection="deptNames" item="id" index="no" separator="," open="(" close=")">
+        		#{id}
+        	</foreach>
+        </if>
+        <if test="currentCandidateGroup!=null and currentCandidateGroup!=''">
+        	and currentCandidateGroup=#{currentCandidateGroup}
+        </if>
+        <if test="currentCandidateGroupNotIn!=null">
+            and currentCandidateGroup not in 
+        	<foreach collection="currentCandidateGroupNotIn" item="cid" index="no" separator="," open="(" close=")">#{cid}</foreach>
+        </if>
+        <!-- 查询在二级部门的用户和一级部门的用户并集-->
+	 	<choose>
+	 		<when test="secondLevelIds!=null and firstLevelIds!=null">
+	 			and process.userId in (select userId from info_user_dept where secondLevelId in
+	 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	 		  OR firstLevelId in
+	 		  <foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	 		)
+	 		</when>
+	 		<when test="secondLevelIds!=null and firstLevelIds==null">
+		 		and process.userId in (select userId from info_user_dept where secondLevelId in
+		 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		) 
+	 		</when>
+	 		<when test="secondLevelIds==null and firstLevelIds!=null">
+		 		and process.userId in (select userId from info_user_dept where firstLevelId in
+		 		<foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		)
+	 		</when>
+	 	</choose>
+  	</where>
+  </select>
+  <select id="selectUsersWhoUnsubmittedProcess" parameterType="hashmap" resultType="user">
+  	select * from info_user
+  	<where>
+  	    <if test="userId!=null and userId!=''">
+  	    	id=#{userId}
+  	    </if>
+  		<if test="titleLike!=null and titleLike!=''">
+  		  <bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
+  			and id not in (select userId from process where title like #{pattern} 
+  			<if test="committed!=null and committed!=''">and committed=#{committed}</if>)
+  		</if>
+
   		<if test="postNames!=null and postNames!=''">
   		    and postId in (select pId from info_post where name in
   			<foreach collection="postNames" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>)
   		</if>
+  		<if test="secondLevelId!=null and secondLevelId!=''">
+  			and id in (select userId from info_user_dept where secondLevelId=#{secondLevelId})
+  		</if>
+  		<if test="firstLevelDeptIds!=null and firstLevelDeptIds!=''">
+  		    and id in (select userId from info_user_dept where firstLevelId in
+  			<foreach collection="firstLevelDeptIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>)
+  		</if>
+  		<if test="limitClause!=null and limitClause!=''">
+  			limit ${limitClause}
+  		</if>
   	</where>
   </select>
+  <!-- 查询未填写指定考核表的员工 -->
+  <select id="selectAllUsersWhoUnsubmittedProcess" parameterType="hashmap" resultMap="com.crm.springboot.mapper.UserMapper.userWithDeptResultMap">
+  	select * from info_user
+  	<where>
+  	    <if test="userId!=null and userId!=''">
+  	    	id=#{userId}
+  	    </if>
+  		<if test="titleLike!=null and titleLike!=''">
+  		  <bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
+  			and id not in (select userId from process where title like #{pattern} and committed=1)
+  		</if>
+
+  		<if test="postNames!=null and postNames!=''">
+  		    and postId in (select pId from info_post where name in
+  			<foreach collection="postNames" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>)
+  		</if>
+  		<if test="secondLevelId!=null and secondLevelId!=''">
+  			and id in (select userId from info_user_dept where secondLevelId=#{secondLevelId})
+  		</if>
+  		<if test="firstLevelDeptIds!=null and firstLevelDeptIds!=''">
+  		    and id in (select userId from info_user_dept where firstLevelId in
+  			<foreach collection="firstLevelDeptIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>)
+  		</if>
+  		<if test="limitClause!=null and limitClause!=''">
+  			limit ${limitClause}
+  		</if>
+  	</where>
+  </select>
+ <!-- *********************************************activiti********************************************************** -->
+ <!-- 查询待办 -->
+ <select id="selectProcessFromActRuTask" parameterType="hashmap" resultMap="processBeanResultMap1">
+ 	select processInstanceId,userId,executionId,requestedDate,title,businessType,deploymentId,businessKey,completed,committed,deptName,currentCandidateGroup,ACT_RU_TASK.ID_ as taskId from process join  ACT_RU_TASK
+ 		on ACT_RU_TASK.PROC_INST_ID_=process.processInstanceId
+ 		    <if test="assignee!=null and assignee!=''">and ACT_RU_TASK.ASSIGNEE_=#{assignee}</if> 
+ 			<if test="title!=null and title!=''">and process.title like '%${title}%'</if>
+ 			<if test="completed!=null and completed!=''">and process.completed=#{completed}</if>
+ 			<if test="deptNames!=null">
+ 				and process.deptName in 
+	        	<foreach collection="deptNames" item="id" index="no" separator="," open="(" close=")">
+	        		#{id}
+	        	</foreach>
+ 			</if>
+ 			<if test="postNames!=null">
+  	  	 	    and process.userId in (select id from info_user where postId in
+  	  	 		<foreach collection="postNames" item="id1" index="no" open="(" close=")" separator=",">
+  	  	 			#{id1}
+  	  	 		</foreach>
+	  	  	 	)
+	  	  	 </if>
+	  	  	<if test="candidateGroups!=null">
+	  	  		and process.currentCandidateGroup in 
+	  	  		<foreach collection="candidateGroups" item="id2" index="no" open="(" close=")" separator=",">#{id2}</foreach>
+	  	  	</if>
+	  	  	<!-- 月度考核加减分不为0 -->
+  	  	 <if test="totalMarkNeZero=='true'">
+  	  	    and process.processInstanceId in (select processInstanceId from res_evaluation where totalMark !=0)
+  	  	 	
+  	  	 </if>
+  	  	 <if test="totalMarkNeZero=='false'">
+  	  	    and process.processInstanceId in (select processInstanceId from res_evaluation where totalMark =0)
+  	  	 	
+  	  	 </if>
+  	  	 order by requestedDate desc
+ </select>
+ <!-- 查询历史审批纪录 -->
+ <select id="selectHistoryProcessFromActHiTaskInst" parameterType="hashmap" resultMap="processBeanResultMap1">
+ 	select processInstanceId,userId,executionId,requestedDate,title,businessType,deploymentId,businessKey,completed,committed,deptName,currentCandidateGroup,ACT_HI_TASKINST.ID_ as taskId from process join  ACT_HI_TASKINST
+ 		on ACT_HI_TASKINST.PROC_INST_ID_=process.processInstanceId
+ 		    <if test="assignee!=null and assignee!=''">and ACT_HI_TASKINST.ASSIGNEE_=#{assignee}</if> 
+ 			<if test="title!=null and title!=''">and process.title like '%${title}%'</if>
+ 			<if test="completed!=null and completed!=''">and process.completed=#{completed}</if>
+ 			<if test="deptNames!=null">
+ 				and process.deptName in 
+	        	<foreach collection="deptNames" item="id" index="no" separator="," open="(" close=")">
+	        		#{id}
+	        	</foreach>
+ 			</if>
+ 			<if test="postNames!=null">
+  	  	 	    and process.userId in (select id from info_user where postId in
+  	  	 		<foreach collection="postNames" item="id1" index="no" open="(" close=")" separator=",">
+  	  	 			#{id1}
+  	  	 		</foreach>
+	  	  	 	)
+	  	  	 </if>
+	  	  	<if test="candidateGroups!=null">
+	  	  		and process.currentCandidateGroup in 
+	  	  		<foreach collection="candidateGroups" item="id2" index="no" open="(" close=")" separator=",">#{id2}</foreach>
+	  	  	</if>
+	  	  	order by END_TIME_ desc
+ </select>
 </mapper>

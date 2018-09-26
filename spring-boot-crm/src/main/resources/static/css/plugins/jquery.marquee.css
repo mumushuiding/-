@@ -1,28 +1,39 @@
 ul.marquee {
 	/* required styles */
 	display: block;
-	padding: 0;
-	margin: 0;
 	list-style: none;
-	line-height: 1;
 	position: relative;
 	overflow: hidden;
     
 	/* optional styles for appearance */
-	width: 500px;
-	left: 200px;
+	
+	width: 800px;
+	margin: 0px auto;
 	height: 50px; /* height should be included to reserve visual space for the marquee */
 }
 
 ul.marquee li {
 	/* required styles */
 	position: absolute;
+	line-height: 50px;
 	top: -999em;
-	left: 200px;
 	display: block;
 	white-space: nowrap; /* keep all text on a single line */
 
-	/* optional styles for appearance */
-	font: 14px Arial, Helvetica, sans-serif;
-	padding: 3px 5px;
+}
+
+
+.examples pre {
+	margin-top: 0;
+}
+
+.marquee .author {
+	display: none;
+}
+
+.marquee-author {
+	float: left; 
+	width: 90px; 
+	text-align: right; 
+	padding: 4px 5px 1px 0;
 }

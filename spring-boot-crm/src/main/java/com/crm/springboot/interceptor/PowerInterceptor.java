@@ -28,27 +28,30 @@ public class PowerInterceptor implements HandlerInterceptor{
 		result.add("/index");
 		result.add("/user/registerForm");
 		result.add("/user/save");
+		result.add("/user/selectFirstLevelDept/");
+		result.add("/user/findPassword");
+		result.add("/user/forgotPasswordForm");
 		return result;
 	}
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		
-		User user=(User) request.getSession().getAttribute("sysuser");
-		
+
 		
 		boolean flag=false;
 		//获取请求的路径进行判断
 		String servletPath=request.getServletPath();
+		
 		for(String s:this.getIgnoreUri()){
 			if(servletPath.contains(s)){
 				flag=true;
 				break;
 			}
 		}
+		
 		//拦截请求
 		if(!flag){
-			
+			User user=(User) request.getSession().getAttribute("sysuser");
 			if(user==null){
 				request.getRequestDispatcher("/user/loginForm").forward(request, response);
 			}else{

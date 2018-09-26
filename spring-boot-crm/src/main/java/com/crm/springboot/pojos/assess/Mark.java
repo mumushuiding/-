@@ -3,7 +3,11 @@ package com.crm.springboot.pojos.assess;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.crm.springboot.pojos.user.User;
+import com.crm.springboot.utils.DateUtil;
+
 
 public class Mark implements Serializable{
 	private Integer markId;
@@ -11,6 +15,7 @@ public class Mark implements Serializable{
 	private String markNumber;
 	private String markReason;
 	private String accordingly;
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 	private Date startDate;
 	private Date endDate;
@@ -66,12 +71,18 @@ public class Mark implements Serializable{
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-
 	public Date getCreateTime() {
+		
+		if(createTime!=null) createTime=DateUtil.parseDefaultDate(DateUtil.formatTimesTampDate(createTime));
+		
+		
 		return createTime;
 	}
+  
 	public void setCreateTime(Date createTime) {
+    	
 		this.createTime = createTime;
+
 	}
 	public Integer getMarkId() {
 		return markId;

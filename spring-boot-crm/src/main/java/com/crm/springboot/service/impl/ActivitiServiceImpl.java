@@ -1,5 +1,6 @@
 package com.crm.springboot.service.impl;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Map.Entry;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
@@ -20,6 +21,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.repository.Deployment;
@@ -35,10 +37,12 @@ import org.apache.logging.log4j.core.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.crm.springboot.mapper.ActivitiMapper;
 import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.GroupTable;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.ProcessVO;
+import com.crm.springboot.pojos.activiti.TaskEntity;
 import com.crm.springboot.service.ActivitiService;
 import com.crm.springboot.service.ProcessService;
 import com.crm.springboot.service.ResponsibilityService;
@@ -49,6 +53,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 @Service
 public class ActivitiServiceImpl implements ActivitiService{
+	
 	@Autowired
 	private RuntimeService runtimeService;
 	@Autowired
@@ -68,6 +73,8 @@ public class ActivitiServiceImpl implements ActivitiService{
 	private ResponsibilityService responsibilityService;
     @Autowired
     private SysPowerService sysPowerService;
+    @Autowired
+    private ActivitiMapper activitiMapper;
 	@Override
 	public List<Group> selectGroups(int nowPage,int pageSize) {
 		
@@ -131,6 +138,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 	@Override
 	public void bindUserAndGroups(String userId, String[] groupIds) {
 		for (String groupId : groupIds) {
+			
 			identityService.createMembership(userId, groupId);
 		}
 		
@@ -390,9 +398,9 @@ public class ActivitiServiceImpl implements ActivitiService{
 	}
 
 	@Override
-	public List<Comment> getComments(String taskId) {
-		ProcessInstance pi=this.getProcessInstance(taskId);
-		List<Comment> comments=this.taskService.getProcessInstanceComments(pi.getId());
+	public List<Comment> getComments(String processInstanceId) {
+		
+		List<Comment> comments=this.taskService.getProcessInstanceComments(processInstanceId);
 		
 		return comments;
 	}
@@ -425,6 +433,29 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public void complete(String taskId, Map<String, Object> variables) {
+	  
+       Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+       if ("true".equals(String.valueOf(variables.get("pass")))) {
+    	   task.setDescription("pass");
+	   }
+       if("false".equals(String.valueOf(variables.get("pass")))){
+    	   task.setDescription("reject");
+       }
+       if("withdraw".equals(String.valueOf(variables.get("pass")))){
+    	   task.setDescription("withdraw");
+       }
+       taskService.saveTask(task);
+       
+       List<HistoricTaskInstance> tasks= historyService.createHistoricTaskInstanceQuery().processInstanceId(task.getProcessInstanceId()).taskAssignee(task.getAssignee()).list();
+
+       for (HistoricTaskInstance historicTaskInstance : tasks) {
+    	  if( !historicTaskInstance.getId().equals(task.getId())){
+    		 
+    		  historyService.deleteHistoricTaskInstance(historicTaskInstance.getId());
+    	  }
+	    }
+        
+        System.out.println("taskId="+taskId+",isPass="+String.valueOf(variables.get("pass")));
 		taskService.complete(taskId, variables);
 		
 	}
@@ -432,7 +463,11 @@ public class ActivitiServiceImpl implements ActivitiService{
 
 	@Override
 	public void complete(String taskId) {
-		this.taskService.complete(taskId);
+		try {
+			this.taskService.complete(taskId);
+		} catch (Exception e) {
+			throw e;
+		}
 		
 	}
 
@@ -447,10 +482,14 @@ public class ActivitiServiceImpl implements ActivitiService{
 	}
 
 	@Override
-	public void completeWithCommentAndAudit(String taskId, String userId, Boolean audit, String comment) {
-		this.identityService.setAuthenticatedUserId(userId);
-		ProcessInstance pi=getProcessInstance(taskId);
-		if(comment!=null&&!"".equals(comment)) this.taskService.addComment(taskId, pi.getId(), comment);
+	public void completeWithCommentAndAudit(String taskId, String userId, String audit, String comment) {
+		taskService.claim(taskId, userId);
+		
+		if(comment!=null&&!"".equals(comment)) {
+			ProcessInstance pi=getProcessInstance(taskId);
+			this.taskService.addComment(taskId, pi.getId(), comment);
+		}
+		
 		if(audit!=null&&!"".equals(audit)){
 			Map<String, Object> var=new HashMap<String, Object>();
 			var.put("pass", Boolean.valueOf(audit));
@@ -502,6 +541,7 @@ public class ActivitiServiceImpl implements ActivitiService{
 			if(this.getDeploymentById(deploymentId)!=null){
 		
 				repositoryService.deleteDeployment(deploymentId, cascade);
+				
 			}
 			
 		} catch (Exception e) {
@@ -683,6 +723,9 @@ public class ActivitiServiceImpl implements ActivitiService{
 	@Override
 	public Object getVariableFromProcessInstance(String processInstanceId,String variableName) {
 		
+		
+		
+		
 		return this.runtimeService.getVariable(processInstanceId, variableName);
 	}
 
@@ -724,26 +767,54 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
 		return historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).count();
 	}
-
 	@Override
-	public List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserId(String userId,Integer pageIndex,
+	public long countAllHistoricTaskInstancesByUserId(String userId,List<String> processInstanceIds) {
+		
+		return historyService.createHistoricTaskInstanceQuery().
+				processInstanceIdIn(processInstanceIds).
+				taskAssignee(userId).count();
+	}
+	@Override
+	public long countAllHistoricTaskInstancesByUserIdWithPassValue(String userId, String isPass) {
+		
+		return historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("pass", isPass).taskAssignee(userId).count();
+	}
+	@Override
+	public List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserId(String userId, List<String> processInstanceIds,Integer pageIndex,
 			Integer pageSize) {
-		
-		
-		return historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).listPage((pageIndex-1)*pageSize, pageSize);
+
+		return historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).
+				processInstanceIdIn(processInstanceIds).
+				orderByHistoricTaskInstanceStartTime().desc().listPage((pageIndex-1)*pageSize, pageSize);
 	}
 
 	@Override
-	public PageInfo listAllHistoricTaskInstancesPageInfoByUserId(String userId, Integer pageIndex, Integer pageSize) {
+	public List<HistoricTaskInstance> listAllHistoricTaskInstancesByUserIdWithPassValue(String userId,
+			Integer pageIndex, Integer pageSize,String isPass) {
+		
+		return historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).taskDescription(isPass).orderByHistoricTaskInstanceStartTime().desc().listPage((pageIndex-1)*pageSize, pageSize);
+	}
 
-		return this.getPageInfo(createAllHistoricProcess(this.listAllHistoricTaskInstancesByUserId(userId, pageIndex, pageSize)), this.countAllHistoricTaskInstancesByUserId(userId));
+	@Override
+	public PageInfo listAllHistoricTaskInstancesPageInfoByUserIdWithPassValue(String userId, Integer pageIndex,
+			Integer pageSize, String isPass) {
+	   
+		return this.getPageInfo(createAllHistoricProcess(this.listAllHistoricTaskInstancesByUserIdWithPassValue(userId, pageIndex, pageSize, isPass)), this.countAllHistoricTaskInstancesByUserIdWithPassValue(userId, isPass));
+	}
+	@Override
+	public PageInfo listAllHistoricTaskInstancesPageInfoByUserId(String userId, List<String> processInstanceIds,Integer pageIndex, Integer pageSize) {
+
+		return this.getPageInfo(createAllHistoricProcess(this.listAllHistoricTaskInstancesByUserId(userId,processInstanceIds, pageIndex, pageSize)), this.countAllHistoricTaskInstancesByUserId(userId,processInstanceIds));
 	}
 
 	@Override
 	public List<ProcessBean> createAllHistoricProcess(List<HistoricTaskInstance> historicTaskInstances) {
+		
 		List<ProcessBean> result=new ArrayList<ProcessBean>();
 		HashMap<String, Object> params=new HashMap<String, Object>();
 		for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+			
+			
 			params.put("processInstanceId", historicTaskInstance.getProcessInstanceId());
 			ProcessBean processBean=processService.selectSingleProcessBean(params);
 			if(processBean==null) {
@@ -761,10 +832,11 @@ public class ActivitiServiceImpl implements ActivitiService{
 	@Override
 	public void withdrawTask(String processInstanceId,String userId) {
 		HashMap<String, Object> variables = new HashMap<String,Object>();
-		variables.put("pass", "false");
+		variables.put("pass", "withdraw");
 
 		Task fTask=this.getFirstTask(processInstanceId);
-		
+
+
 		this.complete(fTask.getId(), variables);
 
 	}
@@ -782,22 +854,141 @@ public class ActivitiServiceImpl implements ActivitiService{
 		
         HistoricTaskInstance historicTaskInstance=this.selectSingleHistoricTaskInstance(userId, processInstanceId);
 		
-		System.out.println("his.TaskDefinitionKey"+historicTaskInstance.getTaskDefinitionKey());
+        if(historicTaskInstance==null) {
+        	System.out.println("historicTaskInstance 为 null 无法撤回");
+        	return false;
+        }
+		
 		
 		Task fTask=this.getFirstTask(processInstanceId);
-		if(fTask==null) return false;
-		System.out.println("fTask="+fTask.getTaskDefinitionKey());
+		
+		if(fTask==null) {
+			System.out.println("first task 为 null 无法撤回");
+			return false;
+		}
+		
 		//默认当前流程的上一个流程名为(当前为usertask2)usertask1
 		String nextTaskDefinitionKey="";
-		
+		System.out.println("historicTaskInstance="+historicTaskInstance);
 		if(RegexUtils.isMatch(historicTaskInstance.getTaskDefinitionKey(), "usertask(.*)")){
 			Integer num=Integer.parseInt(RegexUtils.getFirstGroup(historicTaskInstance.getTaskDefinitionKey(), "usertask(.*)"));
 			nextTaskDefinitionKey="usertask"+(num+1);
-			System.out.println("nextTaskDefinitionKey="+nextTaskDefinitionKey);
+			
+			
 		}
-		if(nextTaskDefinitionKey.equals(fTask.getTaskDefinitionKey())) return true;
+		
+		if(nextTaskDefinitionKey.equals(fTask.getTaskDefinitionKey())||fTask.getName().contains("内可撤回")) return true;
 		return false;
 	}
+
+	@Override
+	public void updateTaskInst(TaskEntity taskEntity) {
+		
+		activitiMapper.updateTaskInst(taskEntity);
+	}
+
+	@Override
+	public String selectAVGDration(HashMap<String, Object> params) {
+		
+		return activitiMapper.selectAVGDration(params);
+	}
+
+	@Override
+	public List<String> generateMonthLabels(int number) {
+		List<String> result=new ArrayList<String>();
+		int year=DateUtil.getYear();
+		int month=DateUtil.getMonth();
+		
+		for (int i = number-1; i>0; i--) {
+			if(month-i<=0){
+				result.add((year-1)+"年"+(month-i+number)+"月");
+			}else {
+				result.add(year+"年"+(month-i)+"月");
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
+	public String selectSumDuration(HashMap<String, Object> params) {
+		
+		return activitiMapper.selectSumDuration(params);
+	}
+
+	@Override
+	public void complete(ProcessBean processBean) {
+		try {
+			Task task=this.getFirstTask(processBean.getProcessInstanceId());
+			
+			//必须要设置任务代理人 ，否则无法撤回
+			this.setAssignee(task.getId(), String.valueOf(processBean.getUser().getId()));
+
+			this.complete(task.getId());
+
+			//设置任务状态为1（已提交）
+			processBean.setCommitted("1");
+			processService.updateProcess(processBean);
+		} catch (Exception e) {
+			throw e;
+		}
+		
+	}
+
+	@Override
+	public void setVariable(ProcessBean processBean, Object param, String paramname) {
+		try {
+			
+			Task task=this.getFirstTask(processBean.getProcessInstanceId());
+			HashMap<String, Object> variable=new HashMap<String, Object>();
+			variable.put(paramname, param);
+			this.setVariable(task, variable);
+		} catch (Exception e) {
+			throw e;
+		}
+		
+		
+	}
+
+	@Override
+	public void setVariable(Task task, Object param, String paramname) {
+		try {
+			HashMap<String, Object> variable=new HashMap<String, Object>();
+			variable.put(paramname, param);
+			this.setVariable(task, variable);
+		} catch (Exception e) {
+			throw e;
+		}
+		
+	}
+
+	@Override
+	public void unBindUserWithGroupids(String userid, String groupids) {
+		for (String id : groupids.split(",")) {
+			identityService.deleteMembership(userid, id);
+		}
+		
+	}
+
+	@Override
+	public void unBindUserWithGroupids(String userid, List<String> groupids) {
+		for (String id : groupids) {
+			identityService.deleteMembership(userid, id);
+		}
+		
+	}
+
+	@Override
+	public Object getVariableFromHistoryWithProcessInstanceId(String processInstanceId, String variableName) {
+		HistoricVariableInstance historicVariableInstance=this.historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName(variableName).singleResult();
+		return historicVariableInstance.getValue();
+	}
+
+
+
+
+
+
 
 	
 

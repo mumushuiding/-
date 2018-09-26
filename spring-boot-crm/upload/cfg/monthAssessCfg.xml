@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <month-mapping>
-	<cronSchedule>0/5 * * * * ?</cronSchedule>
-	<targetGroup>中层副职,中层正职</targetGroup>
-	<yellowLightDay>8</yellowLightDay>
-	<redLightDay>11</redLightDay>
-	<deadLineDay>16</deadLineDay>
+	<cronSchedule>0 50 11 29 * ?</cronSchedule>
+	<targetGroup>普通员工,中层副职,中层正职</targetGroup>
+	<warningBeginDayOfMonth>8</warningBeginDayOfMonth>
+	<dangerBeginDayOfMonth>27</dangerBeginDayOfMonth>
+	<deadLineDayOfMonth>0</deadLineDayOfMonth>
 	<deductPoints>0.5</deductPoints>
 </month-mapping>

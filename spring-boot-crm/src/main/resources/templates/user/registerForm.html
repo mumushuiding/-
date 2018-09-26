@@ -58,27 +58,19 @@
       <div class="modal-body">
         <form action="#" class="form col-md-12 center-block" method="post" th:action="@{/user/save}" th:object="${user}">
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"    maxlength="16"/>
+            <input type="text" class="form-control input-lg" pattern="(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$" required="required"  placeholder="手机号" th:field="*{phone}"    maxlength="16"/>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="邮箱" th:field="*{email}"/>
+            <input type="email" class="form-control input-lg" placeholder="邮箱" th:field="*{email}"/>
           </div>
          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="真实姓名" th:field="*{username}"    maxlength="16"/>
+            <input type="text" class="form-control input-lg" placeholder="真实姓名" required="true" th:field="*{username}"    maxlength="16"/>
           </div>
           <div class="form-group">
-            <input type="password" class="form-control input-lg" placeholder="登录密码" th:field="*{password}"   maxlength="16"/>
+            <input type="password" class="form-control input-lg" placeholder="登录密码" th:field="*{password}" required="true"  maxlength="16"/>
           </div>
-       <!--  <div class="form-group">
-		      <select id="second" class="selectpicker" data-live-search="true" title="请选择部门"  th:field="*{userLinkDept.secondLevel.did}" >
-		        <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
-		      </select>
-		       <select id="first" class="selectpicker" data-live-search="true" title="请选择子部门"  th:field="*{userLinkDept.firstLevelIds}" multiple="multiple">
-		         
-		        </select>
-	     </div>--> 
 	    <div class="form-group">
-	      <select  class="selectpicker" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" >
+	      <select  class="selectpicker form-control input-lg" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" required="true">
 	        <option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}"></option>
 	      </select>
 	    </div>
@@ -86,7 +78,7 @@
           <div class="form-group">
             <div th:text="${msg}" style="font:red;text-align:center"></div>
             <button class="btn btn-primary btn-lg btn-block">注册</button>
-            <span><a href="#">找回密码</a></span>
+           
             <span><a href="/user/loginForm" class="pull-right" >登录</a></span>
           </div>
         </form>
@@ -100,19 +92,25 @@
 <script>
     //修改部门
 	$('#second').change(function(){
+	  
 		$.ajax({
 		  type: 'POST',
 		  url: "/user/selectFirstLevelDept/"+$('#second').val(),
 		  dataType: "text",
 		  success: function(data){
-		        
+		       console.log(data);
 		        $("#first").empty();
 		        $("#first").html('');
 		        $("#first").append(data);
-		        $("#first").selectpicker('refresh');
+		       $("#first").selectpicker('refresh');
 		         
 
-		  }
+		  },
+		   error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+             console.log(textStatus);
+              console.log(errorThrown);
+         }
 		 
 		});
 	});

@@ -8,22 +8,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.loader.custom.EntityFetchReturn;
+
 
 public class RegexUtils {
 //    public static void main(String[] args) throws UnsupportedEncodingException{
-//    	String x="C:\\Users\\Administrator\\Desktop\\SnowBall\\SnowBall.exe";
-//    			//多个空格替换成一个
-//    	x=x.replaceAll("\\s{2,}"," ");
-//        String y="2018年5月份"; 
-////    	//\\s*表示连续多个空格
-////        Pattern pattern4=getPattern("(.*?)年(.*?)月份");
-////    	Pattern pattern1=getPattern("([\\s*,+\\u4e00-\\u9fa5]+)");//匹配中文，空格，逗号,括号
-////    	Pattern pattern2=getPattern("(\\(.*=.*\\))");//
-////        Pattern pattern3=getPattern("(?<=记者)(.*?)(?=<script>)");
-////    	System.out.println(RegexUtils.getFirstGroup(x,"(?<=记者 )(.*?)(?=<!--文章作者--)"));
-////        System.out.println(RegexUtils.getIndexGroup(2, y, "(.*?)年(.*?)月份"));
 //
-//    	
 //    }
     /**
      * 实体类字符转换成正常字符支持:&lt;&gt;&amp;
@@ -76,6 +66,32 @@ public class RegexUtils {
 		}
 		return list;
 	}
+	
+	/**
+	 * 判断整数（int）
+	 * @param str
+	 * @return
+	 */
+	public static boolean isInteger(String str) {
+		if (null == str || "".equals(str)) {
+			return false;
+		}
+		Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+		return pattern.matcher(str).matches();
+	}
+	/**
+	 * 判断浮点数（double和float）
+	 * @param str
+	 * @return
+	 */
+	public static boolean isDouble(String str) {
+		if (null == str || "".equals(str)) {
+			return false;
+		}
+		Pattern pattern = Pattern.compile("^[-\\+]?[.\\d]*$");
+		return pattern.matcher(str).matches();
+	}
+	
     public static boolean isMatch(String input,String regex){
     	Matcher matcher=getMatcher(getPattern(regex), input);
     	return matcher.find();
@@ -96,8 +112,16 @@ public class RegexUtils {
 		Matcher matcher=getMatcher(getBetweenPattern(preTag, postTag), input);
 		return matcher;
 	}
+	public static String getBetweenRegex(String preTag,String postTag){
+		return "(?<="+preTag+")(.*?)(?="+postTag+")";
+	}
+	public static String getBetweenRegexWithGreedMode(String preTag,String postTag){
+		return "(?<="+preTag+")(.*)(?="+postTag+")";
+	}
 	public static Pattern getBetweenPattern(String preTag,String postTag){
-		return Pattern.compile("(?<="+preTag+")(.*?)(?="+postTag+")"+postTag);
+		return Pattern.compile("(?<="+preTag+")(.*?)(?="+postTag+")");
+		
+		
 	}
     public static Pattern getPattern(String regex){
     	return Pattern.compile(regex);

@@ -38,7 +38,8 @@ public interface SysPowerMapper extends BaseMapper{
 	public List<ActionGroup> selectActionGroupWithGroupId(Serializable id);
 	
 	//group
-	List<String> selectAllGroupIds(String groupname);
+	
+	List<String> selectAllGroupIds(HashMap<String, Object> params);
 	//================groupManager==========================
 	public void saveGroupManager(GroupManager groupManager);
 	/**
@@ -49,8 +50,10 @@ public interface SysPowerMapper extends BaseMapper{
 	
 	public List<GroupManager> selectGroupManagerByUserId(Serializable userid);
 	public void deleteGroupManagerById(Serializable id);
+	public void deleteGroupManager(HashMap<String, Object> params);
 	public List<GroupManager> selectGroupManagerWithGroupId(Serializable groupId);
 	public List<GroupManager> selectAllGroupManagers();
 	List<GroupManager> selectAllGroupManagersWithHashMap(HashMap<String, Object> params);
-	
+	List<GroupManager> selectGroupManager(HashMap<String, Object> params);
+	List<String> selectAllGroupIdsFromGroupManager(HashMap<String, Object> params);
 }

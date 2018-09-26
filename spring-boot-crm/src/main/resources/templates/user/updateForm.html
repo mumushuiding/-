@@ -56,23 +56,26 @@
          <form action="#" method="post" th:action="@{/user/update}" th:object="${user}">
           <input type="text" name="id" id="id" th:value="*{id}" style="display:none;"/>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"  th:value="*{phone}"  maxlength="16"/>
+            <input type="text" pattern="(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$" required="required" class="form-control input-lg" placeholder="手机号" th:field="*{phone}"  th:value="*{phone}" />
           </div>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="邮箱" th:field="*{email}" th:value="*{email}"/>
+            <input type="email" class="form-control input-lg" placeholder="邮箱" th:field="*{email}" th:value="*{email}" required="true"/>
           </div>
          <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="真实姓名" th:field="*{username}" th:value="*{username}"   maxlength="16"/>
+            <label>真实姓名</label>
+            <input type="text" class="form-control input-lg" placeholder="真实姓名" required="true" th:field="*{username}" th:value="*{username}"  />
           </div>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="职务" th:field="*{position}" th:value="*{position}" />
+            <label style="text-align:center;">---------------------------------------------------修改《职务》---------------------------------------------</label>
+            <input type="text" class="form-control input-lg" placeholder="职务:采编、技术、审计，人事等" th:field="*{position}" th:value="*{position}" required="true"/>
           </div>
 	    <div class="form-group">
-	      <select  class="selectpicker" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" th:value="*{post.pId}">
+	     <label style="text-align:center;">-----------------------------------------------------修改职级---------------------------------------------</label>
+	      <select  class="selectpicker form-control input-lg" data-live-search="true" title="请正确选择职级..."  th:field="*{post.pId}" th:value="*{post.pId}">
 	        <option th:each="p:${posts}" th:value="${p.pId}" th:text="${p.name}"></option>
 	      </select>
 	     </div>
-          <label style="text-align:center;">----------修改部门-----------</label>
+          <label style="text-align:center;">-----------------------------------------------------修改部门---------------------------------------------</label>
           <div class="form-group">
 		      <select id="second" class="selectpicker" data-live-search="true" title="请选择部门"  th:field="*{userLinkDept.secondLevel.did}" >
 		        <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
@@ -105,6 +108,7 @@
 <script>
     //修改部门
 	$('#second').change(function(){
+	  
 		$.ajax({
 		  type: 'POST',
 		  url: "/user/selectFirstLevelDept/"+$('#second').val(),

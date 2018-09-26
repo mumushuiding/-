@@ -9,4 +9,5 @@ public interface DictionaryMapper {
 	List<String> selectAllDictionaryWithName(String name);
 	List<Dictionary> selectAllDics(HashMap<String, Object> params);
 	List<String> selectDistinctNameWithType(String type);
+	void updateDic(Dictionary dictionary);
 }

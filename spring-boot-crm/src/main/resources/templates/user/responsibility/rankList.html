@@ -37,7 +37,20 @@
 <!-- NAVBAR
 ================================================== -->
   <body>
-    
+    <style  type="text/css">
+.top { background: url(/images/top.jpg) no-repeat center top; width: 1140px; height: 200px; padding-top: 146px; margin: 0px auto; box-shadow: 0px -10px 30px 5px #999999; }
+.top h3{ float:left; padding:11px 15px; border: 1px solid #ddd; margin:0;}
+.tb {line-height: 50px; float: left;  font-size: 20px; background-color: #367fa9; text-align: center; width: 130px; }
+.tb a { color: #FFF; text-decoration: none; }
+.gg { font-size: 16px; color: #FFF; background-color: #3c8dbc; width: 1070px; height: 50px; line-height: 50px; float: left; }
+@media screen and (max-width:721px) {
+.top { background: url(/images/top2.jpg) no-repeat center top; width: 100%; }
+.tb { font-size: 16px; width: 30%; }
+.gg { font-size: 14px; width: 65%; padding-left: 5%;}
+}
+
+
+</style>
     <!-- Bootstrap core JavaScript ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/js/jquery-3.2.1.js"></script>
@@ -56,25 +69,28 @@
     
     <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
     
+    <!-- 日期 -->
+    <script src="/js/DateUtils.js"></script>
+    
     <div class="container"> 
-    <h3> 
-       <ul  class="nav nav-tabs">
-			<li id="month"><a href="/responsibility/selectHistoryTotalMark/month" data-toggle="tab">月考排名</a></li>
-			<li id="halfYear"><a href="/responsibility/selectHistoryTotalMark/halfYear" data-toggle="tab">半年考核排名</a></li>
-			<li id="fullYear"><a href="/responsibility/selectHistoryTotalMark/fullYear" data-toggle="tab">年度考核排名</a></li>
-			
-	    
-			
-		</ul> </h3>
+    <div class="top">
+	    <p class="tb">
+	  	   <a href="/home" >首页</a>
+	       
+	    </p>
+	    <h3 id="month"> 月考排名</h3>
+ 
+     </div>
+    
 		<div  class="tab-content">
 			 <div class="tab-pane fade in active" id="home">
 			  <nav class="navbar navbar-default" role="navigation">
 			   <div class="container-fluid">
 			     <div class="navbar-header">
-			       <span class="navbar-brand">搜索</span>
+			       
 			     </div>
 			
-			     <div class="navbar-form navbar-left" role="search">
+			     <div class="navbar-form" role="search">
 			      
 			
 					   <div class="form-group">  
@@ -96,13 +112,13 @@
 		                    </div>  
 		              </div>  
 			          <div class="form-group">
-			          	 <select id="groups" class="selectpicker" data-style="btn-warning" data-live-search="true" title="请选择考核组"  multiple="multiple">
+			          	 <select id="groups" class="selectpicker"  data-live-search="true" title="请选择考核组"  multiple="multiple">
 		         			<option th:each="g:${groups}" th:value="${g}" th:text="${g}"></option>
 		               </select>
 			          </div>
 			          
 			          <div class="form-group">
-			          	 <select id="posts" class="selectpicker" data-style="btn-success" data-live-search="true" title="请选择职级"  multiple="multiple">
+			          	 <select id="posts" class="selectpicker"  data-live-search="true" title="请选择职级"  multiple="multiple">
 		         			<option th:each="p:${posts}" th:value="${p.name}" th:text="${p.name}" th:if="${p.name} ne '高层正职' and ${p.name} ne '高层副职'"></option>
 		                </select>
 			          </div>
@@ -125,7 +141,78 @@
     
 
 </div>
-
+<!-- 加减分明细 -->
+        <button  id="modalButton" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalTable" style="display:none;">点击查看</button>
+        <div class="modal fade" id="modalTable" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+            <div class="modal-dialog" style="width:900px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">加减分明细</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="table"
+                               data-toggle="table"
+                               data-height="499"
+                              >
+                            <thead>
+                            <tr>
+                                <th style="width:80px;">id</th>
+                                <th style="width:100px;">开始日期</th>
+                                <th style="width:100px;">结束日期</th>
+                                <th style="width:100px;">生成日期</th>
+                                <th style="width:80px;">评分</th>
+                                <th>评分原因</th>
+                                <th>评分依据</th>
+                                
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+<!-- 项目明细 -->
+        <button  id="modalButton1" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalTable1" style="display:none;">点击查看</button>
+        <div class="modal fade" id="modalTable1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+            <div class="modal-dialog" style="width:900px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">加减分明细</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="table1"
+                               data-toggle="table"
+                               data-height="499"
+                              >
+                            <thead>
+                            <tr>
+                                <th style="width:80px;">id</th>
+                                <th>项目内容</th>
+                                <th>项目进展</th>
+                                
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
  <script th:inline="javascript">
 //<![CDATA[
       
@@ -170,7 +257,7 @@
    $('input').each(function(){
      
    	 $(this).change(function(){
-   	    alert($(this).val());
+   	   
    	 	$('#mytab').bootstrapTable('refresh', {url: '/responsibility/selectHistoryTotalMark/'+[[${taskType}]]});
    	 });
    });
@@ -209,51 +296,7 @@
             }
           
         ];
-     var yearColumns=[
-            {
-                title:'全选',
-                field:'select',
-                //复选框
-                checkbox:true,
-                align:'center',
-                valign:'middle'
-            },
-            {
-                title:'名次',
-                field:'',
-                
-            },
-            {
-            	title:"姓名",
-            	field:'',
-            },
-            {
-            	title:"所属部门",
-            	field:'',
-            },
-            {
-            	title:"考效总分",
-            	field:'',
-            }
-            ,
-            {
-            	title:"群众评议",
-            	field:'',
-            },
-            {
-            	title:"领导点评",
-            	field:'',
-            },
-            {
-            	title:"组织考察",
-            	field:'',
-            },
-            {
-            	title:"总分",
-            	field:'',
-            }
-          
-        ];
+   
         
    
     $('#mytab').bootstrapTable({
@@ -304,14 +347,25 @@
             	formatter:function(value,row,index){
             	    var startDate=$('#startDate').val();
             	    var endDate=$('#endDate').val();
-            		var aLink='<a href="/responsibility/projectList?userId='+row.user.id+'&startDate='+startDate+'&endDate='+endDate+'">'+row.user.username+'</a>';
+            		
+            		var aLink='<a href="javascript:void(0);" onclick="javascript:getDetailsOfMarks(\''+row.user.id+'\',\''+startDate+'\',\''+endDate+'\',\'1\')">'+row.user.username+'</a>';
             		return aLink;
             	}
             },
             {
             	title:'部门',
-            	formatter:function(value,row,index){
-            	
+            	formatter:function(value,row,index){ 
+           				if(row.user.userLinkDepts.length==1){
+					        
+					     	 return row.user.userLinkDepts[0].firstLevel.name;
+					     }else{
+					        if(row.user.userLinkDepts[0]){
+					        return row.user.userLinkDepts[0].secondLevel.name;
+					        } else{
+					        	return"无部门，请至《个人中心》添加";
+					        }
+					     	 
+					     }
             	}
             },
             
@@ -369,12 +423,15 @@
     		 $("li").attr("class","");
     		 $(this).attr("class","active");
     		 alert($(this).attr("id"));
-    		//location.href="/responsibility/selectHistoryTotalMark/"+$(this).attr("id");
+    		location.href="/responsibility/selectHistoryTotalMark/"+$(this).attr("id");
     	});
     });
     
     var msg=[[${msg}]];
-    if(msg!=null) alert(msg);
+   if(msg!=null) {
+    	alert(msg);
+    	msg=null;
+    }
     
       //日期控件
   $('#datetimepicker1').datetimepicker({  
@@ -385,6 +442,55 @@
         format: 'YYYY-MM-DD',  
         locale: moment.locale('zh-cn')  
     }); 
+    
+     //modal table
+    function getProject(projectId){
+    	
+    	$('#table1 tbody').html('');
+    	
+    	$.ajax({
+    		type:'post',
+    		url:'/responsibility/selectProjectWithProjectId/'+projectId,
+    		dataType:'json',
+    		success:function(data){
+    			 var result='';
+    			 if(data) result='<tr><td style="width:80px;">'+data.projectId+'</td><td>'+data.projectContent+'</td><td>'+data.progress+'</td></tr>';
+    			 $('#table1 tbody').html(result);
+               	$('#modalButton1').click();
+    		}
+    	});
+    	
+    }
+    function getDetailsOfMarks(userId,startDate,endDate,checked){
+     
+
+        $('#table tbody').html('');
+         $.ajax({
+         	type:'post',
+         	url:'/responsibility/selectAllMark?userId='+userId+'&startDate='+startDate+'&endDate='+endDate+'&checked='+checked,
+         	dataType:'json',
+         	success:function(data){
+         		
+         		var marks=data;
+         		 
+         		 var result='';
+         		
+       		 	 for(x in marks){
+       		 	       
+    	               var date=new Date(Date.parse(marks[x].createTime));
+         		       var startDate=new Date(Date.parse(marks[x].startDate));
+         		       var endDate=new Date(Date.parse(marks[x].endDate));
+         		       var aLink='<a href="javascript:void(0);" onclick="javascript:getProject(\''+marks[x].projectId+'\')"><span class="glyphicon glyphicon-hand-right"></span>'+marks[x].markId+'</a>';
+    	   		       result+='<tr><td style="width:80px;">'+aLink+'</td><td style="width:100px;">'+startDate.format('yyyy-MM-dd')+'</td><td style="width:100px;">'+endDate.format('yyyy-MM-dd')+'</td><td style="width:100px;">'+date.format('yyyy-MM-dd hh:mm:ss')+'</td><td style="width:80px;">'+marks[x].markNumber+'</td><td>'+marks[x].markReason+'</td><td>'+marks[x].accordingly+'</td></tr>';
+    	          }
+         		 
+      	          $('#table tbody').html(result);
+      	          $('#modalButton').click();
+         	}
+         });
+
+    
+    }
 //]]>
     </script>
 

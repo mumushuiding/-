@@ -1,5 +1,7 @@
 package com.crm.springboot.controller;
 
+
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
+import com.crm.springboot.pojos.GroupManager;
 import com.crm.springboot.pojos.ProcessBean;
 import com.crm.springboot.pojos.assess.Mark;
+import com.crm.springboot.pojos.user.Dept;
 import com.crm.springboot.pojos.user.User;
 import com.crm.springboot.service.ActivitiService;
+import com.crm.springboot.service.DictionaryService;
 import com.crm.springboot.service.ProcessService;
 import com.crm.springboot.service.ResponsibilityService;
 import com.crm.springboot.service.UserService;
@@ -36,7 +41,8 @@ public class WelcomController {
 	
 	@Autowired 
 	private UserService userService;
-	
+	@Autowired
+	private DictionaryService dictionaryService;
 	@Autowired
 	private ResponsibilityService responsibilityService;
 	@RequestMapping(value={"/","index"})
@@ -66,11 +72,46 @@ public class WelcomController {
 	}
 	@RequestMapping("/{location}")
 	public String info(@PathVariable String location,Model model){
+        
 		if("home".equals(location)){
+			  
+			  //查询考核组信息
+			  List<String> groupList=dictionaryService.selectDistinctNameWithType("考核组");
+			  if(groupList.size()==0) throw new RuntimeException("数据库info_dict表，不存在type为【考核组】的条目");
+			  model.addAttribute("assessGroups", groupList.toArray(new String[groupList.size()]));
+              //当今年的月度考核还未开始时，先显示去年的排名
+			  HashMap<String, Object> params=new HashMap<String, Object>();
+		      Date date=new Date();
 
-			  model.addAttribute("startDateOfYear", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(new Date())));
-			  log.info(DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(new Date())));
-			  model.addAttribute("endDateOfYear", DateUtil.formatDefaultDate(new Date()));
+		      int year=DateUtil.getYear(date);
+		      params.put("checked", "1");
+		      Date startDateOfYear=DateUtil.getFirstDayOfYear(date);
+		      Date endDateOfYear=date;
+			  params.put("startDate", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(date)));
+			  params.put("endDate",DateUtil.formatDefaultDate(date));
+			  if(responsibilityService.countTotalMarkAndUser(params)==0) {
+				  year=year-1;
+				  date=DateUtil.addYears(date, -1);
+				  startDateOfYear=DateUtil.getFirstDayOfYear(date);
+				  endDateOfYear=DateUtil.getLastDayOfYear(date);
+			  }
+			  
+			  model.addAttribute("year", year);
+			  //查询个人具体得分时会用到
+			  model.addAttribute("startDateOfYear", DateUtil.formatDefaultDate(startDateOfYear));
+			  model.addAttribute("endDateOfYear", DateUtil.formatDefaultDate(endDateOfYear));
+			 
+			  //上月的开始日期和结束日期，为了查询上月月度考核排名前10的员工
+			  Date lastMonth=DateUtil.addMonths(new Date(), -1);
+			  int yearOfLastMonth=DateUtil.getYear(lastMonth);
+			  int monthOfLastMonth=DateUtil.getMonth(lastMonth); 
+			  model.addAttribute("startDateOfLastMonth", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfMonth(yearOfLastMonth, monthOfLastMonth)));
+			  model.addAttribute("endDateOfLastMonth", DateUtil.formatDefaultDate(DateUtil.getLastDayOfMonth(yearOfLastMonth, monthOfLastMonth)));
+			
+			  
+			  //半年考核和年度考核需要部门信息
+			  List<Dept> depts=userService.selectDistinctSecondLevelDept();
+			  model.addAttribute("depts", depts);
 			  
 		}
 		return location;

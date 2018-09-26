@@ -56,7 +56,10 @@ public class SysPowerController {
 			model.addAttribute("actionColumns", actionColumns);
 			model.addAttribute("groups", groups);
 		}
-        
+        //显示组织架构
+		if("structure".equals(location)){
+			
+		}
 		
 		return "/system/power/"+location;
 	}
@@ -88,6 +91,12 @@ public class SysPowerController {
 			session.setAttribute("powercontroller_groupid", purpose);
 			return "/system/activiti/"+location;
 		}
+		
+        if("userList".equals(location)){
+    		model.addAttribute("taskType", purpose);
+    	}
+    	
+
 		return "/system/power/"+location;
 	}
 	@RequestMapping("/{location}/{purpose}/{parameter}")
@@ -212,7 +221,6 @@ public class SysPowerController {
 		PageHelper.startPage(pageIndex,pageSize);
 		List<GroupTable> groupTables=sysPowerService.selectOnlyAllGroups();
 		PageInfo pageInfo=new PageInfo(groupTables);
-		System.out.println(JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(groupTables), pageInfo.getTotal(), pageIndex, pageSize));
 		return JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(groupTables), pageInfo.getTotal(), pageIndex, pageSize);
     }
     
@@ -250,7 +258,7 @@ public class SysPowerController {
 	@RequestMapping("/deleteGroupManager/{userId}/{groupId}/{groupManagerId}")
 	public String deleteGroupManager(@PathVariable String userId,@PathVariable String groupId,@PathVariable String groupManagerId,HttpServletRequest request){
 		String referer=request.getHeader("referer");
-		System.out.println(referer);
+	
 		
 		sysPowerService.deleteGroupManagerById(groupManagerId);
 		activitiService.unBindUserAndGroup(userId, groupId);
@@ -267,7 +275,7 @@ public class SysPowerController {
 //		session.removeAttribute("powercontroller_groupid");
 		List<GroupManager> groupManagers=sysPowerService.selectGroupManagerWithGroupId(groupId);
 		PageInfo pageInfo=new PageInfo(groupManagers);
-		System.out.println(JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(groupManagers), pageInfo.getTotal(), pageIndex, pageSize));
+		
 		return JsonUtils.formatDataForPagination(JsonUtils.getGson().toJson(groupManagers), pageInfo.getTotal(), pageIndex, pageSize);
 	}
 }

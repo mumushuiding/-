@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../static/images/favicon.ico"/>
+
+    <title>待办和受理的业务</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-select.min.css" rel="stylesheet"/>
+     <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+     <link href="/css/plugins/bootstrap-table.min.css" rel="stylesheet"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/css/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom styles for this template -->
+   
+   
+  </head>
+<!-- NAVBAR
+================================================== -->
+  <body>
+    
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.2.1.js"></script>
+
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/holder.min.js"></script>
+
+    <script src="/js/bootstrap-select.min.js"></script>
+    
+    <script src="/js/moment-with-locales.min.js"></script>
+    
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table.min.js"></script>
+    
+    <script src="/js/plugins/bootstrap-table-zh-CN.min.js"></script>
+    
+    <div class="container"> 
+    <h3> 
+       <ul  class="nav nav-tabs">
+            <li id="res"><a href="/responsibility/assessmentList/res" data-toggle="tab">责任清单表</a></li> 
+			<li id="month"><a href="/responsibility/assessmentList/month" data-toggle="tab">月考核表</a></li>
+			<li id="halfYear"><a href="/responsibility/assessmentList/halfYear" data-toggle="tab">半年考核</a></li>
+			<li id="fullYear"><a href="/responsibility/assessmentList/fullYear" data-toggle="tab">年度考核</a></li>
+			<li id="all"><a href="/responsibility/assessmentList/all" data-toggle="tab">所有考核表</a></li>
+	    
+			
+		</ul> </h3>
+		<div  class="tab-content">
+			 <div class="tab-pane fade in active" id="home">
+			  <nav class="navbar navbar-default" role="navigation">
+			   <div class="container-fluid">
+			     <div class="navbar-header">
+			       <span class="navbar-brand">搜索标题</span>
+			     </div>
+			
+			     <div class="navbar-form navbar-left" role="search">
+			      
+			
+			       <div class="input-group">
+			         <input type="text" class="form-control" placeholder="输入标题" id="title"/>
+			
+			         <div class="input-group-btn">
+			           <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+			         </div>
+			       </div>
+			       <button id="search_btn" class="btn btn-default">搜索</button>
+			
+			     </div>
+			         
+			   </div>
+			   <!-- .container-fluid -->
+			 </nav>
+			
+			   <!-- 工具栏 -->
+			  <div id="toolbar" class="btn-group pull-left" >
+			   <button id="btn_add" type="button" class="btn btn-primary">
+			        <span class="glyphicon glyphicon-plus" aria-hidden="true">新增</span>
+			  </button>
+			 
+			    <button id="btn_delete" type="button" class="btn btn-danger" >
+			        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+			    </button>
+
+			  </div>
+			  <!-- /工具栏 -->
+			  <table id="mytab" class="table table-hover"></table>
+			</div>
+			
+		</div>
+    
+    
+
+</div>
+
+    <script th:inline="javascript">
+    //根据窗口调整表格高度
+    $(window).resize(function() {
+        $('#mytab').bootstrapTable('resetView', {
+            height: tableHeight()
+        })
+    })
+//生成用户数据
+//bootstrapTable保存pageIndex
+    var state={};
+    if(window.history.state){
+    	state=window.history.state;
+    }else{
+    	state={
+    		'pageIndex':1,
+    		'pageSize':10,
+    	};
+    	window.history.pushState(state,'assessmentList',[[${taskType}]]);
+    }
+    $('#mytab').bootstrapTable({
+        method: 'post',
+        contentType: "application/x-www-form-urlencoded",//必须要有！！！！
+        url:"/system/activiti/listProcessInstance/"+[[${taskType}]],//要请求数据的文件路径
+        //height:tableHeight(),//高度调整
+        toolbar: '#toolbar',//指定工具栏
+        striped: true, //是否显示行间隔色
+        pageNumber: window.history.state.pageIndex, //初始化加载第一页，默认第一页
+        pagination:true,//是否分页
+        queryParamsType:'limit',//查询参数组织方式
+        queryParams:queryParams,//请求服务器时所传的参数
+        sidePagination:'server',//指定服务器端分页
+        pageSize:window.history.state.pageSize,//单页记录数
+        pageList:[5,10,20,30],//分页步进值
+        showRefresh:true,//刷新按钮
+        showColumns:true,
+        clickToSelect: true,//是否启用点击选中行
+        toolbarAlign:'left',//工具栏对齐方式
+        buttonsAlign:'left',//按钮对齐方式
+        toolbar:'#toolbar',//指定工作栏
+        columns:[
+            {
+                title:'全选',
+                field:'select',
+                //复选框
+                checkbox:true,
+                align:'center',
+                valign:'middle'
+            },
+            {
+                title:'流程ID',
+                field:'processInstanceId',
+                
+            }
+            ,
+            {
+                title:'标题',
+                field:'title',
+                formatter: operateTitle
+            },
+            {
+                title:'申请用户ID',
+                field:'user.id',
+                visible:false
+               
+            }
+            ,
+            {
+                title:'申请用户',
+                field:'user.username'
+               
+            },
+            {
+                title:'表单类型',
+                field:'businessType',
+                
+            },
+            {
+                title:'部门',
+                field:'deptName',
+               
+            }
+            ,
+            {
+            	title:'申请日期',
+            	field:'requestedDate',
+            },
+            {
+                title:'流程定义',
+                field:'businessKey',
+                visible:false
+            }
+            ,
+            {
+                title:'executionId',
+                field:'executionId',
+                visible:false
+            }
+            ,
+            {
+                title:'当前状态',
+                field:'committed',
+                formatter:function(value,row,index){
+                   
+                   if(!row.deptName)return '<span class="btn btn-danger">部门为空，无法流转</span>';
+                	if(row.committed=="0"){
+                		return '<span class="btn btn-danger">未提交</span>';
+                	}else{
+                		return "已提交";
+                	}
+                }
+                
+            }
+            ,
+            
+            {  
+	            field: 'operate',  
+	            title: '操作',   
+	            //operateEvents,
+	            formatter: operateFormatter,
+	            width:'170px'
+            }
+        ],
+        locale:'zh-CN',//中文支持,
+        responseHandler:function(result){
+
+		    return result;
+        }
+    });
+    function operateTitle(value, row, index) {
+        
+        var params=row.processInstanceId+","+row.executionId;
+      
+        var businessType="";
+	    if(row.businessType=='一线干部-月度考核') businessType="month";
+	    if(row.businessType=='一线干部责任清单') businessType="res";
+	    if(row.businessType=='一线干部-年度考核') businessType="fullYear";
+        return [  
+           '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+businessType+'" >'+row.title+'</a>',
+	       ].join('');
+        
+        
+
+          
+    }
+
+    function operateFormatter(value, row, index) {
+   
+        var params=row.processInstanceId+","+row.executionId;
+        var taskType=[[${taskType}]];
+        var committed=row.committed;
+        var completed=row.completed;
+        if(row.businessType=='一线干部-月度考核') taskType="month";
+        if(row.businessType=='一线干部责任清单') taskType="res";
+        if(row.businessType=='一线干部-年度考核') taskType="fullYear";
+        //如果流程已经结束
+        if(completed==="1"){
+        	return [  
+        	'<span class="btn btn-default">已结束</span>',
+            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"/>查阅</a>',
+            
+        ].join('');
+        //如果流程已经提交
+         }
+        if(committed=="1"){
+            if([[${session.sysuser.id}]]==row.user.id){
+            	
+            	return [  
+		            '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>进度</a>',
+		            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>考察表</a>',
+		            '<a  href="/system/activiti/withdrawTask/'+row.processInstanceId+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>撤回</a>',
+		            
+		        ].join('');
+            	
+            }
+		    return [  
+		            '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>进度</a>',
+		            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>考察表</a>',
+		            
+		        ].join('');
+	     }
+       
+	    return [  
+	            '<a id="claim" href="/system/activiti/getDiagram?params='+params+'" class="btn btn-default"><span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>进度</a>',
+	            '<a  href="/responsibility/selectEvaluation/'+row.processInstanceId+'/'+taskType+'" class="btn btn-default"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>编辑</a>',
+	            
+	            ].join('');  	
+          
+    }
+
+    //请求服务数据时所传参数
+    function queryParams(params){
+      state = { 
+        'pageIndex':params.pageNumber, 
+        'pageSize':params.limit,
+        };
+        window.history.replaceState(state,'assessmentList',[[${taskType}]]);
+        return{
+            //每页多少条数据
+            pageSize: params.limit,
+            //请求第几页
+            pageIndex:params.pageNumber,
+            title:$('#title').val()
+        }
+    }
+     //查询按钮事件
+    $('#search_btn').click(function(){
+        $('#mytab').bootstrapTable('refresh', {url: '/system/activiti/listProcessInstance/'+[[${taskType}]]});
+    })
+    //tableHeight函数
+    function tableHeight(){
+        //可以根据自己页面情况进行调整
+        return $(window).height() -280;
+    }
+    //删除用户
+    
+    $('#btn_delete').click(function(){
+    	var dataArr=$('#mytab').bootstrapTable('getSelections');
+    	var result="";
+    	if(dataArr=="") {
+    		alert("请您先选择一个对象！！");
+    		return;
+    	}
+        for(x in dataArr){
+        	result+=dataArr[x].processInstanceId+",";
+        }
+        var phone=[[${session.sysuser.phone}]];
+        var requestedUserId="";
+        if(dataArr[0].user) requestedUserId=dataArr[0].user.id;
+		var sysuserid=[[${session.sysuser.id}]];
+		var flag=false;
+	    if(phone=="18250315022"){
+       	   alert("这个号码可以随意删除");
+       	   deleteProcess(result);
+       	   return ;
+        }
+        if(requestedUserId!=sysuserid){
+			alert("你不能删除别人的文件");
+			return; 	
+        }
+       if(dataArr[0].committed=='1'){
+           alert("任务已经提交，不允许删除，可以让下一级审批人逐级驳回后，再删除");
+           return ;
+       }
+
+      deleteProcess(result);
+    });
+    function deleteProcess(ids){
+        if(!confirm("你确定要删除吗？？")) return ;
+    	location.href="/process/deleteProcess/"+ids;
+    }
+    //添加
+    $('#btn_add').click(function(){
+    	
+    	location.href="/system/activiti/preStart/EvaluationProcess/"+[[${taskType}]]+"Form";
+    });
+
+    var taskType = [[${taskType}]];
+    $("#" + taskType).attr("class", "active");
+    $("li").each(function(){
+    	$(this).click(function(){
+    		 $("li").attr("class","");
+    		 $(this).attr("class","active");
+    		 location.href="/responsibility/assessmentList/"+$(this).attr("id");
+    	});
+    });
+    
+    var msg=[[${msg}]];
+    if(msg!=null) alert(msg);
+    </script>
+
+  </body>
+</html>

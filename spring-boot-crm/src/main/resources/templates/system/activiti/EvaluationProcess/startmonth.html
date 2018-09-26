@@ -19,20 +19,9 @@
     <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet"/>
      
     <link href="/css/grid.css" rel="stylesheet"/>
-     
-     
-     
-     
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
     <script src="/css/ie-emulation-modes-warning.js"></script>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-   
     
     
        <!-- Bootstrap core JavaScript ================================================== -->
@@ -48,11 +37,36 @@
     <script src="/js/moment-with-locales.min.js"></script>
     
     <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    <!-- autosize -->
+      <script th:src="${urls.getForLookupPath('/js/plugins/autosize.js') }"></script>
+    <!-- 前端打印 -->
+    <script src="/js/plugins/jQuery.print.js"></script>
+
   </head>
   
 <body>
- 
-      <div class="container border1" >
+<style>
+	textarea{
+        display: table-cell; vertical-align: middle;
+		resize : none;
+
+
+	}
+</style>
+<!-- 去掉页眉页脚 -->
+<style media="print">
+    @page {
+      size: auto;  /* auto is the initial value */
+      margin: 0mm 0mm 0mm 0mm; /* this affects the margin in the printer settings */
+    }
+</style>
+
+       <button id="print" class="pull-right btn-lg btn-primary">
+              
+             <span class="glyphicon glyphicon-print" aria-hidden="true">打印</span>
+       </button>
+     
+      <div id="content" class="container" >
         <form id="f1" method="post"  th:object="${evaluation}">
 		 <input type="text" th:value="*{processBean.deploymentId}" th:field="*{processBean.deploymentId}" style="display:none;"/>
          <input type="text" th:value="*{processBean.businessKey}" th:field="*{processBean.businessKey}" style="display:none;"/>
@@ -66,15 +80,15 @@
     	</div>
     	<div class="row">
     		<div class="FlexRow">
-    			<div class="FlexItem FlexItem-md-6">
+    			<div class="FlexItem FlexItem-md-5">
     		                   <p>表格类型</p>
     			</div>
-    			<div class="FlexItem FlexItem-md-6 ">
+    			<div class="FlexItem FlexItem-md-8 ">
     			    <input type="text" th:value="*{startDate}" th:field="*{startDate}" readOnly="true"  style="display:none;"/>
     			    <input type="text" th:value="*{endDate}" th:field="*{endDate}" readOnly="true"  style="display:none;"/>
     			    <input type="text" th:value="*{sparation}" th:field="*{sparation}" readOnly="true"/>
     			</div>
-    			<div class="FlexItem FlexItem-md-6">
+    			<div class="FlexItem FlexItem-md-5">
     		            <p> 填表日期:</p>
     			</div>
     			<div class="FlexItem FlexItem-md-7">
@@ -88,22 +102,23 @@
     			<div class="FlexItem FlexItem-md-2">
     				<p>姓名</p>			
     			</div>
-    			<div class="FlexItem FlexItem-md-4">
+    			<div class="FlexItem FlexItem-md-3">
     			      
-    				<input type="text" name="" readonly="true" th:value="*{processBean.user.username}"/>			
-    			</div>   
-    			<div class="FlexItem FlexItem-md-4">
-    				<p>部门</p>
-    			</div>   
-    			<div class="FlexItem FlexItem-md-8">
-    				<input type="text" name="" readonly="true" th:value="*{processBean.deptName}" th:field="*{processBean.deptName}"/>
-    			</div>   
-    			<div class="FlexItem FlexItem-md-2">
+    				<p><input type="text" name="" readonly="true" th:value="*{processBean.user.username}"/></p>				
+    			</div>
+    			<div class="FlexItem FlexItem-md-3">
     				<p>职务</p>		
     			</div>   
+    			<div class="FlexItem FlexItem-md-5">
+    				<input type="text" name=""  th:value="*{processBean.user.position}" th:field="*{processBean.user.position}" />	
+    			</div>  
+    			<div class="FlexItem FlexItem-md-5">
+    				<p>部门</p>
+    			</div>   
     			<div class="FlexItem FlexItem-md-7">
-    				<input type="text" name=""  th:value="*{processBean.user.position}" th:field="*{processBean.user.position}"/>	
-    			</div>       			
+    				<p><input type="text" name="" readonly="true" th:value="*{processBean.deptName}" th:field="*{processBean.deptName}"/></p>
+    			</div>   
+      			
     		</div>
     	</div>
     	<div class="row">
@@ -120,10 +135,10 @@
     						    	<div class="FlexColumn">
     						    		<div class="FlexItem FlexItem-vd-1">
     						    			<div class="FlexRow">
-    						    			    <div class="FlexItem FlexItem-md-4"><p>操作</p></div>
+    						    			    <div class="FlexItem FlexItem-md-2"><p id="operate">操作</p></div>
     						    				<div class="FlexItem FlexItem-md-7"><p>项目内容</p></div>
-    						    				<div class="FlexItem FlexItem-md-7"><p>进展情况</p></div>
-    						    				<div class="FlexItem FlexItem-md-5"><p>加减分原因</p></div>
+    						    				<div class="FlexItem FlexItem-md-8"><p>进展情况</p></div>
+    						    				<div class="FlexItem FlexItem-md-6"><p>加减分原因</p></div>
     						    				<div class="FlexItem FlexItem-md-2"><p>加减分</p></div>
     						    			</div>
     						    		
@@ -131,30 +146,35 @@
     						    		<div class="FlexItem FlexItem-vd-19">
     						    		    <div class="FlexColumn">
 	    						    		    <div class="FlexRow" th:each="p,pStat:${projects}">
-	    						    		        <div class="FlexItem FlexItem-md-4">
-	    						    		          <p>
-	    						    		          	<a th:href="@{'/responsibility/selectProjectWithProjectId/'+${p.projectId}+'/'+${processInstanceId}}" class="btn btn-primary">评分</a>
-	    						    		            <a href="javascript:void(0)" th:onclick="'javascript:deleteProject(\''+${p.projectId}+'\',\''+${processInstanceId}+'\')'" class="btn btn-danger">删除</a>
-	    	
-	    						    		          </p>
+	    						    		        <div class="FlexItem FlexItem-md-2" style="vertical-align:middle;">
+	    						    		             
+	 												      <div class="btn-group" >
+											                  <button type="button" class="btn btn-primary">操作</button>
+											                  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+											                    <span class="caret"></span>
+											                    <span class="sr-only">Toggle Dropdown</span>
+											                  </button>
+											                  <ul class="dropdown-menu" role="menu">
+											                    <li><a  href="javascript:void(0)" th:onclick="'javascript:updateProject(\''+${p.projectId}+'\',\''+${processInstanceId}+'\')'" >修改</a></li>
+											                    <li><a  href="javascript:void(0)" th:onclick="'javascript:markProject(\''+${p.projectId}+'\',\''+${processInstanceId}+'\')'"  >评分</a></li>
+											                    <li><a href="javascript:void(0)" th:onclick="'javascript:deleteProject(\''+${p.projectId}+'\',\''+${processInstanceId}+'\')'" >删除</a></li>
+											                  </ul>
+										                  </div>
+	    						                        
 	    						    		         </div>
 	    						    				<div class="FlexItem FlexItem-md-7">
-	    						    				    <textarea  th:text="${p.projectContent}" readonly="true" rows="5" class="form-control" style="height:100%;"></textarea>
-	    						
+	    						    				    <textarea  th:text="${p.projectContent}" readonly="true"  class="form-control" style="background:none;border:none;"></textarea>
 	    						    				</div>
-	    						    				<div class="FlexItem FlexItem-md-7" >
-	    						    					<textarea  th:text="${p.progress}" readonly="true" rows="5" class="form-control" style="height:100%;"></textarea>
+	    						    				<div class="FlexItem FlexItem-md-8" >
+	    						    					<textarea  th:text="${p.progress}" readonly="true"  class="form-control" style="background:none;border:none;"></textarea>
 	    						    				</div>
-	    						    				<div class="FlexItem FlexItem-md-7">
+	    						    				<div class="FlexItem FlexItem-md-8">
 	    						    				    <div class="FlexColumn">
-	    						    				         
 	    						    				    	 <div class="FlexRow" th:each="m,mStat:${p.marks}">
-	    						    				    	 
-	    						    				             
-	    						    				    	    <div class="FlexItem FlexItem-md-18">
-	    						    					             <textarea readonly="true" class="form-control" style="height:100%;width:100%;" rows="" cols=""  th:text="${m.accordingly}"></textarea>
+	    						    				    	    <div class="FlexItem FlexItem-md-20">
+	    						    					             <textarea readonly="true" class="form-control" style="background:none;border:none;" rows="" cols=""  th:text="${m.accordingly}"></textarea>
 	    						    				             </div>
-	    						    				             <div class="FlexItem FlexItem-md-7">
+	    						    				             <div class="FlexItem FlexItem-md-5">
 	    						    					             <p th:text="${m.markNumber}"></p>
 	    						    				             </div>
 	    						    				    	 </div>	    			
@@ -164,12 +184,27 @@
 	    						    				
 	    						    			</div>
 	    						    			<div class="FlexRow" style="border:none;max-height:50px;">
-	    						    			    <div class="FlexItem FlexItem-md-18">
-	    						    			    	<p>
-	    						    			    	 <a id="employee_0" th:href="@{'/responsibility/project/projectForm/'+*{startDate}+'/'+*{endDate}}" class="btn btn-primary"  style="display:none;">点击添加项目</a>
-	    						    			        </p>
+	    						    			    <div class="FlexItem FlexItem-md-19" >
+	    						    			        
+	    						    			    	<div class="form-group" id="employee_0" style="text-align:center;display:none;">
+	    						    			    	   <a  th:href="@{'/responsibility/project/projectForm/'+*{startDate}+'/'+*{endDate}+'?userId='+*{processBean.user.id}}" class="btn btn-primary"  >点击添加项目</a>
+	    						    			    	  <div class="btn-group">
+											                  <button type="button" class="btn btn-danger">生成常用项目</button>
+											                  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+											                    <span class="caret"></span>
+											                    <span class="sr-only">Toggle Dropdown</span>
+											                  </button>
+											                  <ul class="dropdown-menu" role="menu">
+											                    <li><a  th:href="@{'/responsibility/autoGenerateProject/'+*{sparation}+'/1'}">上个月</a></li>
+											                    <li><a  th:href="@{'/responsibility/autoGenerateProject/'+*{sparation}+'/2'}">前两个月</a></li>
+											                    <li><a  th:href="@{'/responsibility/autoGenerateProject/'+*{sparation}+'/3'}">前三个月</a></li>
+											                  </ul>
+										                  </div>
+	    						    			    	
+	    						    			    	</div>
+	    						    			    	
 	    						    			    </div>
-	    						    			    <div class="FlexItem FlexItem-md-4"><p>总分</p></div>
+	    						    			    <div class="FlexItem FlexItem-md-3"><p>总分</p></div>
 	    						    			    <div class="FlexItem FlexItem-md-3">
 	    						    			        <p th:text="*{totalMark}">总分</p>
 	    						    			    	<p><input type="text" th:value="*{totalMark}" th:field="*{totalMark}" readonly="true" style="display:none;"/></p>
@@ -199,7 +234,7 @@
     				<p>存在问题及下月整改计划</p>
     			</div>
     			<div class="FlexItem FlexItem-md-20">
-					<textarea id="employee_1" class="form-control input-lg" placeholder="问题及计划" rows="" cols="" th:value="*{shortComesAndPlan}" th:field="*{shortComesAndPlan}" readonly="true" style="height:100%;"></textarea>
+					<textarea id="employee_1" class="form-control input-lg" placeholder="问题及计划" rows="" cols="" th:value="*{shortComesAndPlan}" th:field="*{shortComesAndPlan}" readonly="true" style="background:none;border:none;"></textarea>
 				</div>
     		</div>
     	</div>
@@ -219,7 +254,7 @@
     				<p>自我定格</p>
     			</div>
     			<div class="FlexItem FlexItem-md-22">
-					<select id="employee_2" th:field="*{selfEvaluation}" th:value="*{selfEvaluation}" disabled="true" class="form-control input-lg">
+					<select id="employee_2" th:field="*{selfEvaluation}" th:value="*{selfEvaluation}" required="true" disabled="true" class="form-control input-lg">
 					    <option value=""></option>
 						<option value="优秀">优秀</option>
 						<option value="合格">合格</option>
@@ -234,7 +269,7 @@
     			<div class="FlexItem FlexItem-md-3">
     				<p>领导点评</p>
     			</div>
-    			<div class="FlexItem FlexItem-md-3">
+    			<div class="FlexItem FlexItem-md-5">
 					<select id="leader_1" th:field="*{leadershipEvaluation}" th:value="*{leadershipEvaluation}" class="form-control input-lg" style="height:100%;" disabled="true">
 					    <option value=""></option>
 						<option value="优秀">优秀</option>
@@ -243,24 +278,28 @@
 						<option value="不合格">不合格</option>
 					</select>
     			</div>
-    			<div class="FlexItem FlexItem-md-19">
-    				<textarea id="leader_2" class="form-control input-lg" placeholder="领导简评" rows="" cols="" th:value="*{leadershipRemark}" th:field="*{leadershipRemark}" disabled="true" readonly="true"></textarea>
+    			<div class="FlexItem FlexItem-md-17">
+    				<textarea id="leader_2" class="form-control input-lg" placeholder="" rows="" cols="" th:value="*{leadershipRemark}" th:field="*{leadershipRemark}" disabled="true" readonly="true"></textarea>
     			</div>
     		</div>
     	</div>
     	<div class="row">
-    		<div class="FlexRow">
+    		  <div class="FlexRow">
     			<div class="FlexItem FlexItem-md-3">
     				<p>组织考评</p>
     			</div>
-    			<div class="FlexItem FlexItem-md-22">
-					<select id="overseer_1"  th:field="*{overseerEvaluation}" th:value="*{overseerEvaluation}" disabled="true" class="form-control input-lg">
+    			<div class="FlexItem FlexItem-md-5">
+					<select id="overseer_1"  th:field="*{overseerEvaluation}" th:value="*{overseerEvaluation}" disabled="true" style="height:100%;" class="form-control input-lg" required="true"
+					>
 					     <option value=""></option>
 						<option value="优秀">优秀</option>
 						<option value="合格">合格</option>
 						<option value="基本合格">基本合格</option>
 						<option value="不合格">不合格</option>
 					</select>
+    			</div>
+    			<div class="FlexItem FlexItem-md-17">
+    				<textarea id="overseer_2" class="form-control input-lg" placeholder="" rows="" cols="" th:value="*{overseerRemark}" th:field="*{overseerRemark}" disabled="true" readonly="true" style="vertical-align:middle;"></textarea>
     			</div>
     		</div>
     	</div>
@@ -272,7 +311,11 @@
 	   </form>
     </div>
     <script th:inline="javascript">
-       
+    //<![CDATA[
+    
+      
+       //设置textarea高度
+        autosize(document.querySelectorAll('textarea'));
 		//当查看文件的为本人时，并且未提交的情况下，可以修改
 		var requestedUserId=[[${evaluation.processBean.user.id}]];
 		var sysuserid=[[${session.sysuser.id}]];
@@ -281,58 +324,122 @@
 		//是否结束
 		var completed=[[${evaluation.processBean.completed}]];
 		var identity=[[${identity}]];
-		
+		//
 		if(completed=="1") identity=null;
 
-		if(requestedUserId==sysuserid){
-		    //已经提交时本人无法编辑
-			if(committed=="1") identity=null;
-		}else{
-		//未提交时，只有本人才能编辑
-			if(committed=="0") identity=null;
-		}
-       
+
         //显示可以编辑的内容
-       
-        
-   
         if(identity){
         
         	$("[id^="+identity+"]").each(function(){
 				$(this).removeAttr("readonly");
 				$(this).removeAttr("disabled");
 				$(this).show();
+		
+			
             });
         }
-		
+
+       function markProject(projectId,processInstanceId){
+	     if(canIchange())    window.location='/responsibility/selectProjectWithProjectId/'+projectId+'/'+processInstanceId; 
+	  
+	   }
+	   function updateProject(projectId,processInstanceId){
+	    if(canIchange()) 
+	    window.location='/responsibility/project/projectForm/update/'+projectId+'?processInstanceId='+processInstanceId;
+	   }
 	   function deleteProject(projectId,processInstanceId){
 	        
-	    	if([[${evaluation.processBean.user.id}]]!=[[${session.sysuser.id}]]){
-	    	    	alert("只有本人才能删除");
-	    	    	return;
-	    	    }
+	    	if(!canIchange()) return;
 	    	if(confirm("是否确认删除?")){
     	    
               window.location="/responsibility/deleteProject/"+projectId+"?processInstanceId="+processInstanceId;
             }  
     	}
-    	if([[${msg}]]) alert([[${msg}]]);
+    	var msg=[[${msg}]];
+    	if(msg) {
+    	
+    	   alert(msg);
+    	   msg==null;
+    	
+    	};
+    	//打印
+       var groups=[[${session.sysuser.userLinkGroup}]];
+       $("#print").hide();
+       for(x in groups){
+           
+       		if(groups[x].groupTable.groupname.indexOf('考核')!=-1){
+       			$("#print").show();
+       			break;
+       		}
+       } 
+       //是否有管理员权限
+       function isGM(groups){
+       		for(x in groups){
+       			if(groups[x].groupTable.groupname.indexOf('管理')!=-1){
+       				return true;
+       			}
+       		}
+       		return false;
+       }
+    	//以下为不同内容 
+       function canIchange(){
+         if(isGM(groups)) return true;
+         if([[${evaluation.processBean.user.id}]]!=[[${session.sysuser.id}]]){
+	    	    	alert("只有本人和管理员才能删除或修改");
+	    	    	return false;
+	      }
+	       if(committed=="1"){
+	    		alert("该申请已经提交，无法修改！！可以先撤回再修改");
+	    		return false;
+	    	}
+       	return true;
+       }
 		//当已经提交或者不是本人操作时，隐藏
 		if(committed=="1"||requestedUserId!=sysuserid){
 		   $("#submit").hide();
 		   $("#save").hide();
 		}
         $("#submit").click(function(){
-          
+           
+            $(this).addClass("disabled");
+            setTimeout("$(this).removeAttr('disabled')",3000); //设置三秒后提交按钮 显示 
             $("#f1").attr("action","/system/activiti/startEvaluation/complete");
     		$("#f1").submit();
+    		
 
     	});
     	$("#save").click(function(){
+    	    $(this).addClass("disabled");
+    	     setTimeout("$(this).removeAttr('disabled')",3000); //设置三秒后提交按钮 显示 
     		 $("#f1").attr("action","/system/activiti/startEvaluation/save");
     		$("#f1").submit();
+    		
     	});
+       
+      
+       $("#print").on('click', function() {
+                var a4=700;
+                var width=$("#content").width();
+                
+                $("#content").width(a4);
+                //设置textarea高度
+                $("textarea").each(function() {
+                	$(this).css('overflow','auto');
 
+                	$(this).height(this.scrollHeight+'px');
+                	
+                	$(this).css('overflow','hidden');
+                });
+              
+                $("#content").find("button").hide();
+                $('#operate').html('');
+               jQuery.print("#content");
+               $("#content").find("button").show();
+              $("#content").width(width);
+              $('#operate').html('操作');
+       });
+       //]]>
     </script>
 </body>
 </html>

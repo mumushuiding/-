@@ -48,6 +48,11 @@
     <script src="/js/moment-with-locales.min.js"></script>
     
     <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+        <!-- autosize -->
+    <script src="/js/plugins/autosize.js"></script>
+    <!-- 前端打印 -->
+    <script src="/js/plugins/jQuery.print.js"></script>
   </head>
   
 <body>
@@ -57,10 +62,20 @@
       		height:auto;
       	}
       	textarea{
-      		height:auto;
+      		resize : none;
       	}
       </style>
-      <div class="container border1">
+<style media="print">
+    @page {
+      size: auto;  /* auto is the initial value */
+      margin: 0mm 0mm 0mm 0mm; /* this affects the margin in the printer settings */
+    }
+</style>
+       <button id="print" class="pull-right btn-lg btn-primary " >
+              
+             <span class="glyphicon glyphicon-print" aria-hidden="true">打印</span>
+       </button>
+      <div id="content" class="container border1">
         <form id="f1" method="post"  th:object="${evaluation}">
 		 <input type="text" th:value="*{processBean.deploymentId}" th:field="*{processBean.deploymentId}" style="display:none;"/>
          <input type="text" th:value="*{processBean.businessKey}" th:field="*{processBean.businessKey}" style="display:none;"/>
@@ -68,26 +83,17 @@
          <input type="text" th:value="*{processBean.processInstanceId}" th:field="*{processBean.processInstanceId}" style="display:none;"/>
          <input type="text" th:value="*{id}" th:field="*{id}" style="display:none;"/>
     	<div class="row">
-	    	<div class="page-header">
-              
-	           <div class="FlexRow">
-	           <div class="FlexItem FlexItem-md-16" style="border:none;">
-	           <h2 style="text-align:right;">日常工作一线干部(工作人员)责任清单(</h2>
-	           </div>
-	           <div class="FlexItem FlexItem-md-2" style="border:none;">
-	            <h1 style="text-align:right;"><input type="text" name=""  th:value="${#dates.format(evaluation.createTime,'yyyy')}" style="width:70px;"/></h1>
-	           </div>
-	           <div class="FlexItem FlexItem-md-8" style="border:none;"><h2>)年</h2></div>
-	           </div>
+	    	
 	          
-	        </div>
+	              <p><h2 style="text-align:center;">日常工作一线干部(工作人员)责任清单(<span th:text="${#dates.format(evaluation.createTime,'yyyy')}"/>)年</h2></p>
+	
     	</div>
     	<div class="row">
     		<div class="FlexRow">
     			<div class="FlexItem FlexItem-md-6">
     		                   <p>表格类型</p>
     			</div>
-    			<div class="FlexItem FlexItem-md-6 ">
+    			<div class="FlexItem FlexItem-md-7 ">
     			    <input type="text" th:value="*{startDate}" th:field="*{startDate}" readOnly="true"  style="display:none;"/>
     			    <input type="text" th:value="*{endDate}" th:field="*{endDate}" readOnly="true"  style="display:none;"/>
     			    <input type="text" th:value="*{sparation}" th:field="*{sparation}" readOnly="true"/>
@@ -95,7 +101,7 @@
     			<div class="FlexItem FlexItem-md-6">
     		            <p> 填表日期:</p>
     			</div>
-    			<div class="FlexItem FlexItem-md-7">
+    			<div class="FlexItem FlexItem-md-6">
     		        <input type="text" name="" readonly="true" th:value="${#dates.format(evaluation.createTime,'yyyy-MM-dd')}"/>
     			</div>
     		</div>
@@ -113,13 +119,13 @@
     			<div class="FlexItem FlexItem-md-4">
     				<p>部门</p>
     			</div>   
-    			<div class="FlexItem FlexItem-md-8">
+    			<div class="FlexItem FlexItem-md-10">
     				<input type="text" name="" readonly="true" th:value="*{processBean.deptName}" th:field="*{processBean.deptName}"/>
     			</div>   
     			<div class="FlexItem FlexItem-md-2">
     				<p>职务</p>		
     			</div>   
-    			<div class="FlexItem FlexItem-md-7">
+    			<div class="FlexItem FlexItem-md-4">
     				<input type="text" name="" readonly="true" th:value="*{oldPosition}" th:field="*{oldPosition}"/>	
     			</div>       			
     		</div>
@@ -130,7 +136,7 @@
     				<p>岗<br/>位<br/>职<br/>责</p>
     			</div>
     			<div class="FlexItem FlexItem-md-23">
-					<textarea  class="form-control input-lg" placeholder="岗位职责" rows="" cols="" th:value="*{currentJobDescription}" th:field="*{currentJobDescription}" readonly="true" style="height:100%;"></textarea>
+					<textarea id="edit_1" class="form-control input-lg" placeholder="岗位职责" rows="" cols="" th:value="*{currentJobDescription}" th:field="*{currentJobDescription}" readonly="true" style="height:100%;"></textarea>
     			</div>
     		</div>
     	</div>
@@ -140,7 +146,7 @@
     				<p>年<br/>度<br/>工<br/>作<br/>任<br/>务</p>
     			</div>
     			<div class="FlexItem FlexItem-md-23">
-					<textarea  class="form-control input-lg" placeholder="年度工作任务" rows="" cols="" th:value="*{currentJob}" th:field="*{currentJob}" readonly="true" style="height:100%;"></textarea>
+					<textarea id="edit_2" class="form-control input-lg" placeholder="年度工作任务" rows="" cols="" th:value="*{currentJob}" th:field="*{currentJob}" readonly="true" style="height:100%;"></textarea>
     			</div>
     		</div>
     	</div>
@@ -154,39 +160,40 @@
 						<div class="FlexItem FlexItem-vd-2">
 							<!-- 新部门职责 生生效时间-->
 								<div class="FlexRow">
-					    			<div class="FlexItem FlexItem-md-2">
+					    			<div class="FlexItem FlexItem-md-3">
 					    				<p>调整时间</p>			
 					    			</div>
-					    			<div class="FlexItem FlexItem-md-4">
-										<div class="form-group" >  
+					    			<div class="FlexItem FlexItem-md-5" style="height:50px;">
+										<div class="form-group" style="border:none;">  
 						                    <!--指定 date标记-->  
-						                    <div class='input-group date' id='datetimepicker2'>  
-						                        <input  type='text' class="form-control" placeholder="调整时间"  readonly="true" th:field="*{ajustDate}" th:value="*{ajustDate}"/>  
+						                    <div class='input-group date' id='datetimepicker2' style="height:50px;border:none;">  
+						                        <input id="edit_3" type='text'  placeholder=""  readonly="true" th:field="*{ajustDate}" th:value="*{ajustDate}" style="height:100%;border:none;background:none;"/>  
 						                        <span class="input-group-addon">  
 						                            <span class="glyphicon glyphicon-calendar"></span>  
 						                        </span>  
 						                    </div>  
 						                </div>			
 					    			</div>   
-					    			<div class="FlexItem FlexItem-md-4">
-					    				<p>现任单位</p>
+					    			<div class="FlexItem FlexItem-md-2">
+					    				<p>现任<br/>单位</p>
 					    			</div>   
-					    			<div class="FlexItem FlexItem-md-8">
-					    			    <div class="FlexRow">
+					    			<div class="FlexItem FlexItem-md-12" style="height:50px;">
+					    			    <div id="dept" class="FlexRow" style="height:50px;">
 					    			       
-					    			    	<select id="second" class="selectpicker" data-live-search="true" title="请选择部门" disabled="true" th:field="*{secondLevelId}" th:value="*{secondLevelId}" style="width:30%;">
+					    			    	<select id="second"  title="请选择部门"  th:field="*{secondLevelId}" th:value="*{secondLevelId}" style="width:40%;height:50px;;border:none;">
+									         <option value=""></option>
 									          <option th:each="d:${depts}" th:value="${d.did}" th:text="${d.name}"></option>
 									       </select>
-									       <select id="first" class="selectpicker" data-live-search="true" title="请选择子部门" disabled="true" th:field="*{firstLevelIds}" th:value="*{firstLevelIds}" multiple="multiple" style="width:70%;">
+									       <select id="first"  title="请选择子部门"   th:field="*{firstLevelIds}" th:value="*{firstLevelIds}" style="width:60%;height:100%;border:none;">
 									         
 									      </select>
 					    			    </div>
 					    			</div>   
 					    			<div class="FlexItem FlexItem-md-2">
-					    				<p>现任职务</p>		
+					    				<p>现任<br/>职务</p>		
 					    			</div>   
-					    			<div class="FlexItem FlexItem-md-7">
-					    				<input type="text" name="" readonly="true" th:value="*{position}" th:field="*{position}"/>	
+					    			<div class="FlexItem FlexItem-md-3">
+					    				<input type="text" name="" id="edit_6" readonly="true" th:value="*{position}" th:field="*{position}"/>	
 					    			</div>
 					    		</div>
 							<!-- /新部门职责 生生效时间-->
@@ -198,7 +205,7 @@
 					    				<p>岗<br/>位<br/>职<br/>责</p>
 					    			</div>
 					    			<div class="FlexItem FlexItem-md-23">
-										<textarea  class="form-control input-lg" placeholder="新岗位职责" rows="" cols="" th:value="*{newJobDescription}" th:field="*{newJobDescription}" readonly="true" style="height:100%;"></textarea>
+										<textarea id="edit_7"  class="form-control input-lg" placeholder="新岗位职责" rows="" cols="" th:value="*{newJobDescription}" th:field="*{newJobDescription}" readonly="true" style="height:100%;"></textarea>
 					    			</div>
 					    		</div>
 							<!-- /岗位职责 -->
@@ -210,7 +217,7 @@
 					    				<p>年<br/>度<br/>工<br/>作<br/>任<br/>务</p>
 					    			</div>
 					    			<div class="FlexItem FlexItem-md-23">
-										<textarea  class="form-control input-lg" placeholder="新年度工作任务" rows="" cols="" th:value="*{newJob}" th:field="*{newJob}" readonly="true" style="height:100%;"></textarea>
+										<textarea id="edit_8" class="form-control input-lg" placeholder="新年度工作任务" rows="" cols="" th:value="*{newJob}" th:field="*{newJob}" readonly="true" style="height:100%;"></textarea>
 					    			</div>
 					    		</div>
 							<!-- /年度工作 -->
@@ -240,53 +247,36 @@
         if([[${candidateGroupList}]]){
         	candidateGroupList=[[${candidateGroupList}]];
         }
-        checkCandidateGroup(candidateGroupList)
-        function checkCandidateGroup(candidateGroupList){
-			var flag=false;
-			 //当候选组为空时，如果是本人则可以修改
-            if(!candidateGroupList){
-
-		        if(requestedUserId==sysuserid){
-					flag=true;
-				}
-            }
-            
-			
-			//当前流程的候选用户组为空,说明流程还在提交申请阶段，那么为本人时则允许编辑
-			if(!currentCandidateGroup){
-				if(requestedUserId==sysuserid){
-					flag=true;
-				}
-			}else{
-			    //用户的候选用户组不为空，且用户包含它，则允许编辑
-				for(x in candidateGroupList){
-					if(candidateGroupList[x]==currentCandidateGroup) flag=true;
-				}
-			}
-
-			if(flag){
-				$('select').removeAttr("disabled");
-				$('input').removeAttr("readonly");
-				$('textArea').removeAttr("readonly");
-			}
-	        if(flag){
-			   $("#submit").show();
-			   $("#save").show();
-			}else{
-				$("#submit").hide();
-			   $("#save").hide();
-			}
-        }
-		
-		
        
+        
+       //是否可以编辑
+		var identity=[[${identity}]];
+	    
+	    if(identity){
+	        
+	        	$("[id^=edit]").each(function(){
+					$(this).removeAttr("readonly");
+					$(this).removeAttr("disabled");
+					$(this).show();
+			
+				
+	            });
+	     }else{
+	     	$("#submit").hide();
+    	    $("#save").hide();
+	     
+	     }
+
         $("#submit").click(function(){
-          
+             $(this).addClass("disabled");
+    	     setTimeout("$(this).removeAttr('disabled')",3000); //设置三秒后提交按钮 显示 
             $("#f1").attr("action","/system/activiti/startResponsibility/complete");
     		$("#f1").submit();
 
     	});
     	$("#save").click(function(){
+    	    $(this).addClass("disabled");
+    	     setTimeout("$(this).removeAttr('disabled')",3000); //设置三秒后提交按钮 显示 
     		 $("#f1").attr("action","/system/activiti/startResponsibility/save");
     		$("#f1").submit();
     	});
@@ -336,25 +326,83 @@
 			  success: function(data){
 			        
 			        $("#first").empty();
-			        $("#first").html('');
+			        $("#first").html('<option value=""></option>');
 			        $("#first").append(data);
 					   var firstLevelIds=[[${evaluation.firstLevelIds}]];
-				        console.log("firstLevelIds="+firstLevelIds);
+				       
 				        var ids=[];
 							        
 					   if(firstLevelIds){
 				             
-				        	ids=firstLevelIds.split(",");
-				            $('#first').selectpicker('val', ids);
+				        	//ids=firstLevelIds.split(",");
+				           // $('#first').selectpicker('val', ids);
+				           $('#first').val(firstLevelIds);
 
 				        }
-				    $("#first").selectpicker('refresh');
+				    //$("#first").selectpicker('refresh');
 			         
 	
 			  }
 			 
 			});
        }
+        
+        
+        $("textarea").each(function(){
+        
+        	$(this).attr("style",'background:none;border:none;');
+        });
+        //设置textarea高度
+        autosize(document.querySelectorAll('textarea'));
+      //打印
+      var groups=[[${session.sysuser.userLinkGroup}]];
+       $("#print").hide();
+       for(x in groups){
+            
+       		if(groups[x].groupTable.groupname.indexOf('考核')!=-1){
+       			$("#print").show();
+       			break;
+       		}
+       }
+       $("#print").on('click', function() {
+              
+               var val=$("#first").val();
+        
+        
+                var a4=700;
+                var width=$("#content").width();
+                
+                $("#content").width(a4);
+                //设置textarea高度
+                $("textarea").each(function() {
+                	//var height=$(this).height();
+                	//$(this).height(height*width/a4+20);
+                	$(this).css('overflow','auto');
+
+                	$(this).height(this.scrollHeight+'px');
+                	
+                	$(this).css('overflow','hidden');
+				});
+				
+                $('#second').hide();
+              
+                $("#content").find("button").hide();
+                $(".input-group-addon").hide();
+                
+                var dept=$('#dept').html();
+                var text=$('#first').find("option:selected").text();
+                $('#dept').html('<p>'+text+'</p>');
+                jQuery.print("#content");
+                $('#dept').html(dept);
+                
+                $("#first").val(val);
+                $("#content").find("button").show();
+                 $('#second').show();
+                
+                 $(".input-group-addon").show();
+                $("#content").width(width);
+
+       });
   </script>
 </body>
 </html>

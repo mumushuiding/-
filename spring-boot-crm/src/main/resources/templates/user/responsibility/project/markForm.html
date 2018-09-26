@@ -32,6 +32,11 @@
    
   </head>
 <body>
+     <style>
+     	.odd{
+     		background:black;
+     	}
+     </style>
 	 <div id="loginDiv" class="modal show" style="top:10%">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
@@ -47,20 +52,19 @@
                 <textarea name="" id="" cols="30" rows="3" class="form-control input-lg" placeholder="加分或者减分原因" th:value="*{markReason}" th:field="*{markReason}"></textarea>
               </div>
               <div class="form-group">
-                <select  class="selectpicker show-tick form-control" data-live-search="true"  th:value="*{accordingly}" th:field="*{accordingly}">
-                	<option th:each="a:${accordingList}" th:value="${a}" th:text="${a}"></option>
+                <select id="accordingly" class="selectpicker show-tick form-control" data-live-search="true"  th:value="*{accordingly}" th:field="*{accordingly}">
+                	<option th:each="a,aStat:${accordingList}" th:value="${a}" th:text="${a}" style="white-space:normal;" th:class="${aStat.odd}?'btn btn-block btn-default btn-lg active':'btn btn-block btn-default btn-lg'"></option>
                 </select>
               </div>
               <div class="form-group">
                   <label>评分</label>
-                  <input type="text" value="50" class="slider form-control" data-slider-min="-50" data-slider-max="50"
-                         data-slider-step="1"  data-slider-orientation="horizontal"
-                          data-slider-tooltip="show" data-slider-id="aqua"
+                
+                  <input type="number" value="50" class="form-control" min="-50" max="50" step="0.01"
                           th:value="*{markNumber}" th:field="*{markNumber}"/>
                </div>
               <div class="form-group">
                 <div th:text="${msg}" style="font:red;text-align:center"></div>
-                <button class="btn btn-primary btn-lg btn-block" >添加</button>
+                <button class="btn btn-primary btn-lg btn-block" >确定</button>
               </div>
 	        </form>
 	      </div>
@@ -110,7 +114,7 @@
         isClosed = true;
       }
   }
-  
+
   $('[data-toggle="offcanvas"]').click(function () {
         $('#wrapper').toggleClass('toggled');
   });
@@ -126,7 +130,12 @@
         locale: moment.locale('zh-cn')  
     }); 
     //slider
-    $('.slider').slider();  
+    $('.slider').slider();
+    //弹出框
+   $("[data-toggle='popover']").popover();
+   $("option").click(function(){
+   	  alert('hello');
+   });
 });</script>
 </body>
 </html>

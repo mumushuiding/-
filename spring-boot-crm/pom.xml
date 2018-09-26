@@ -70,13 +70,22 @@
       <artifactId>springloaded</artifactId>
       <version>1.2.4.RELEASE</version>
    </dependency>
-
+   <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context-support</artifactId>
+        <version>${spring.version}</version>
+   </dependency>
 <!-- =============================数据库相关============================== -->
     <!-- 添加MySQL数据库驱动依赖包. -->
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-    </dependency>
+
+	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+	<dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>5.1.46</version>
+	</dependency>
+
+
     <!-- 添加Mybatis框架jar包 -->
     <dependency>
 	    <groupId>org.mybatis</groupId>
@@ -117,14 +126,21 @@
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-data-redis</artifactId>
 	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+	<dependency>
+	    <groupId>com.mchange</groupId>
+	    <artifactId>c3p0</artifactId>
+	    <version>0.9.5.2</version>
+	</dependency>
+	
 <!-- =============================日志相关=============================== -->
 	<!-- log4j日志 -->
 	<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 	<dependency>
 	    <groupId>org.apache.logging.log4j</groupId>
 	    <artifactId>log4j-core</artifactId>
-	    <version>2.11.0</version>
-	</dependency>
+    </dependency>
 
 <!-- =============================工作流引擎   ================================ -->
 	 <dependency>
@@ -165,6 +181,23 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-websocket</artifactId>
     <version>2.0.2.RELEASE</version>
+</dependency>
+<!-- =============================quartz定时任务=============================== -->
+
+
+<!-- https://mvnrepository.com/artifact/de.chandre.quartz/spring-boot-starter-quartz -->
+<dependency>
+    <groupId>de.chandre.quartz</groupId>
+    <artifactId>spring-boot-starter-quartz</artifactId>
+    <version>1.0.4</version>
+</dependency>
+
+<!-- ============================邮件======================================== -->
+<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+    <version>2.0.4.RELEASE</version>
 </dependency>
 
 <!-- =============================测试=============================== -->
