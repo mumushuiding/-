@@ -1,6 +1,30 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.wyait.com/ws"
             targetNamespace="http://www.wyait.com/ws" elementFormDefault="qualified">
+        
+	   <xs:element name="holidayRequest">
+	        <xs:complexType>
+	            <xs:sequence>
+	                <xs:element name="name" type="xs:string"/>
+	            </xs:sequence>
+	        </xs:complexType>
+	    </xs:element>
+	
+	    <xs:element name="holidayResponse">
+	        <xs:complexType>
+	            <xs:sequence>
+	                <xs:element name="name" type="xs:string"/>
+	                <xs:element name="age" type="xs:integer"/>
+	            </xs:sequence>
+	        </xs:complexType>
+	    </xs:element>
         <xs:element name="getCountryRequest">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getNameRequest">
             <xs:complexType>
                 <xs:sequence>
                     <xs:element name="name" type="xs:string"/>
@@ -11,6 +35,13 @@
             <xs:complexType>
                 <xs:sequence>
                     <xs:element name="country" type="tns:country"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name="getNameResponse">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:element>

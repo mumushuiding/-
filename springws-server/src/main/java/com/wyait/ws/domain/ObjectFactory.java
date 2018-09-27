@@ -2,7 +2,7 @@
 // 此文件是由 JavaTM Architecture for XML Binding (JAXB) 引用实现 v2.2.8-b130911.1802 生成的
 // 请访问 <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // 在重新编译源模式时, 对此文件的所有修改都将丢失。
-// 生成时间: 2018.09.26 时间 04:14:59 PM CST 
+// 生成时间: 2018.09.27 时间 10:19:47 AM CST 
 //
 
 
@@ -45,6 +45,30 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link GetNameResponse }
+     * 
+     */
+    public GetNameResponse createGetNameResponse() {
+        return new GetNameResponse();
+    }
+
+    /**
+     * Create an instance of {@link HolidayRequest }
+     * 
+     */
+    public HolidayRequest createHolidayRequest() {
+        return new HolidayRequest();
+    }
+
+    /**
+     * Create an instance of {@link HolidayResponse }
+     * 
+     */
+    public HolidayResponse createHolidayResponse() {
+        return new HolidayResponse();
+    }
+
+    /**
      * Create an instance of {@link GetCountryResponse }
      * 
      */
@@ -58,6 +82,14 @@ public class ObjectFactory {
      */
     public Country createCountry() {
         return new Country();
+    }
+
+    /**
+     * Create an instance of {@link GetNameRequest }
+     * 
+     */
+    public GetNameRequest createGetNameRequest() {
+        return new GetNameRequest();
     }
 
 }
