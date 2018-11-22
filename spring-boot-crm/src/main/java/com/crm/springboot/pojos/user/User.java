@@ -39,7 +39,8 @@ public class User implements Serializable{
     private UserLinkDept userLinkDept;//主要是注册时接收员工部门属性，没有其它作用
     
     private String deptIds;////主要是接收注册时员工的部门信息;
-
+    
+    private int retire;
     
 	@Override
 	public String toString() {
@@ -47,6 +48,18 @@ public class User implements Serializable{
 				+ ", sex=" + sex + ", userLinkDepts=" + userLinkDepts + ", post=" + post + ", position=" + position
 				+ ", userLinkGroup=" + userLinkGroup + ", email=" + email + ", birthday=" + birthday + ", phone="
 				+ phone + ", avatar=" + avatar + ", userLinkDept=" + userLinkDept + ", deptIds=" + deptIds + "]";
+	}
+
+
+
+	public int getRetire() {
+		return retire;
+	}
+
+
+
+	public void setRetire(int retire) {
+		this.retire = retire;
 	}
 
 

@@ -377,60 +377,6 @@
     group by userId 
 
   </select>
-  <select id="selectTotalMarkWithAllUser" resultMap="markResultMap2" parameterType="hashmap">
-  	select info_user.id as userId,ifnull(round(sum(markNumber),2),0) as totalMark 
-  		from info_user
-  		
-  		left outer join res_mark on(
-  			info_user.id=res_mark.userId
-  			<if test="checked!=null and checked!=''">
-	 			and checked=#{checked}
-	 	    </if>
-	 	    <if test="startDate!=null and startDate!=''">
-	 	 	   and startDate &gt;=#{startDate}
-	 	    </if>
-	 	    <if test="endDate!=null and endtDate!=''">
-	 	 	   and endDate &lt;=#{endDate}
-	 	    </if>
-
-  		)
-  		<where>
-  			  <!-- 查询在二级部门的用户和一级部门的用户并集-->
-		 	<choose>
-		 		<when test="secondLevelIds!=null and firstLevelIds!=null">
-		 			 info_user.id in (select info_user_dept.userId from info_user_dept where secondLevelId in
-		 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
-		 		  OR firstLevelId in
-		 		  <foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
-		 		)
-		 		</when>
-		 		<when test="secondLevelIds!=null and firstLevelIds==null">
-			 		and info_user.id in (select info_user_dept.userId from info_user_dept where secondLevelId in
-			 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
-			 		) 
-		 		</when>
-		 		<when test="secondLevelIds==null and firstLevelIds!=null">
-			 		and info_user.id in (select info_user_dept.userId from info_user_dept where firstLevelId in
-			 		<foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
-			 		)
-		 		</when>
-		 	</choose>
-	        <if test="postNames!=null">
-	        	and info_user.id in (select info_user.id from info_user where postId in(select pId from info_post where name  in 
-	        		<foreach collection="postNames" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
-	        	))
-	        </if>
-		 	<if test="postNameLike!=null and postNameLike!=''">
-		 	  <bind name="pattern" value="'%'+_parameter.postNameLike+'%'"/>
-		 		and info_user.id in (select id from info_user where postId in(select pId from info_post where name  like #{pattern}))
-		 	</if>
-  		</where>
-  		group by info_user.id order by totalMark desc
-       <if test="limitClause!=null and limitClause!=''">
-	 		limit ${limitClause}
-	   </if>
-  		
-  </select>
   <select id="selectTotalMarkAndUser" resultMap="markResultMap2" parameterType="hashmap">
    	select userId,startDate,endDate,ifnull(round(sum(markNumber),2),0) totalMark from res_mark
    	<where>
@@ -438,7 +384,7 @@
 	 		userId=#{userId}
 	 	</if>
 	 	<if test="checked!=null and checked!=''">
-	 		and checked=#{checked}
+	 		and res_mark.checked=#{checked}
 	 	</if>
 	 	<if test="startDate!=null and startDate!=''">
 	 	   and startDate &gt;=#{startDate}
@@ -481,6 +427,69 @@
 	 		limit ${limitClause}
 	 </if>
   </select>
+  <select id="selectTotalMarkWithAllUser" resultMap="markResultMap2" parameterType="hashmap">
+  	select info_user.id as userId,ifnull(round(sum(markNumber),2),0) as totalMark 
+  		from info_user
+  		
+  		left outer join res_mark on(
+  			info_user.id=res_mark.userId
+  			<if test="checked!=null and checked!=''">
+	 			and res_mark.checked=#{checked}
+	 	    </if>
+	 	    <if test="startDate!=null and startDate!=''">
+	 	 	   and startDate &gt;=#{startDate}
+	 	    </if>
+	 	    <if test="endDate!=null and endtDate!=''">
+	 	 	   and endDate &lt;=#{endDate}
+	 	    </if>
+
+  		)
+  		<where>
+  			  <!-- 查询在二级部门的用户和一级部门的用户并集-->
+		 	<choose>
+		 		<when test="secondLevelIds!=null and firstLevelIds!=null">
+		 			 info_user.id in (select info_user_dept.userId from info_user_dept where secondLevelId in
+		 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		  OR firstLevelId in
+		 		  <foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		)
+		 		</when>
+		 		<when test="secondLevelIds!=null and firstLevelIds==null">
+			 		and info_user.id in (select info_user_dept.userId from info_user_dept where secondLevelId in
+			 		<foreach collection="secondLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+			 		) 
+		 		</when>
+		 		<when test="secondLevelIds==null and firstLevelIds!=null">
+			 		and info_user.id in (select info_user_dept.userId from info_user_dept where firstLevelId in
+			 		<foreach collection="firstLevelIds" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+			 		)
+		 		</when>
+		 	</choose>
+	        <if test="postNames!=null">
+	        	and info_user.id in (select info_user.id from info_user where postId in(select pId from info_post where name  in 
+	        		<foreach collection="postNames" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+	        	))
+	        </if>
+		 	<if test="postNameLike!=null and postNameLike!=''">
+		 	  <bind name="pattern" value="'%'+_parameter.postNameLike+'%'"/>
+		 		and info_user.id in (select id from info_user where postId in(select pId from info_post where name  like #{pattern}))
+		 	</if>
+		 	<if test="xmwt!=null">
+		 	 
+		 		and info_user.id in (
+		 		
+		 		select id from info_user where xmwt in
+		 		<foreach collection="xmwt" item="id" index="no" separator="," open="(" close=")">#{id}</foreach>
+		 		)
+		 	</if>
+  		</where>
+  		group by info_user.id order by totalMark desc
+       <if test="limitClause!=null and limitClause!=''">
+	 		limit ${limitClause}
+	   </if>
+  		
+  </select>
+  
   <!-- 查询延迟未交被扣分的月分 -->
   <select id="selectAllMarkAsType" resultType="mark" parameterType="hashmap">
    	select * from res_mark

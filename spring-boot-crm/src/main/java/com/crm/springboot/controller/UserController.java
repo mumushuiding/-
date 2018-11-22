@@ -378,6 +378,16 @@ public class UserController {
 		System.out.println(JsonUtils.getGson().toJson(userLinkDepts));
 		return JsonUtils.getGson().toJson(userLinkDepts);
 	}
+	@RequestMapping("/deleteUserLinkDept/{id}")
+	public String deleteUserLinkDept(@PathVariable String id,HttpServletRequest request,@RequestParam(required=false) String username) throws UnsupportedEncodingException{
+		String referer=request.getHeader("referer");
+		System.out.println("refere:"+referer+"?username="+username);
+		String[] ids=new String[1];
+		ids[0]=id;
+		userService.deleteUserLinkDeptByIds(ids);
+
+		return "redirect:"+referer+"?username="+URLEncoder.encode(username, "utf-8");
+	}
 	@RequestMapping("/updateUserLinkDepts")
 	public String updateUserLinkDepts(UserLinkDept userLinkDept,HttpSession session){
 		String referer=(String) session.getAttribute("referer");

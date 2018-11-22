@@ -120,6 +120,7 @@
 			          <div class="form-group">
 			          	 <select id="posts" class="selectpicker"  data-live-search="true" title="请选择职级"  multiple="multiple">
 		         			<option th:each="p:${posts}" th:value="${p.name}" th:text="${p.name}" th:if="${p.name} ne '高层正职' and ${p.name} ne '高层副职'"></option>
+		         			<option value="项目舞台负责人">项目舞台负责人</option>
 		                </select>
 			          </div>
 			     </div>
@@ -130,7 +131,9 @@
 			
 			   <!-- 工具栏 -->
 			  <div id="toolbar" class="btn-group pull-left" >
-			    
+			     <button id="btn_export" type="button" class="btn btn-primary">
+			        <span class="glyphicon glyphicon-plus" aria-hidden="true">导出Excel</span>
+			   </button>
 			  </div>
 			  <!-- /工具栏 -->
 			  <table id="mytab" class="table table-hover"></table>
@@ -215,7 +218,7 @@
         </div><!-- /.modal -->
  <script th:inline="javascript">
 //<![CDATA[
-      
+
 
     //下拉框加载时初始值设定
     if([[${group}]]){
@@ -413,7 +416,13 @@
         return $(window).height() -280;
     }
     //删除用户
-    
+          //导出文件
+      $("#btn_export").click(function(){
+        if(confirm("确定要导出吗？")){
+        	location.href="/file/export/totalMark?groups="+$('#groups').val().join(',')+"&startDate="+$('#startDate').val()+"&endDate="+$('#endDate').val()+"&posts="+$('#posts').val().join(',');
+        }
+    	
+    });
    
 
     var taskType = [[${taskType}]];

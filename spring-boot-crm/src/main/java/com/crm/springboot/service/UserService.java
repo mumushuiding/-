@@ -32,6 +32,7 @@ public interface UserService{
 	User selectSingleUser(HashMap<String, Object> params);
 	User selectSingleUserWithPhone(String phone);
 	void deleteUsersByUserIds(String[] ids);
+	void disableUsersByUserIds(String[] ids);
 	User update(User user);
 
 	public User getById(String valueOf);
@@ -76,6 +77,7 @@ public interface UserService{
 	DeptType selectSingleDeptType(int deptId);
 	DeptType selectSingleDeptType(String deptName);
 	void saveDeptType(DeptType deptType);
+	String getDeptName(User user);
 	/**
 	 * ***********************用户和职级*******************************************
 	 */

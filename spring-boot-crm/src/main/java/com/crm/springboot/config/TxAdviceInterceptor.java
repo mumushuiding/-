@@ -26,6 +26,7 @@ public class TxAdviceInterceptor {
   private PlatformTransactionManager transactionManager;
   @Bean
   public TransactionInterceptor txAdvice() {
+	System.out.println("****************开启事务******************");
     NameMatchTransactionAttributeSource source = new NameMatchTransactionAttributeSource();
      /*只读事务，不做更新操作*/
     RuleBasedTransactionAttribute readOnlyTx = new RuleBasedTransactionAttribute();

@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
@@ -374,6 +375,7 @@ public class SysPowerServiceImpl implements SysPowerService{
 
 	@Override
 	public void deleteGroupManager(Integer userid, String groupids) {
+		if(StringUtils.isEmpty(groupids)) return;
 		HashMap<String, Object> params=new HashMap<String, Object>();
 		System.out.println(" userid="+userid+" and groupid in ("+groupids+")");
 		params.put("condition", " userid="+userid+" and groupid in ("+groupids+")");

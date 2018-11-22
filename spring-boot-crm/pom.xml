@@ -60,8 +60,7 @@
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-devtools</artifactId>
-          <optional>true</optional>
-         <scope>true</scope>
+         <scope>runtime</scope>
       </dependency>
         
     <!-- 热部署方法2 vm中添加-javaagent:.\lib\springloaded-1.2.4.RELEASE.jar -noverify -->
@@ -87,11 +86,14 @@
 
 
     <!-- 添加Mybatis框架jar包 -->
-    <dependency>
-	    <groupId>org.mybatis</groupId>
-	    <artifactId>mybatis</artifactId>
-	    <version>3.4.6</version>
-    </dependency>
+   <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis</artifactId>
+    <version>3.4.2</version>
+</dependency>
+
+
     <!-- 添加Mybatis整合spring中间件-->
     <dependency>
 	   <groupId>org.mybatis</groupId>
@@ -134,7 +136,7 @@
 	    <version>0.9.5.2</version>
 	</dependency>
 	
-<!-- =============================日志相关=============================== -->
+<!-- =============================日志相关=============================== =-->
 	<!-- log4j日志 -->
 	<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 	<dependency>
@@ -200,24 +202,7 @@
     <version>2.0.4.RELEASE</version>
 </dependency>
 
-<!-- =============================测试=============================== -->
-	<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
-	<dependency>
-	    <groupId>org.springframework.boot</groupId>
-	    <artifactId>spring-boot-starter-test</artifactId>
-	    <version>2.0.2.RELEASE</version>
-	    <scope>test</scope>
-	</dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>4.3.6.RELEASE</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version> 4.12</version>
-    </dependency>
+
 
       <dependency>
       	<groupId>org.springframework.boot</groupId>
@@ -235,14 +220,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                      <!--fork :  如果没有该项配置，这个devtools不会起作用，即应用不会restart -->
-                    <fork>true</fork>
-                    <executable>true</executable> 
-                    <addResources>true</addResources>
-                </configuration>
-    
-                
             </plugin>
 			<plugin>
 			

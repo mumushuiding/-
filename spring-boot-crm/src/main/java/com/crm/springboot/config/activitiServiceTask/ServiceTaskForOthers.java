@@ -20,6 +20,7 @@ import com.crm.springboot.pojos.process.AddMarksForProcess;
 import com.crm.springboot.pojos.process.DeleteMarkForProcess;
 import com.crm.springboot.pojos.process.DeleteMarksByOverTimeForProcess;
 import com.crm.springboot.pojos.process.DeleteUserForProcess;
+import com.crm.springboot.pojos.process.DisableUserForProcess;
 import com.crm.springboot.pojos.process.GroupManagerForProcess;
 import com.crm.springboot.pojos.process.UpdateMarkForProcess;
 import com.crm.springboot.pojos.user.DepartmentLevel;
@@ -64,18 +65,24 @@ public class ServiceTaskForOthers implements JavaDelegate{
 		case ProcessType.BUSINESSTYPE_DELETEUSER:
 			deleteUser(aPojo);
 			break;
+		case ProcessType.BUSINESSTYPE_DISABLEUSER:
+			disableUser(aPojo);
+			break;
 		case ProcessType.BUSINESSTYPE_DELETEMARK:
 			deleteMark(aPojo);
 			break;
 		case ProcessType.BUSINESSTYPE_ADDDEPARTMENT:
 			addDepartment(aPojo);
 			break;
+		
 		default:
 			break;
 		}
 	}
    
-   private void addDepartment(AbstractProcessPojo aPojo) {
+  
+
+private void addDepartment(AbstractProcessPojo aPojo) {
 	    AddDeptForProcess pojo=(AddDeptForProcess)aPojo;
 	    
 		//跟添加部门相关的表有info_dept(部门信息),info_dept_identitylink(部门层级关系),info_dept_type(部门类型)
@@ -128,7 +135,18 @@ private void deleteMark(AbstractProcessPojo aPojo) {
 		}
 
 	}
-
+private void disableUser(AbstractProcessPojo aPojo) {
+	DisableUserForProcess pojo=(DisableUserForProcess)aPojo;
+	if(pojo.getUsers().size()==0) return ;
+	String[] ids=new String[pojo.getUsers().size()];
+	for (int i=0;i<pojo.getUsers().size();i++) {
+		
+		ids[i]=String.valueOf(pojo.getUsers().get(i).getId());
+		System.out.println("********************删除："+pojo.getUsers().get(i).getId());
+	}
+	userService.disableUsersByUserIds(ids);
+	
+}
 private void deleteUser(AbstractProcessPojo aPojo) {
 		DeleteUserForProcess pojo=(DeleteUserForProcess)aPojo;
 		if(pojo.getUsers().size()==0) return ;

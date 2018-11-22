@@ -32,6 +32,7 @@ public interface UserMapper extends BaseMapper<User> {
 	List<User> selectAllUser();
 	List<User> selectUserAsResultType(HashMap<String, Object> params);
 	void deleteUsersByUserIds(String[] ids);
+	void disableUsersByUserIds(String[] ids);
 	List<User> selectAllUserWithHashMap(HashMap<String, Object> params);
 	
 	String selectUserIdByPhone(String phone);
@@ -90,4 +91,5 @@ public interface UserMapper extends BaseMapper<User> {
 	void saveDeptIdentityLink(DeptIdentityLink deptIdentityLink);
 	void saveDeptIdentityLinkWithHashMap(HashMap<String, Object> params);
 	List<String> selectDistinctFirstDeptNames(HashMap<String, Object> params);
+	
 }

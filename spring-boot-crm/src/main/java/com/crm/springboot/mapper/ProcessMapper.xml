@@ -304,10 +304,11 @@
   	</where>
   </select>
   <select id="selectUsersWhoUnsubmittedProcess" parameterType="hashmap" resultType="user">
-  	select * from info_user
+  	select * from info_user 
   	<where>
+	    retire=0 
   	    <if test="userId!=null and userId!=''">
-  	    	id=#{userId}
+  	    	and id=#{userId}
   	    </if>
   		<if test="titleLike!=null and titleLike!=''">
   		  <bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>
@@ -335,8 +336,9 @@
   <select id="selectAllUsersWhoUnsubmittedProcess" parameterType="hashmap" resultMap="com.crm.springboot.mapper.UserMapper.userWithDeptResultMap">
   	select * from info_user
   	<where>
+  	    retire=0
   	    <if test="userId!=null and userId!=''">
-  	    	id=#{userId}
+  	    	and id=#{userId}
   	    </if>
   		<if test="titleLike!=null and titleLike!=''">
   		  <bind name="pattern" value="'%'+_parameter.titleLike+'%'"/>

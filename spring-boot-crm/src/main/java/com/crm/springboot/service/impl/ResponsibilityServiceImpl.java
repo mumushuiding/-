@@ -895,6 +895,7 @@ public class ResponsibilityServiceImpl implements ResponsibilityService{
 		  params.put("completed", "1");
 		  double currentNum=processService.selectCountProcess(params);
 		  params.remove("completed");
+		  //System.out.println("total:"+total+",current:"+currentNum+",rate:"+currentNum/total);
 		  if(currentNum/total>rate) return true;
 		  
 		return false;

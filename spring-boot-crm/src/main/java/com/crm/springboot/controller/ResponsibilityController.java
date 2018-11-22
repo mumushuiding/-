@@ -641,11 +641,17 @@ public class ResponsibilityController {
 	  params.put("startDate", DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(date)));
 	  params.put("endDate",DateUtil.formatDefaultDate(date));
 	  
-	 
-	  params.put("postNameLike", postNameLike);
+	  if("项目舞台负责人".equals(postNameLike)){
+		  params.put("xmwt", group.split(","));
+		  System.out.println("*****************xmwt="+group.split(","));
+	  }else {
+		  params.put("postNameLike", postNameLike);
+	  }
+	  
 	  params.put("limitClause", "0,"+total);
 	  params.put("checked", "1");
 	  // List<Mark> marks=responsibilityService.selectTotalMarkAndUser(params);
+	  System.out.println("*******************总分**********");
 	  List<Mark> marks=responsibilityService.selectTotalMarkWithAllUser(params);
 	  if(marks.size()==0){
 		  date=DateUtil.addYears(date, -1);
@@ -689,7 +695,13 @@ public class ResponsibilityController {
       
       params.put("startDate", startDate);
 	  params.put("endDate",endDate);
-	  if(posts!=null && posts!="")params.put("postNames", posts.split(","));
+	  if("项目舞台负责人".equals(posts)){
+		 params.put("xmwt", groups.split(","));
+	  }else {
+		 if(posts!=null && posts!="")params.put("postNames", posts.split(","));
+	  }
+
+	 
 	  params.put("checked", "1");
 	  List<Mark> marks=null;
 	  

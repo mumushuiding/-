@@ -137,8 +137,9 @@
     						    			<div class="FlexRow">
     						    			    <div class="FlexItem FlexItem-md-2"><p id="operate">操作</p></div>
     						    				<div class="FlexItem FlexItem-md-7"><p>项目内容</p></div>
-    						    				<div class="FlexItem FlexItem-md-8"><p>进展情况</p></div>
-    						    				<div class="FlexItem FlexItem-md-6"><p>加减分原因</p></div>
+    						    				<div class="FlexItem FlexItem-md-7"><p>进展情况</p></div>
+    						    				<div class="FlexItem FlexItem-md-2"><p>id</p></div>
+    						    				<div class="FlexItem FlexItem-md-5"><p>加减分原因</p></div>
     						    				<div class="FlexItem FlexItem-md-2"><p>加减分</p></div>
     						    			</div>
     						    		
@@ -165,13 +166,16 @@
 	    						    				<div class="FlexItem FlexItem-md-7">
 	    						    				    <textarea  th:text="${p.projectContent}" readonly="true"  class="form-control" style="background:none;border:none;"></textarea>
 	    						    				</div>
-	    						    				<div class="FlexItem FlexItem-md-8" >
+	    						    				<div class="FlexItem FlexItem-md-7" >
 	    						    					<textarea  th:text="${p.progress}" readonly="true"  class="form-control" style="background:none;border:none;"></textarea>
 	    						    				</div>
-	    						    				<div class="FlexItem FlexItem-md-8">
+	    						    				<div class="FlexItem FlexItem-md-9">
 	    						    				    <div class="FlexColumn">
 	    						    				    	 <div class="FlexRow" th:each="m,mStat:${p.marks}">
-	    						    				    	    <div class="FlexItem FlexItem-md-20">
+	    						    				    	   <div class="FlexItem FlexItem-md-5">
+	    						    					             <p th:text="${m.markId}"></p>
+	    						    				             </div>
+	    						    				    	    <div class="FlexItem FlexItem-md-15">
 	    						    					             <textarea readonly="true" class="form-control" style="background:none;border:none;" rows="" cols=""  th:text="${m.accordingly}"></textarea>
 	    						    				             </div>
 	    						    				             <div class="FlexItem FlexItem-md-5">

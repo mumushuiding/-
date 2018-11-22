@@ -1,6 +1,8 @@
 package com.crm.springboot.controller;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.crm.springboot.pojos.Action;
@@ -65,7 +68,7 @@ public class SysPowerController {
 	}
 
 	@RequestMapping("/{location}/{purpose}")
-	public String Location(@PathVariable String location,@PathVariable String purpose,Model model,HttpSession session){
+	public String Location(@PathVariable String location,@PathVariable String purpose,Model model,HttpSession session,@RequestParam(required=false) String username){
 		
 		//更新Action
 		if("updateActionForm".equals(location)){
@@ -94,6 +97,12 @@ public class SysPowerController {
 		
         if("userList".equals(location)){
     		model.addAttribute("taskType", purpose);
+    		try {
+				if(username!=null)model.addAttribute("username", URLDecoder.decode(username, "utf-8"));
+			} catch (UnsupportedEncodingException e) {
+				
+				e.printStackTrace();
+			}
     	}
     	
 

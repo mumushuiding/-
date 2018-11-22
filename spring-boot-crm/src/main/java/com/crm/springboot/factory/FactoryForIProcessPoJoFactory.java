@@ -17,6 +17,9 @@ public  class  FactoryForIProcessPoJoFactory implements IFactoryForIProcessPojoF
 		case ProcessType.BUSINESSTYPE_DELETEUSER:
 			factory=new DeleteUserFactoryForProcess();
 			break;
+		case ProcessType.BUSINESSTYPE_DISABLEUSER:
+			factory=new DisableUserFactoryForProcess();
+			break;
 		case ProcessType.BUSINESSTYPE_DELETEMARKSBYOVERTIME:
 			factory=new DeleteMarksByOverTimeFactoryForProcess();
 			break;
@@ -29,9 +32,11 @@ public  class  FactoryForIProcessPoJoFactory implements IFactoryForIProcessPojoF
 		case ProcessType.BUSINESSTYPE_DELETEMARK:
 			factory=new DeleteMarkFactoryForProcess();
 			break;
+		
 		case ProcessType.BUSINESSTYPE_ADDDEPARTMENT:
 			factory=new AddDepartmentFacotoryForProcess();
 			break;
+			
 		default:
 			break;
 		}

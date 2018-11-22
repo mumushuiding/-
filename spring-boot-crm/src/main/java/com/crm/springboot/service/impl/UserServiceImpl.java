@@ -1,5 +1,7 @@
 package com.crm.springboot.service.impl;
 
+import static org.mockito.Matchers.anyCollection;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.crm.springboot.mapper.UserMapper;
 import com.crm.springboot.pojos.GroupManager;
@@ -132,7 +136,11 @@ public class UserServiceImpl implements UserService{
 		userMapper.deleteUsersByUserIds(ids);
 		
 	}
-
+	@Override
+	public void disableUsersByUserIds(String[] ids) {
+		userMapper.disableUsersByUserIds(ids);
+		
+	}
 
 	@Override
 	public String[] getDeptNames(User user) {
@@ -634,6 +642,21 @@ public class UserServiceImpl implements UserService{
 		this.saveDeptIdentityLinkWithHashMap(params);
 		
 	}
+
+	@Override
+	public String getDeptName(User user) {
+		List<UserLinkDept> depts = user.getUserLinkDepts();
+		if(!CollectionUtils.isEmpty(depts)) {
+			if(depts.size()==1) {
+				 return depts.get(0).getFirstLevel().getName();
+			}else {
+				return depts.get(0).getSecondLevel().getName();
+			}
+		}
+		return "";
+	}
+
+
 
 
 

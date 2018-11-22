@@ -33,10 +33,10 @@
 	</where>
 </select>
    <sql id="User_Column_List" >  
-    id,loginname,phone,username,email,sex,postId,avatar,position
+    id,loginname,phone,username,email,sex,postId,avatar,position,retire
   </sql>
   <sql id="User_Column_List1" >  
-    id,phone,username
+    id,phone,username,retire
   </sql>   
   <insert id="save" parameterType="user" keyProperty="id" useGeneratedKeys="true">
     INSERT INTO info_user
@@ -171,6 +171,12 @@
   		#{id}
   	</foreach>
   </delete>
+  <update id="disableUsersByUserIds" parameterType="int[]">
+  	update info_user set retire=1 where id in 
+  	<foreach collection="array" item="id" index="no" separator="," open="(" close=")">
+  		#{id}
+  	</foreach>
+  </update>
 <!-- =================================部门分类================================================================== -->
 <resultMap type="deptType" id="deptTypeResultMap">
     <id property="id" column="id"/>

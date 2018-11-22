@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * 该注解指定项目为springboot,由此类当作程序入口自动装备web依赖环境
+ * 该注解指定项目为springboot,由此类当作程序入口自动装备web依赖环境//
  * @author Administrator
  *
  */

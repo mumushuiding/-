@@ -728,6 +728,8 @@ for(x in groups){
     
     // var groups=["第一考核组","第二考核组","第三考核组","第四考核组"];
      var groups=[[${assessGroups}]];
+     //var posts=["中层","项目舞台负责人","普通员工"];
+     //var total=[5,5,10];
      var posts=["中层","普通员工"];
      var total=[5,10];
      
@@ -735,12 +737,15 @@ for(x in groups){
      getData();
 
      function getData(){
-       
+       //
         $('#month').html('');
         for(x in posts){
             if(posts[x]=='普通员工'){
             
             	$('#month').append('<div class="tit"><p>工作人员'+[[${year}]]+'年一线考核加减分排行（累计）<a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike='+posts[x]+'" style="color:red;float:right;" >》》更多&nbsp;&nbsp;&nbsp;</a></p></div>')
+            }
+            if(posts[x]=='项目舞台负责人'){
+            	$('#month').append('<div class="tit"><p>"项目舞台"负责人'+[[${year}]]+'年一线考核加减分排行（累计）<a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike='+posts[x]+'" style="color:red;float:right;" >》》更多&nbsp;&nbsp;&nbsp;</a></p></div>')
             }
         	if(posts[x]=='中层'){
             	$('#month').append('<div class="tit"><p>中层干部'+[[${year}]]+'年一线考核加减分排行（累计）<a href="/responsibility/rankList/month?group=第一考核组&amp;postNameLike='+posts[x]+'" style="color:red;float:right;" >》》更多&nbsp;&nbsp;&nbsp;</a></p></div>')
@@ -753,12 +758,13 @@ for(x in groups){
         	}
         	
         }
+        //项目舞台负责人
         
 
      }
      
      function getDataForEachGroup(a,b){
-     
+     		 console.log('*****************'+groups[b]);
      	       //ajax
 		       $.ajax({
 				  type: 'POST',

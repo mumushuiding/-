@@ -24,6 +24,9 @@ public class ProcessType {
 	public static final String BUSINESSTYPE_DELETEUSER="deleteUser";
 	public static final String TITLE_DELETEUSER="删除用户";
 	
+	public static final String BUSINESSTYPE_DISABLEUSER="disableUser";
+	public static final String TITLE_DISABLEUSER="离退用户设置";
+	
 	public static final String BUSINESSTYPE_DELETEMARKSBYOVERTIME="deleteMarksByOverTime";
 	public static final String TITLE_DELETEMARKSBYOVERTIME="删除超时扣分申请";
 	

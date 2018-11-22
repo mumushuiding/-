@@ -40,6 +40,8 @@ import com.crm.springboot.pojos.ProcessEntity;
 import com.crm.springboot.pojos.assess.Assessment;
 import com.crm.springboot.pojos.assess.Evaluation;
 import com.crm.springboot.pojos.assess.EvaluationForExport;
+import com.crm.springboot.pojos.assess.Mark;
+import com.crm.springboot.pojos.assess.MarkForExport;
 import com.crm.springboot.pojos.user.Dept;
 import com.crm.springboot.pojos.user.DeptIdentityLink;
 import com.crm.springboot.pojos.user.DeptType;
@@ -78,7 +80,64 @@ public class FileController {
 		
 		return "/file/"+var1;
 	}
+	/**
+	 * *******************下载总分
+	 * @throws UnsupportedEncodingException *************
+	 */
+	@RequestMapping("/export/totalMark")
+	public ResponseEntity<byte[]> exportTotalMark(
+			@RequestParam(required=false) String startDate,
+			@RequestParam(required=false)  String endDate,
+			@RequestParam(required=false)  String posts,
+			@RequestParam(required=false)  String groups) throws UnsupportedEncodingException{
+		HttpHeaders headers=new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		//下载显示的文件名，解决中文名称乱码问题
+		String filename="导出.xls";
+		String downloadFileName=new String(filename.getBytes("UTF-8"),"ISO-8859-1");
+		//通知浏览器以attachment(下载方式）打开
+		headers.setContentDispositionFormData("attachment", downloadFileName);
 
+		  //时间段
+		  Date date=new Date();
+		  startDate=startDate==null?DateUtil.formatDefaultDate(DateUtil.getFirstDayOfYear(date)):startDate;
+		  endDate=endDate==null?DateUtil.formatDefaultDate(DateUtil.getLastDayOfYear(date)):endDate;
+	      
+		  //获取考核组下的所有二级部门和一级部门id,并将它们以字符串数组形式存入哈希表
+		  HashMap<String, Object> params=null;
+		 
+		  if (groups!=null&&!"".equals(groups)) {
+			  params=sysPowerService.getDepartmentsWithGroupname(groups, "考核组");
+		  }else {
+			  params=new HashMap<String, Object>();
+		 }
+	      
+	      params.put("startDate", startDate);
+		  params.put("endDate",endDate);
+		  if("项目舞台负责人".equals(posts)){
+			 params.put("xmwt", groups.split(","));
+		  }else {
+			 if(posts!=null && posts!="")params.put("postNames", posts.split(","));
+		  }
+		  params.put("checked", "1");
+		  List<Mark> result=responsibilityService.selectTotalMarkWithAllUser(params);
+		  List<Object> list=new ArrayList<>();
+		  for (Mark mark : result) {
+			if(mark.getUser().getRetire()==1) {
+				System.out.println("已经离退");
+				continue;
+			}else {
+				System.out.println("未离退");
+			}
+			MarkForExport export=new MarkForExport();
+			export.setDeptname(userService.getDeptName(mark.getUser()));
+			export.setTotalMark(mark.getTotalMark());
+			export.setUsername(mark.getUser().getUsername());
+			list.add(export);
+		  }
+		  return new ResponseEntity<byte[]>(ExcelUtils.exportDataToExcelAsByteArray(list, MarkForExport.getColnames()),headers,HttpStatus.CREATED);
+		
+	}
 	/**
 	 * *********************************半年考核和年度考核下载
 	 * @throws UnsupportedEncodingException **************************
